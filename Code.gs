@@ -746,31 +746,173 @@ function adminGetAllUsers(token) {
 function triggerSOS(token, lat, lng) {
   try {
     const session = _auth(token);
+    const sos = _getSOSSheets();
+    const latNum = Number(lat);
+    const lngNum = Number(lng);
 
-    const alerts = _readSheet('SOSAlerts', {
-      ReporterEmail: ['ReporterEmail', 'EmailOptional', 'Email'],
-      Lat: ['Lat', 'Latitude'],
-      Lng: ['Lng', 'Longitude'],
-      Status: ['Status'],
-      WhatsAppLink: ['WhatsAppLink', 'WhatsAppURL']
-    });
+    if (isNaN(latNum) || latNum < -90 || latNum > 90) {
+      throw new Error('Valid latitude is required.');
+    }
 
-    const row = new Array(alerts.headers.length).fill('');
-    row[alerts.idx.ReporterEmail] = session.email;
-    row[alerts.idx.Lat] = Number(lat) || 0;
-    row[alerts.idx.Lng] = Number(lng) || 0;
-    row[alerts.idx.Status] = 'Open';
-    row[alerts.idx.WhatsAppLink] = '';
+    if (isNaN(lngNum) || lngNum < -180 || lngNum > 180) {
+      throw new Error('Valid longitude is required.');
+    }
 
-    alerts.sheet.appendRow(row);
+    const row = new Array(sos.alerts.headers.length).fill('');
+    row[sos.alerts.idx.ReporterEmail] = _norm(session.email);
+    row[sos.alerts.idx.Lat] = latNum;
+    row[sos.alerts.idx.Lng] = lngNum;
+    row[sos.alerts.idx.Status] = 'Open';
+    row[sos.alerts.idx.WhatsAppLink] = _buildSOSWhatsAppLink(sos.settings, session.email, latNum, lngNum);
 
-    return { success: true };
+    sos.alerts.sheet.appendRow(row);
+
+    const alertRowIndex = sos.alerts.rows.length + 2;
+
+    return {
+      success: true,
+      alert: {
+        SOSID: _deriveSOSID(sos.alerts, row, alertRowIndex),
+        ReporterEmail: _norm(session.email),
+        Lat: latNum,
+        Lng: lngNum,
+        Status: 'Open',
+        WhatsAppLink: row[sos.alerts.idx.WhatsAppLink]
+      }
+    };
   } catch (e) {
     throw new Error(_errMsg('triggerSOS', e));
   }
 }
 
+function getSOSAlerts(token) {
+  try {
+    const session = _auth(token);
+    const sos = _getSOSSheets();
+    const permissions = _getSOSPermissions(session, sos);
+    const email = _norm(session.email);
 
+    const alerts = sos.alerts.rows
+      .map((row, i) => {
+        const rowIndex = i + 2;
+        return {
+          SOSID: _deriveSOSID(sos.alerts, row, rowIndex),
+          ReporterEmail: _norm(row[sos.alerts.idx.ReporterEmail]),
+          Lat: Number(row[sos.alerts.idx.Lat]) || 0,
+          Lng: Number(row[sos.alerts.idx.Lng]) || 0,
+          Status: String(row[sos.alerts.idx.Status] || '').trim() || 'Open',
+          WhatsAppLink: String(row[sos.alerts.idx.WhatsAppLink] || '').trim()
+        };
+      })
+      .filter(alert => {
+        if (permissions.canViewAllAlerts) {
+          return true;
+        }
+        return alert.ReporterEmail === email;
+      })
+      .sort((a, b) => String(b.SOSID).localeCompare(String(a.SOSID)));
+
+    return {
+      success: true,
+      canViewAllAlerts: permissions.canViewAllAlerts,
+      canViewSOSMedia: permissions.canViewSOSMedia,
+      alerts: alerts
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getSOSAlerts', e));
+  }
+}
+
+function getSOSMedia(token, sosID) {
+  try {
+    const session = _auth(token);
+    const normalizedSOSID = String(sosID || '').trim();
+
+    if (!normalizedSOSID) {
+      throw new Error('SOSID is required.');
+    }
+
+    const sos = _getSOSSheets();
+    const permissions = _getSOSPermissions(session, sos);
+    const alert = _findSOSAlertByID(sos, normalizedSOSID);
+
+    if (!alert) {
+      throw new Error('SOS alert not found.');
+    }
+
+    const isOwner = _norm(alert.ReporterEmail) === _norm(session.email);
+    if (!permissions.canViewAllAlerts && !isOwner) {
+      throw new Error('Unauthorized to access this SOS alert.');
+    }
+
+    if (!permissions.canViewSOSMedia && !isOwner) {
+      throw new Error('Unauthorized to view SOS media for this alert.');
+    }
+
+    const media = sos.media.rows
+      .map(row => ({
+        SOSID: String(row[sos.media.idx.SOSID] || '').trim(),
+        MediaType: _normalizeSOSMediaType(row[sos.media.idx.MediaType]),
+        FileURL: String(row[sos.media.idx.FileURL] || '').trim()
+      }))
+      .filter(item => item.SOSID === normalizedSOSID && item.FileURL);
+
+    return {
+      success: true,
+      media: media
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getSOSMedia', e));
+  }
+}
+
+function saveSOSMedia(token, sosID, mediaType, fileURL) {
+  try {
+    const session = _auth(token);
+    const normalizedSOSID = String(sosID || '').trim();
+    const normalizedFileURL = String(fileURL || '').trim();
+    const normalizedMediaType = _normalizeSOSMediaType(mediaType);
+
+    if (!normalizedSOSID) {
+      throw new Error('SOSID is required.');
+    }
+
+    if (!normalizedFileURL) {
+      throw new Error('FileURL is required.');
+    }
+
+    const sos = _getSOSSheets();
+    const permissions = _getSOSPermissions(session, sos);
+    const alert = _findSOSAlertByID(sos, normalizedSOSID);
+
+    if (!alert) {
+      throw new Error('SOS alert not found.');
+    }
+
+    const isOwner = _norm(alert.ReporterEmail) === _norm(session.email);
+    if (!permissions.canViewAllAlerts && !isOwner) {
+      throw new Error('Unauthorized to attach media to this SOS alert.');
+    }
+
+    const row = new Array(sos.media.headers.length).fill('');
+    row[sos.media.idx.SOSID] = normalizedSOSID;
+    row[sos.media.idx.MediaType] = normalizedMediaType;
+    row[sos.media.idx.FileURL] = normalizedFileURL;
+
+    sos.media.sheet.appendRow(row);
+
+    return {
+      success: true,
+      media: {
+        SOSID: normalizedSOSID,
+        MediaType: normalizedMediaType,
+        FileURL: normalizedFileURL
+      }
+    };
+  } catch (e) {
+    throw new Error(_errMsg('saveSOSMedia', e));
+  }
+}
 
 /* =====================================================
    GOVERNANCE VOTING
@@ -1244,6 +1386,154 @@ function _getMessagingSheets() {
       SentAt: ['SentAt']
     })
   };
+}
+
+function _getSOSSheets() {
+  return {
+    alerts: _readSheet('SOSAlerts', {
+      ReporterEmail: ['ReporterEmail', 'EmailOptional', 'Email'],
+      Lat: ['Lat', 'Latitude'],
+      Lng: ['Lng', 'Longitude'],
+      Status: ['Status'],
+      WhatsAppLink: ['WhatsAppLink', 'WhatsAppURL']
+    }),
+    media: _readSheet('SOSMedia', {
+      SOSID: ['SOSID', 'AlertID'],
+      MediaType: ['MediaType', 'Type'],
+      FileURL: ['FileURL', 'URL', 'MediaURL']
+    }),
+    settings: _readSheet('Settings', {
+      Key: ['Key', 'SettingKey'],
+      Value: ['Value', 'SettingValue']
+    }),
+    access: _readSheet('Access', {
+      EmailOptional: ['EmailOptional', 'Email'],
+      Role: ['Role', 'RoleName']
+    }),
+    roles: _readSheet('Roles', {
+      Email: ['Email', 'EmailOptional'],
+      RoleName: ['RoleName', 'Role'],
+      IsAdult: ['IsAdult', 'Adult']
+    })
+  };
+}
+
+function _deriveSOSID(alertsCtx, row, rowIndex) {
+  const sosIndex = alertsCtx.headers.indexOf('SOSID');
+  const fromHeader = sosIndex !== -1 ? String(row[sosIndex] || '').trim() : '';
+  return fromHeader || ('SOS-' + rowIndex);
+}
+
+function _buildSOSWhatsAppLink(settingsCtx, reporterEmail, lat, lng) {
+  const settingsMap = settingsCtx.rows.reduce((acc, row) => {
+    const key = _norm(row[settingsCtx.idx.Key]);
+    if (!key) {
+      return acc;
+    }
+    acc[key] = String(row[settingsCtx.idx.Value] || '').trim();
+    return acc;
+  }, {});
+
+  const emergencyNumber = _pickSetting(settingsMap, [
+    'soswhatsappnumber',
+    'whatsappnumber',
+    'emergencywhatsappnumber',
+    'sosnumber'
+  ]);
+
+  if (!emergencyNumber) {
+    return '';
+  }
+
+  const template = _pickSetting(settingsMap, [
+    'soswhatsappmessage',
+    'sosmessage',
+    'emergencymessage'
+  ]) || 'Emergency SOS from {email}. Location: {lat}, {lng}';
+
+  const message = template
+    .replace(/\{email\}/gi, reporterEmail)
+    .replace(/\{lat\}/gi, String(lat))
+    .replace(/\{lng\}/gi, String(lng));
+
+  const number = String(emergencyNumber).replace(/[^\d]/g, '');
+  if (!number) {
+    return '';
+  }
+
+  return 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
+}
+
+function _pickSetting(settingsMap, aliases) {
+  for (let i = 0; i < aliases.length; i += 1) {
+    const alias = _norm(aliases[i]);
+    if (!alias) {
+      continue;
+    }
+    if (Object.prototype.hasOwnProperty.call(settingsMap, alias) && settingsMap[alias]) {
+      return settingsMap[alias];
+    }
+  }
+  return '';
+}
+
+function _getSOSPermissions(session, sos) {
+  const email = _norm(session.email);
+  const accessRole = sos.access.rows.reduce((found, row) => {
+    if (found) return found;
+    if (_norm(row[sos.access.idx.EmailOptional]) === email) {
+      return String(row[sos.access.idx.Role] || '').trim();
+    }
+    return '';
+  }, '');
+
+  const roleRows = sos.roles.rows.filter(row => _norm(row[sos.roles.idx.Email]) === email);
+
+  const hasPrivilegedRole = ['admin', 'security', 'governance', 'chair'].some(name => _norm(accessRole).indexOf(name) !== -1) ||
+    roleRows.some(row => {
+      const roleName = _norm(row[sos.roles.idx.RoleName]);
+      return ['admin', 'security', 'governance', 'chair'].some(name => roleName.indexOf(name) !== -1);
+    });
+
+  const isAdult = !roleRows.length || roleRows.some(row => {
+    const normalized = String(row[sos.roles.idx.IsAdult] || '').toLowerCase().trim();
+    if (!normalized) return true;
+    return normalized === 'true' || normalized === 'yes' || normalized === '1';
+  });
+
+  return {
+    canViewAllAlerts: hasPrivilegedRole,
+    canViewSOSMedia: hasPrivilegedRole || isAdult
+  };
+}
+
+function _findSOSAlertByID(sos, sosID) {
+  const normalizedSOSID = String(sosID || '').trim();
+  if (!normalizedSOSID) {
+    return null;
+  }
+
+  const mapped = sos.alerts.rows.map((row, i) => {
+    const rowIndex = i + 2;
+    return {
+      SOSID: _deriveSOSID(sos.alerts, row, rowIndex),
+      ReporterEmail: _norm(row[sos.alerts.idx.ReporterEmail]),
+      Lat: Number(row[sos.alerts.idx.Lat]) || 0,
+      Lng: Number(row[sos.alerts.idx.Lng]) || 0,
+      Status: String(row[sos.alerts.idx.Status] || '').trim() || 'Open',
+      WhatsAppLink: String(row[sos.alerts.idx.WhatsAppLink] || '').trim()
+    };
+  });
+
+  return mapped.find(item => item.SOSID === normalizedSOSID) || null;
+}
+
+function _normalizeSOSMediaType(value) {
+  const normalized = String(value || '').toLowerCase().trim();
+  if (normalized === 'photo' || normalized === 'image') return 'photo';
+  if (normalized === 'video') return 'video';
+  if (normalized === 'audio' || normalized === 'voice') return 'audio';
+  throw new Error('Invalid media type. Use photo, video, or audio.');
 }
 
 function _mapHistoryRow(historyCtx, row) {

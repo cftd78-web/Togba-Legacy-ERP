@@ -186,14 +186,43 @@ Financial Distribution
 
 <div id="page-sos" class="page p-6">
 
-<h2 class="text-2xl font-bold mb-4">Emergency SOS</h2>
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-2xl font-bold">Emergency SOS</h2>
+<button onclick="loadSOSAlerts()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+</div>
 
-<button onclick="triggerSOS()"
-class="bg-red-600 text-white p-4 rounded-xl font-bold w-full">
+<div id="sos-error" class="hidden text-sm text-red-600 mb-3"></div>
+<div id="sos-status" class="hidden text-sm text-blue-700 mb-3"></div>
 
-Send SOS Alert
+<div class="grid gap-4 lg:grid-cols-3">
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
+<button id="btn-trigger-sos" onclick="triggerSOS()" class="bg-red-600 text-white p-4 rounded-xl font-bold w-full">Send SOS Alert</button>
+<p class="text-xs text-slate-500 mt-3">This captures your current location and creates an emergency record.</p>
+<div id="sos-whatsapp-action" class="mt-3"></div>
+</div>
 
-</button>
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Alert History</h3>
+<div id="sos-alert-history" class="space-y-2"></div>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-sm font-bold text-slate-500 uppercase">SOS Media References</h3>
+<span id="sos-media-title" class="text-xs text-slate-500">Select an alert to view media</span>
+</div>
+<div class="grid gap-3 md:grid-cols-4 mb-4">
+<select id="sos-media-type" class="p-3 rounded-xl border border-slate-200">
+<option value="photo">photo</option>
+<option value="video">video</option>
+<option value="audio">audio</option>
+</select>
+<input id="sos-media-url" type="url" placeholder="https://example.com/media" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+<button id="btn-save-sos-media" onclick="saveSOSMediaRef()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Save Media Link</button>
+</div>
+<div id="sos-media-list" class="space-y-2"></div>
+</div>
+</div>
 
 </div>
 
@@ -330,6 +359,8 @@ let selectedChannelID = ""
 let timelineLoaded = false
 let voteDataLoaded = false
 let votePermissions = {canCreateVote:false, canCastBallot:false}
+let sosAlerts = []
+let selectedSOSID = ""
 
 function isSessionExpiredError(err){
 const msg = String((err && err.message) || err || "")
@@ -400,6 +431,30 @@ el.innerText = message
 
 function setVoteError(message){
 const el = document.getElementById("vote-error")
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
+}
+
+function setSOSError(message){
+const el = document.getElementById("sos-error")
+if(!el) return
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
+}
+
+function setSOSStatus(message){
+const el = document.getElementById("sos-status")
+if(!el) return
 if(!message){
 el.classList.add("hidden")
 el.innerText = ""
@@ -516,6 +571,7 @@ if(page==="messages") loadUserChannels()
 if(page==="timeline") loadTimelineData()
 if(page==="finance") loadFinanceDashboard()
 if(page==="voting") loadVotes()
+if(page==="sos") loadSOSAlerts()
 }
 
 function loadFinanceDashboard(){
@@ -968,19 +1024,198 @@ renderUpcomingList([])
 .getTimelineData(token)
 }
 
-function triggerSOS(){
-if(!navigator.geolocation){
-alert("GPS not available")
+function loadSOSAlerts(){
+setSOSError("")
+setSOSStatus("")
+const history = document.getElementById("sos-alert-history")
+if(history && !history.innerHTML.trim()){
+history.innerHTML = "<div class='text-sm text-slate-500'>Loading SOS alerts...</div>"
+}
+google.script.run
+.withSuccessHandler(res=>{
+const data = res || {}
+sosAlerts = Array.isArray(data.alerts) ? data.alerts : []
+if(!selectedSOSID || !sosAlerts.some(a=>a.SOSID===selectedSOSID)){
+selectedSOSID = sosAlerts.length ? sosAlerts[0].SOSID : ""
+}
+renderSOSAlerts()
+if(selectedSOSID){
+loadSOSMedia(selectedSOSID)
+}else{
+renderSOSMedia([])
+renderSOSWhatsAppAction("")
+}
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
 return
 }
+setSOSError((err && err.message) || "Unable to load SOS alerts.")
+renderSOSAlerts()
+renderSOSMedia([])
+})
+.getSOSAlerts(token)
+}
 
-navigator.geolocation.getCurrentPosition(pos=>{
+function renderSOSAlerts(){
+const history = document.getElementById("sos-alert-history")
+if(!history) return
+if(!sosAlerts.length){
+history.innerHTML = "<div class='text-sm text-slate-500'>No SOS alerts available.</div>"
+return
+}
+history.innerHTML = sosAlerts.map(alert=>`
+<button onclick="selectSOSAlert('${escapeHtml(alert.SOSID)}')" class="w-full text-left border rounded-xl p-3 ${alert.SOSID===selectedSOSID ? 'border-red-300 bg-red-50' : 'border-slate-200 bg-white'}">
+<div class="flex items-center justify-between gap-2">
+<div>
+<div class="text-xs text-slate-500">${escapeHtml(alert.SOSID || '')}</div>
+<div class="font-semibold text-slate-800">${escapeHtml(alert.ReporterEmail || 'Unknown reporter')}</div>
+<div class="text-xs text-slate-600 mt-1">Lat: ${Number(alert.Lat||0).toFixed(5)} • Lng: ${Number(alert.Lng||0).toFixed(5)}</div>
+</div>
+<div class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700">${escapeHtml(alert.Status || 'Open')}</div>
+</div>
+</button>
+`).join("")
+}
+
+function selectSOSAlert(sosID){
+selectedSOSID = sosID
+renderSOSAlerts()
+const selected = sosAlerts.find(a=>a.SOSID===selectedSOSID)
+renderSOSWhatsAppAction((selected && selected.WhatsAppLink) || "")
+loadSOSMedia(selectedSOSID)
+}
+
+function renderSOSWhatsAppAction(link){
+const container = document.getElementById("sos-whatsapp-action")
+if(!container) return
+if(!link){
+container.innerHTML = "<div class='text-xs text-slate-500'>WhatsApp emergency action is not configured.</div>"
+return
+}
+container.innerHTML = `<button onclick="openSOSWhatsApp('${escapeHtml(link)}')" class="w-full bg-emerald-600 text-white p-3 rounded-xl font-semibold">Open WhatsApp Emergency Action</button>`
+}
+
+function openSOSWhatsApp(link){
+const href = String(link || "").trim()
+if(!href){
+setSOSError("WhatsApp link is not configured for this alert.")
+return
+}
+window.open(href, "_blank")
+}
+
+function loadSOSMedia(sosID){
+if(!sosID){
+renderSOSMedia([])
+return
+}
+const selected = sosAlerts.find(a=>a.SOSID===sosID)
+document.getElementById("sos-media-title").innerText = `Alert: ${sosID}`
+renderSOSWhatsAppAction((selected && selected.WhatsAppLink) || "")
 google.script.run
-.withSuccessHandler(()=>alert("SOS sent"))
-.withFailureHandler(onServerFailure)
+.withSuccessHandler(res=>{
+const media = (res && Array.isArray(res.media)) ? res.media : []
+renderSOSMedia(media)
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setSOSError((err && err.message) || "Unable to load SOS media.")
+renderSOSMedia([])
+})
+.getSOSMedia(token, sosID)
+}
+
+function renderSOSMedia(items){
+const list = document.getElementById("sos-media-list")
+if(!list) return
+if(!items || !items.length){
+list.innerHTML = "<div class='text-sm text-slate-500'>No media references found for this alert.</div>"
+return
+}
+list.innerHTML = items.map(item=>`
+<div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+<div class="text-xs uppercase text-slate-500">${escapeHtml(item.MediaType || 'media')}</div>
+<a href="${escapeHtml(item.FileURL || '#')}" target="_blank" class="text-sm text-blue-700 break-all underline">${escapeHtml(item.FileURL || '')}</a>
+</div>
+`).join("")
+}
+
+function saveSOSMediaRef(){
+if(!selectedSOSID){
+setSOSError("Select an SOS alert before saving media.")
+return
+}
+const btn = document.getElementById("btn-save-sos-media")
+const mediaType = document.getElementById("sos-media-type").value
+const fileURL = String(document.getElementById("sos-media-url").value || "").trim()
+if(!fileURL){
+setSOSError("A media URL is required.")
+return
+}
+btn.disabled = true
+btn.classList.add("opacity-60")
+setSOSError("")
+setSOSStatus("")
+google.script.run
+.withSuccessHandler(()=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+document.getElementById("sos-media-url").value = ""
+setSOSStatus("Media reference saved.")
+loadSOSMedia(selectedSOSID)
+})
+.withFailureHandler(err=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setSOSError((err && err.message) || "Unable to save SOS media.")
+})
+.saveSOSMedia(token, selectedSOSID, mediaType, fileURL)
+}
+
+function triggerSOS(){
+const btn = document.getElementById("btn-trigger-sos")
+if(!navigator.geolocation){
+setSOSError("GPS is not available on this device.")
+return
+}
+btn.disabled = true
+btn.classList.add("opacity-60")
+setSOSError("")
+setSOSStatus("Capturing location...")
+navigator.geolocation.getCurrentPosition(pos=>{
+setSOSStatus("Submitting SOS alert...")
+google.script.run
+.withSuccessHandler(()=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+setSOSStatus("SOS alert sent successfully.")
+loadSOSAlerts()
+})
+.withFailureHandler(err=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setSOSError((err && err.message) || "Unable to trigger SOS alert.")
+setSOSStatus("")
+})
 .triggerSOS(token,pos.coords.latitude,pos.coords.longitude)
 }, err=>{
-alert("Unable to get location: " + ((err && err.message) || "Unknown error"))
+btn.disabled = false
+btn.classList.remove("opacity-60")
+setSOSStatus("")
+setSOSError("Unable to get location: " + ((err && err.message) || "Unknown error"))
 }, {timeout:10000, enableHighAccuracy:true})
 }
 
