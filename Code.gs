@@ -204,6 +204,183 @@ function getFinanceData(token) {
 }
 
 /* =====================================================
+   TIMELINE (HISTORY + EVENTS)
+===================================================== */
+
+function getHistoryEvents(token) {
+  try {
+    _auth(token);
+
+    const history = _readSheet('History', {
+      Title: ['Title'],
+      EventDate: ['EventDate', 'Date'],
+      EventType: ['EventType', 'Type'],
+      Description: ['Description', 'Details']
+    });
+
+    const timelineEvents = _readSheet('Events', {
+      EventID: ['EventID', 'ID'],
+      Title: ['Title'],
+      EventDate: ['EventDate', 'Date'],
+      Recurrence: ['Recurrence', 'Repeat']
+    });
+
+    const now = new Date();
+
+    const historyRows = history.rows
+      .map(row => _mapHistoryRow(history, row))
+      .filter(item => item.EventDate)
+      .sort((a, b) => new Date(b.EventDate).getTime() - new Date(a.EventDate).getTime());
+
+    const pastEventRows = timelineEvents.rows
+      .map(row => _mapEventRow(timelineEvents, row))
+      .filter(item => {
+        if (!item.EventDate) {
+          return false;
+        }
+        const date = new Date(item.EventDate);
+        return !isNaN(date.getTime()) && date.getTime() < now.getTime() && !item.IsRecurring;
+      })
+      .map(item => ({
+        Title: item.Title,
+        EventDate: item.EventDate,
+        EventType: 'Event',
+        Description: item.Recurrence ? 'Recurrence: ' + item.Recurrence : ''
+      }));
+
+    return historyRows
+      .concat(pastEventRows)
+      .sort((a, b) => new Date(b.EventDate).getTime() - new Date(a.EventDate).getTime());
+  } catch (e) {
+    throw new Error(_errMsg('getHistoryEvents', e));
+  }
+}
+
+function getUpcomingEvents(token) {
+  try {
+    _auth(token);
+
+    const events = _readSheet('Events', {
+      EventID: ['EventID', 'ID'],
+      Title: ['Title'],
+      EventDate: ['EventDate', 'Date'],
+      Recurrence: ['Recurrence', 'Repeat']
+    });
+
+    const today = _startOfDay(new Date());
+
+    return events.rows
+      .map(row => _mapEventRow(events, row))
+      .map(item => {
+        const normalizedRecurrence = _normalizeRecurrence(item.Recurrence);
+        const nextOccurrence = _computeNextOccurrence(item.EventDate, normalizedRecurrence, today);
+        return {
+          EventID: item.EventID,
+          Title: item.Title,
+          EventDate: item.EventDate,
+          Recurrence: item.Recurrence,
+          RecurrenceNormalized: normalizedRecurrence,
+          NextOccurrence: nextOccurrence ? nextOccurrence.toISOString() : ''
+        };
+      })
+      .filter(item => item.NextOccurrence)
+      .sort((a, b) => new Date(a.NextOccurrence).getTime() - new Date(b.NextOccurrence).getTime());
+  } catch (e) {
+    throw new Error(_errMsg('getUpcomingEvents', e));
+  }
+}
+
+function getTimelineData(token) {
+  try {
+    _auth(token);
+
+    const historySheet = _readSheet('History', {
+      Title: ['Title'],
+      EventDate: ['EventDate', 'Date'],
+      EventType: ['EventType', 'Type'],
+      Description: ['Description', 'Details']
+    });
+
+    const eventSheet = _readSheet('Events', {
+      EventID: ['EventID', 'ID'],
+      Title: ['Title'],
+      EventDate: ['EventDate', 'Date'],
+      Recurrence: ['Recurrence', 'Repeat']
+    });
+
+    const now = new Date();
+    const today = _startOfDay(new Date());
+
+    const history = historySheet.rows
+      .map(row => _mapHistoryRow(historySheet, row))
+      .filter(item => item.EventDate)
+      .sort((a, b) => new Date(b.EventDate).getTime() - new Date(a.EventDate).getTime());
+
+    const eventRows = eventSheet.rows.map(row => _mapEventRow(eventSheet, row));
+
+    const historyWithPastEvents = history
+      .concat(eventRows
+        .filter(item => {
+          if (!item.EventDate) {
+            return false;
+          }
+          const date = new Date(item.EventDate);
+          return !isNaN(date.getTime()) && date.getTime() < now.getTime() && !item.IsRecurring;
+        })
+        .map(item => ({
+          Title: item.Title,
+          EventDate: item.EventDate,
+          EventType: 'Event',
+          Description: item.Recurrence ? 'Recurrence: ' + item.Recurrence : ''
+        })))
+      .sort((a, b) => new Date(b.EventDate).getTime() - new Date(a.EventDate).getTime());
+
+    const upcoming = eventRows
+      .map(item => {
+        const normalizedRecurrence = _normalizeRecurrence(item.Recurrence);
+        const nextOccurrence = _computeNextOccurrence(item.EventDate, normalizedRecurrence, today);
+        return {
+          EventID: item.EventID,
+          Title: item.Title,
+          EventDate: item.EventDate,
+          Recurrence: item.Recurrence,
+          RecurrenceNormalized: normalizedRecurrence,
+          NextOccurrence: nextOccurrence ? nextOccurrence.toISOString() : ''
+        };
+      })
+      .filter(item => item.NextOccurrence)
+      .sort((a, b) => new Date(a.NextOccurrence).getTime() - new Date(b.NextOccurrence).getTime());
+
+    const list = historyWithPastEvents
+      .map(item => ({
+        category: 'historical',
+        date: item.EventDate,
+        title: item.Title,
+        eventType: item.EventType,
+        recurrence: '',
+        description: item.Description || ''
+      }))
+      .concat(upcoming.map(item => ({
+        category: 'upcoming',
+        date: item.NextOccurrence,
+        title: item.Title,
+        eventType: 'Event',
+        recurrence: item.Recurrence,
+        description: ''
+      })))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    return {
+      historical: historyWithPastEvents,
+      upcoming: upcoming,
+      timeline: list
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getTimelineData', e));
+  }
+}
+
+/* =====================================================
    MESSAGING
 ===================================================== */
 
@@ -477,6 +654,103 @@ function _getMessagingSheets() {
       SentAt: ['SentAt']
     })
   };
+}
+
+function _mapHistoryRow(historyCtx, row) {
+  const title = String(row[historyCtx.idx.Title] || '').trim();
+  const eventType = String(row[historyCtx.idx.EventType] || '').trim();
+  const description = String(row[historyCtx.idx.Description] || '').trim();
+  const eventDate = _safeIsoDate(row[historyCtx.idx.EventDate]);
+
+  return {
+    Title: title,
+    EventDate: eventDate,
+    EventType: eventType,
+    Description: description
+  };
+}
+
+function _mapEventRow(eventCtx, row) {
+  const recurrence = String(row[eventCtx.idx.Recurrence] || '').trim();
+  const normalizedRecurrence = _normalizeRecurrence(recurrence);
+
+  return {
+    EventID: String(row[eventCtx.idx.EventID] || '').trim(),
+    Title: String(row[eventCtx.idx.Title] || '').trim(),
+    EventDate: _safeIsoDate(row[eventCtx.idx.EventDate]),
+    Recurrence: recurrence,
+    IsRecurring: normalizedRecurrence !== 'none' && normalizedRecurrence !== 'unsupported'
+  };
+}
+
+function _safeIsoDate(value) {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+  const dateValue = new Date(value);
+  if (isNaN(dateValue.getTime())) {
+    return '';
+  }
+  return dateValue.toISOString();
+}
+
+function _normalizeRecurrence(value) {
+  const normalized = String(value || '').toLowerCase().trim();
+  if (!normalized || normalized === 'none' || normalized === 'no' || normalized === 'once' || normalized === 'one-time') {
+    return 'none';
+  }
+  if (normalized.indexOf('day') !== -1) return 'daily';
+  if (normalized.indexOf('week') !== -1) return 'weekly';
+  if (normalized.indexOf('month') !== -1) return 'monthly';
+  if (normalized.indexOf('year') !== -1 || normalized.indexOf('annual') !== -1) return 'yearly';
+  return 'unsupported';
+}
+
+function _computeNextOccurrence(eventDateIso, recurrence, todayStart) {
+  if (!eventDateIso) {
+    return null;
+  }
+
+  const sourceDate = _startOfDay(new Date(eventDateIso));
+  if (isNaN(sourceDate.getTime())) {
+    return null;
+  }
+
+  if (recurrence === 'none') {
+    return sourceDate.getTime() >= todayStart.getTime() ? sourceDate : null;
+  }
+
+  if (recurrence === 'unsupported') {
+    return sourceDate.getTime() >= todayStart.getTime() ? sourceDate : null;
+  }
+
+  const next = new Date(sourceDate.getTime());
+  let guard = 0;
+
+  while (next.getTime() < todayStart.getTime() && guard < 1200) {
+    if (recurrence === 'daily') {
+      next.setDate(next.getDate() + 1);
+    } else if (recurrence === 'weekly') {
+      next.setDate(next.getDate() + 7);
+    } else if (recurrence === 'monthly') {
+      next.setMonth(next.getMonth() + 1);
+    } else if (recurrence === 'yearly') {
+      next.setFullYear(next.getFullYear() + 1);
+    }
+    guard += 1;
+  }
+
+  if (guard >= 1200) {
+    return null;
+  }
+
+  return next;
+}
+
+function _startOfDay(dateObj) {
+  const d = new Date(dateObj.getTime());
+  d.setHours(0, 0, 0, 0);
+  return d;
 }
 
 function _resolveAuthorizedChannel(messageCtx, email, channelID) {

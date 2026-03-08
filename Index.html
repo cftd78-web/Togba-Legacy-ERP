@@ -176,9 +176,27 @@ Send SOS Alert
 
 <div id="page-timeline" class="page p-6">
 
-<h2 class="text-2xl font-bold mb-4">Family Timeline</h2>
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-2xl font-bold">Family Timeline</h2>
+<button onclick="loadTimelineData()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+</div>
 
-<div id="timeline"></div>
+<div id="timeline-error" class="hidden text-sm text-red-600 mb-3"></div>
+
+<div class="grid gap-4 lg:grid-cols-3">
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Unified Timeline</h3>
+<div id="timeline-list" class="space-y-3"></div>
+</div>
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Historical</h3>
+<div id="timeline-history" class="space-y-3"></div>
+</div>
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Upcoming Events</h3>
+<div id="timeline-upcoming" class="space-y-3"></div>
+</div>
+</div>
 
 </div>
 
@@ -250,6 +268,7 @@ let token = ""
 let financeChartInstance = null
 let userChannels = []
 let selectedChannelID = ""
+let timelineLoaded = false
 
 function isSessionExpiredError(err){
 const msg = String((err && err.message) || err || "")
@@ -260,6 +279,7 @@ function resetToLogin(message){
 token = ""
 userChannels = []
 selectedChannelID = ""
+timelineLoaded = false
 document.getElementById("step-1").classList.remove("hidden")
 document.getElementById("step-2").classList.add("hidden")
 document.getElementById("view-app").classList.add("hidden")
@@ -293,6 +313,24 @@ return
 }
 el.classList.remove("hidden")
 el.innerText = message
+}
+
+function setTimelineError(message){
+const el = document.getElementById("timeline-error")
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
+}
+
+function formatDate(value){
+if(!value) return "Unknown date"
+const d = new Date(value)
+if(Number.isNaN(d.getTime())) return "Unknown date"
+return d.toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})
 }
 
 function handleOTP(){
@@ -380,6 +418,7 @@ document.getElementById("page-"+page)
 
 if(page==="admin") loadAdmin()
 if(page==="messages") loadUserChannels()
+if(page==="timeline") loadTimelineData()
 }
 
 function loadAdmin(){
@@ -423,6 +462,10 @@ renderChannelList()
 refreshMessages()
 })
 .withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
 setMessageError((err && err.message) || "Unable to load channels.")
 })
 .getUserChannels(token)
@@ -477,6 +520,10 @@ google.script.run
 renderMessageHistory(messages)
 })
 .withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
 setMessageError((err && err.message) || "Unable to load messages.")
 })
 .getMessages(token, selectedChannelID)
@@ -507,9 +554,90 @@ refreshMessages()
 .withFailureHandler(err=>{
 btn.disabled = false
 btn.classList.remove("opacity-60")
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
 setMessageError((err && err.message) || "Unable to send message.")
 })
 .sendMessage(token, selectedChannelID, text)
+}
+
+function renderTimelineList(items){
+const container = document.getElementById("timeline-list")
+if(!items || !items.length){
+container.innerHTML = "<div class='text-sm text-slate-500'>No timeline items.</div>"
+return
+}
+container.innerHTML = items.map(item=>`
+<div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+<div class="text-xs text-slate-500 mb-1">${escapeHtml(formatDate(item.date))} • ${escapeHtml(item.category)}</div>
+<div class="font-semibold text-slate-800">${escapeHtml(item.title || "Untitled")}</div>
+<div class="text-xs text-slate-600 mt-1">${escapeHtml(item.eventType || "")}${item.recurrence ? ' • ' + escapeHtml(item.recurrence) : ''}</div>
+${item.description ? `<div class="text-sm text-slate-700 mt-2 whitespace-pre-wrap">${escapeHtml(item.description)}</div>` : ''}
+</div>
+`).join("")
+}
+
+function renderHistoryList(items){
+const container = document.getElementById("timeline-history")
+if(!items || !items.length){
+container.innerHTML = "<div class='text-sm text-slate-500'>No historical records found.</div>"
+return
+}
+container.innerHTML = items.map(item=>`
+<div class="border border-slate-200 rounded-xl p-3">
+<div class="text-xs text-slate-500">${escapeHtml(formatDate(item.EventDate))}</div>
+<div class="font-semibold text-slate-800">${escapeHtml(item.Title || "Untitled")}</div>
+<div class="text-xs text-slate-600 mt-1">${escapeHtml(item.EventType || "")}</div>
+${item.Description ? `<div class="text-sm text-slate-700 mt-2 whitespace-pre-wrap">${escapeHtml(item.Description)}</div>` : ''}
+</div>
+`).join("")
+}
+
+function renderUpcomingList(items){
+const container = document.getElementById("timeline-upcoming")
+if(!items || !items.length){
+container.innerHTML = "<div class='text-sm text-slate-500'>No upcoming events.</div>"
+return
+}
+container.innerHTML = items.map(item=>`
+<div class="border border-slate-200 rounded-xl p-3">
+<div class="text-xs text-slate-500">Next: ${escapeHtml(formatDate(item.NextOccurrence))}</div>
+<div class="font-semibold text-slate-800">${escapeHtml(item.Title || "Untitled")}</div>
+<div class="text-xs text-slate-600 mt-1">${escapeHtml(item.Recurrence || "One-time")}</div>
+<div class="text-xs text-slate-400 mt-1">Original date: ${escapeHtml(formatDate(item.EventDate))}</div>
+</div>
+`).join("")
+}
+
+function loadTimelineData(){
+setTimelineError("")
+if(!timelineLoaded){
+document.getElementById("timeline-list").innerHTML = "<div class='text-sm text-slate-500'>Loading timeline...</div>"
+document.getElementById("timeline-history").innerHTML = "<div class='text-sm text-slate-500'>Loading history...</div>"
+document.getElementById("timeline-upcoming").innerHTML = "<div class='text-sm text-slate-500'>Loading upcoming events...</div>"
+}
+google.script.run
+.withSuccessHandler(data=>{
+timelineLoaded = true
+renderTimelineList((data && data.timeline) || [])
+renderHistoryList((data && data.historical) || [])
+renderUpcomingList((data && data.upcoming) || [])
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setTimelineError((err && err.message) || "Unable to load timeline data.")
+if(!timelineLoaded){
+renderTimelineList([])
+renderHistoryList([])
+renderUpcomingList([])
+}
+})
+.getTimelineData(token)
 }
 
 function triggerSOS(){
