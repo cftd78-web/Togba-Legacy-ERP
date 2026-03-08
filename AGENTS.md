@@ -4,8 +4,8 @@
 This is the Togba Legacy ERP project.
 
 ## Non-negotiable rules
-- Read the entire project folder before editing anything.
-- Treat MASTER_HANDOFF_TOGBA_LEGACY_ERP.md as the primary architecture brief.
+- Read the entire project before editing anything.
+- Treat MASTER_HANDOFF_TOGBA_LEGACY_ERP.md as the main architecture brief.
 - Preserve backward compatibility at all times.
 - Do not rename Google Sheets tabs.
 - Do not rename spreadsheet headers.
@@ -25,7 +25,7 @@ This is the Togba Legacy ERP project.
 - Assume the Google Sheets workbook is a live production database.
 - Validate sheet existence before reading.
 - Validate required headers before reading or writing.
-- If a header is missing, add support for legacy aliases before proposing any schema change.
+- If a header is missing, support legacy aliases before proposing any schema change.
 - Never migrate or restructure the database without explicit approval.
 
 ## Coding safety
