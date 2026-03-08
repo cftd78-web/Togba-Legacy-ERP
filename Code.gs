@@ -203,6 +203,241 @@ function getFinanceData(token) {
   }
 }
 
+function getInvestmentAllocation(token) {
+  try {
+    _auth(token);
+
+    const contributions = _readSheet('Contributions', {
+      AmountUSD: ['AmountUSD']
+    });
+
+    const settings = _readSheet('InstitutionSettings', {
+      SettingKey: ['SettingKey', 'Key'],
+      SettingValue: ['SettingValue', 'Value']
+    });
+
+    const totalContributions = contributions.rows.reduce((sum, row) => {
+      return sum + (Number(row[contributions.idx.AmountUSD]) || 0);
+    }, 0);
+
+    const settingsMap = settings.rows.reduce((acc, row) => {
+      const key = String(row[settings.idx.SettingKey] || '').trim();
+      if (!key) {
+        return acc;
+      }
+      acc[key.toLowerCase()] = row[settings.idx.SettingValue];
+      return acc;
+    }, {});
+
+    const projectionRate = _numSetting(settingsMap, ['ProjectionRate'], 0);
+    const equityPercent = _numSetting(settingsMap, ['EquityPercent'], 0);
+    const fixedIncomePercent = _numSetting(settingsMap, ['FixedIncomePercent'], 0);
+    const cashPercent = _numSetting(settingsMap, ['CashPercent'], 0);
+    const alternativePercent = _numSetting(settingsMap, ['AlternativePercent'], 0);
+
+    const breakdown = [
+      { key: 'EquityPercent', label: 'Equity', percent: equityPercent },
+      { key: 'FixedIncomePercent', label: 'Fixed Income', percent: fixedIncomePercent },
+      { key: 'CashPercent', label: 'Cash', percent: cashPercent },
+      { key: 'AlternativePercent', label: 'Alternative', percent: alternativePercent }
+    ].map(item => {
+      const projectedAmount = totalContributions * (item.percent / 100) * (1 + projectionRate / 100);
+      return {
+        key: item.key,
+        label: item.label,
+        percent: item.percent,
+        projectedAmount: projectedAmount
+      };
+    });
+
+    const totalPercent = breakdown.reduce((sum, item) => sum + (Number(item.percent) || 0), 0);
+    const isValid = Math.abs(totalPercent - 100) < 0.0001;
+
+    return {
+      success: true,
+      totalContributions: totalContributions,
+      projectionRate: projectionRate,
+      totalPercent: totalPercent,
+      isValid: isValid,
+      message: isValid ? '' : 'Allocation percentages in InstitutionSettings must total 100.',
+      breakdown: breakdown,
+      projectedTotal: breakdown.reduce((sum, item) => sum + item.projectedAmount, 0)
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getInvestmentAllocation', e));
+  }
+}
+
+function getFounderLocksSummary(token) {
+  try {
+    _auth(token);
+
+    const locks = _readSheet('FounderLocks', {
+      AmountUSD: ['AmountUSD'],
+      ExpiryDate: ['ExpiryDate'],
+      LockYears: ['LockYears'],
+      Released: ['Released']
+    });
+
+    const now = new Date();
+
+    const normalizedLocks = locks.rows.map(row => {
+      const amount = Number(row[locks.idx.AmountUSD]) || 0;
+      const expiryRaw = row[locks.idx.ExpiryDate];
+      const expiryDate = _safeIsoDate(expiryRaw);
+      const lockYears = Number(row[locks.idx.LockYears]) || 0;
+      const released = _toBoolean(row[locks.idx.Released]);
+      const progressPercent = _computeFounderLockProgress(expiryRaw, lockYears, now);
+
+      return {
+        AmountUSD: amount,
+        ExpiryDate: expiryDate,
+        LockYears: lockYears,
+        Released: released,
+        progressPercent: progressPercent
+      };
+    });
+
+    const totals = normalizedLocks.reduce((acc, item) => {
+      acc.totalLocked += item.AmountUSD;
+      if (item.Released) {
+        acc.totalReleased += item.AmountUSD;
+      } else {
+        acc.activeLocked += item.AmountUSD;
+      }
+      return acc;
+    }, {
+      totalLocked: 0,
+      activeLocked: 0,
+      totalReleased: 0
+    });
+
+    return {
+      success: true,
+      totalLocked: totals.totalLocked,
+      activeLocked: totals.activeLocked,
+      totalReleased: totals.totalReleased,
+      totalRecords: normalizedLocks.length,
+      locks: normalizedLocks
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getFounderLocksSummary', e));
+  }
+}
+
+function getFinanceDashboardData(token) {
+  try {
+    _auth(token);
+
+    const contributions = _readSheet('Contributions', {
+      AmountUSD: ['AmountUSD'],
+      ContributionType: ['ContributionType', 'Type']
+    });
+
+    const locks = _readSheet('FounderLocks', {
+      AmountUSD: ['AmountUSD'],
+      ExpiryDate: ['ExpiryDate'],
+      LockYears: ['LockYears'],
+      Released: ['Released']
+    });
+
+    const settings = _readSheet('InstitutionSettings', {
+      SettingKey: ['SettingKey', 'Key'],
+      SettingValue: ['SettingValue', 'Value']
+    });
+
+    const settingsMap = settings.rows.reduce((acc, row) => {
+      const key = String(row[settings.idx.SettingKey] || '').trim();
+      if (key) {
+        acc[key.toLowerCase()] = row[settings.idx.SettingValue];
+      }
+      return acc;
+    }, {});
+
+    const totalContributions = contributions.rows.reduce((sum, row) => {
+      return sum + (Number(row[contributions.idx.AmountUSD]) || 0);
+    }, 0);
+
+    const projectionRate = _numSetting(settingsMap, ['ProjectionRate'], 0);
+    const allocationBreakdown = [
+      { key: 'EquityPercent', label: 'Equity', percent: _numSetting(settingsMap, ['EquityPercent'], 0) },
+      { key: 'FixedIncomePercent', label: 'Fixed Income', percent: _numSetting(settingsMap, ['FixedIncomePercent'], 0) },
+      { key: 'CashPercent', label: 'Cash', percent: _numSetting(settingsMap, ['CashPercent'], 0) },
+      { key: 'AlternativePercent', label: 'Alternative', percent: _numSetting(settingsMap, ['AlternativePercent'], 0) }
+    ].map(item => ({
+      key: item.key,
+      label: item.label,
+      percent: item.percent,
+      projectedAmount: totalContributions * (item.percent / 100) * (1 + projectionRate / 100)
+    }));
+
+    const allocationTotalPercent = allocationBreakdown.reduce((sum, item) => sum + (Number(item.percent) || 0), 0);
+    const allocationIsValid = Math.abs(allocationTotalPercent - 100) < 0.0001;
+
+    const now = new Date();
+    const founderLocks = locks.rows.map(row => {
+      const amount = Number(row[locks.idx.AmountUSD]) || 0;
+      const expiryRaw = row[locks.idx.ExpiryDate];
+      const lockYears = Number(row[locks.idx.LockYears]) || 0;
+      const released = _toBoolean(row[locks.idx.Released]);
+      return {
+        AmountUSD: amount,
+        ExpiryDate: _safeIsoDate(expiryRaw),
+        LockYears: lockYears,
+        Released: released,
+        progressPercent: _computeFounderLockProgress(expiryRaw, lockYears, now)
+      };
+    });
+
+    const founderLockTotals = founderLocks.reduce((acc, item) => {
+      acc.totalLocked += item.AmountUSD;
+      if (item.Released) {
+        acc.totalReleased += item.AmountUSD;
+      } else {
+        acc.activeLocked += item.AmountUSD;
+      }
+      return acc;
+    }, {
+      totalLocked: 0,
+      totalReleased: 0,
+      activeLocked: 0
+    });
+
+    const categoryTotals = contributions.rows.reduce((acc, row) => {
+      const type = String(row[contributions.idx.ContributionType] || 'Other').trim() || 'Other';
+      acc[type] = (acc[type] || 0) + (Number(row[contributions.idx.AmountUSD]) || 0);
+      return acc;
+    }, {});
+
+    return {
+      success: true,
+      totals: {
+        totalContributions: totalContributions,
+        contributionCategories: categoryTotals
+      },
+      founderLocks: {
+        totalLocked: founderLockTotals.totalLocked,
+        totalReleased: founderLockTotals.totalReleased,
+        activeLocked: founderLockTotals.activeLocked,
+        totalRecords: founderLocks.length,
+        locks: founderLocks
+      },
+      allocation: {
+        projectionRate: projectionRate,
+        totalPercent: allocationTotalPercent,
+        isValid: allocationIsValid,
+        message: allocationIsValid ? '' : 'Allocation percentages in InstitutionSettings must total 100.',
+        breakdown: allocationBreakdown
+      },
+      projection: {
+        totalProjected: allocationBreakdown.reduce((sum, item) => sum + item.projectedAmount, 0)
+      }
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getFinanceDashboardData', e));
+  }
+}
+
 /* =====================================================
    TIMELINE (HISTORY + EVENTS)
 ===================================================== */
@@ -745,6 +980,54 @@ function _computeNextOccurrence(eventDateIso, recurrence, todayStart) {
   }
 
   return next;
+}
+
+function _computeFounderLockProgress(expiryValue, lockYears, referenceDate) {
+  const expiryDate = new Date(expiryValue);
+  if (isNaN(expiryDate.getTime())) {
+    return 0;
+  }
+
+  if (!lockYears || lockYears <= 0) {
+    return referenceDate.getTime() >= expiryDate.getTime() ? 100 : 0;
+  }
+
+  const startDate = new Date(expiryDate.getTime());
+  startDate.setFullYear(startDate.getFullYear() - lockYears);
+
+  const totalMs = expiryDate.getTime() - startDate.getTime();
+  if (totalMs <= 0) {
+    return referenceDate.getTime() >= expiryDate.getTime() ? 100 : 0;
+  }
+
+  const elapsed = referenceDate.getTime() - startDate.getTime();
+  const progress = (elapsed / totalMs) * 100;
+  return Math.max(0, Math.min(100, progress));
+}
+
+function _toBoolean(value) {
+  const normalized = String(value || '').toLowerCase().trim();
+  return normalized === 'true' || normalized === 'yes' || normalized === '1' || normalized === 'released';
+}
+
+function _numSetting(settingsMap, aliases, fallback) {
+  const value = (aliases || []).reduce((found, alias) => {
+    if (found !== null) {
+      return found;
+    }
+    const k = String(alias || '').toLowerCase().trim();
+    if (!k || !Object.prototype.hasOwnProperty.call(settingsMap, k)) {
+      return null;
+    }
+    return settingsMap[k];
+  }, null);
+
+  if (value === null || value === undefined || value === '') {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+  return isNaN(parsed) ? fallback : parsed;
 }
 
 function _startOfDay(dateObj) {
