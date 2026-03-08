@@ -121,9 +121,29 @@ Financial Distribution
 
 <div id="page-messages" class="page p-6">
 
-<h2 class="text-2xl font-bold mb-4">Messages</h2>
+<h2 class="text-2xl font-bold mb-4">Messaging</h2>
 
-<div id="message-list"></div>
+<div class="grid gap-4 lg:grid-cols-3">
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Channels</h3>
+<div id="channel-list" class="space-y-2 max-h-[52vh] overflow-y-auto"></div>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2 flex flex-col min-h-[52vh]">
+<div class="flex items-center justify-between mb-3">
+<h3 id="message-channel-title" class="text-sm font-bold text-slate-500 uppercase">Select a channel</h3>
+<button onclick="refreshMessages()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+</div>
+<div id="message-error" class="hidden text-sm text-red-600 mb-2"></div>
+<div id="message-history" class="flex-1 overflow-y-auto space-y-2 bg-slate-50 rounded-xl p-3"></div>
+<div class="mt-3 flex gap-2">
+<input id="message-input" type="text" placeholder="Type a message..." class="flex-1 p-3 rounded-xl border border-slate-200" />
+<button id="btn-send-message" onclick="sendCurrentMessage()" class="bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Send</button>
+</div>
+</div>
+
+</div>
 
 </div>
 
@@ -228,6 +248,8 @@ Admin
 
 let token = ""
 let financeChartInstance = null
+let userChannels = []
+let selectedChannelID = ""
 
 function isSessionExpiredError(err){
 const msg = String((err && err.message) || err || "")
@@ -236,6 +258,8 @@ return msg.toLowerCase().indexOf("session expired") !== -1
 
 function resetToLogin(message){
 token = ""
+userChannels = []
+selectedChannelID = ""
 document.getElementById("step-1").classList.remove("hidden")
 document.getElementById("step-2").classList.add("hidden")
 document.getElementById("view-app").classList.add("hidden")
@@ -249,6 +273,26 @@ resetToLogin("Your session expired. Please login again.")
 return
 }
 alert((err && err.message) || "Request failed.")
+}
+
+function escapeHtml(value){
+return String(value || "")
+.replaceAll("&", "&amp;")
+.replaceAll("<", "&lt;")
+.replaceAll(">", "&gt;")
+.replaceAll('"', "&quot;")
+.replaceAll("'", "&#39;")
+}
+
+function setMessageError(message){
+const el = document.getElementById("message-error")
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
 }
 
 function handleOTP(){
@@ -286,6 +330,7 @@ if(data.profile.role === "Admin")
 document.getElementById("btn-nav-admin").classList.remove("hidden")
 
 loadCharts()
+loadUserChannels()
 })
 .withFailureHandler(onServerFailure)
 .getDashboardData(token)
@@ -334,6 +379,7 @@ document.getElementById("page-"+page)
 .classList.add("active")
 
 if(page==="admin") loadAdmin()
+if(page==="messages") loadUserChannels()
 }
 
 function loadAdmin(){
@@ -344,17 +390,126 @@ let container=document.getElementById("user-list")
 container.innerHTML=users.map(u=>`
 <div class="bg-white p-4 rounded-2xl border flex justify-between">
 <div>
-<div class="font-bold">${u.FullName || ""}</div>
-<div class="text-xs text-slate-400">${u.EmailOptional || ""}</div>
+<div class="font-bold">${escapeHtml(u.FullName || "")}</div>
+<div class="text-xs text-slate-400">${escapeHtml(u.EmailOptional || "")}</div>
 </div>
 <div class="text-xs font-bold bg-slate-100 p-2 rounded-lg">
-${u.OneTimeCode || "---"}
+${escapeHtml(u.OneTimeCode || "---")}
 </div>
 </div>
 `).join("")
 })
 .withFailureHandler(onServerFailure)
 .adminGetAllUsers(token)
+}
+
+function loadUserChannels(){
+setMessageError("")
+google.script.run
+.withSuccessHandler(channels=>{
+userChannels = Array.isArray(channels) ? channels : []
+renderChannelList()
+if(!userChannels.length){
+selectedChannelID = ""
+renderMessageHistory([])
+document.getElementById("message-channel-title").innerText = "No channels available"
+setMessageError("You are not a member of any active channel.")
+return
+}
+if(!selectedChannelID || !userChannels.some(c=>c.ChannelID===selectedChannelID)){
+selectedChannelID = userChannels[0].ChannelID
+}
+renderChannelList()
+refreshMessages()
+})
+.withFailureHandler(err=>{
+setMessageError((err && err.message) || "Unable to load channels.")
+})
+.getUserChannels(token)
+}
+
+function renderChannelList(){
+const container = document.getElementById("channel-list")
+if(!userChannels.length){
+container.innerHTML = "<div class='text-sm text-slate-500'>No channels.</div>"
+return
+}
+container.innerHTML = userChannels.map(ch=>`
+<button onclick="selectChannel('${escapeHtml(ch.ChannelID)}')"
+class="w-full text-left p-3 rounded-xl border ${ch.ChannelID===selectedChannelID ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}">
+<div class="font-semibold">${escapeHtml(ch.Name || ch.ChannelID)}</div>
+<div class="text-xs text-slate-500">${escapeHtml(ch.Type || 'channel')}</div>
+</button>
+`).join("")
+}
+
+function selectChannel(channelID){
+selectedChannelID = channelID
+renderChannelList()
+refreshMessages()
+}
+
+function renderMessageHistory(messages){
+const container = document.getElementById("message-history")
+if(!messages || !messages.length){
+container.innerHTML = "<div class='text-sm text-slate-500'>No messages yet.</div>"
+return
+}
+container.innerHTML = messages.map(msg=>`
+<div class="bg-white border border-slate-100 rounded-xl p-3">
+<div class="text-xs text-slate-500 mb-1">${escapeHtml(msg.SenderEmail)} • ${escapeHtml(new Date(msg.SentAt).toLocaleString())}</div>
+<div class="text-sm text-slate-800 whitespace-pre-wrap">${escapeHtml(msg.Body)}</div>
+</div>
+`).join("")
+container.scrollTop = container.scrollHeight
+}
+
+function refreshMessages(){
+if(!selectedChannelID){
+renderMessageHistory([])
+return
+}
+const selected = userChannels.find(c=>c.ChannelID===selectedChannelID)
+document.getElementById("message-channel-title").innerText = selected ? (selected.Name || selected.ChannelID) : selectedChannelID
+setMessageError("")
+google.script.run
+.withSuccessHandler(messages=>{
+renderMessageHistory(messages)
+})
+.withFailureHandler(err=>{
+setMessageError((err && err.message) || "Unable to load messages.")
+})
+.getMessages(token, selectedChannelID)
+}
+
+function sendCurrentMessage(){
+const btn = document.getElementById("btn-send-message")
+const input = document.getElementById("message-input")
+const text = String(input.value || "").trim()
+if(!selectedChannelID){
+setMessageError("Please select a channel.")
+return
+}
+if(!text){
+setMessageError("Message cannot be empty.")
+return
+}
+btn.disabled = true
+btn.classList.add("opacity-60")
+setMessageError("")
+google.script.run
+.withSuccessHandler(()=>{
+input.value = ""
+btn.disabled = false
+btn.classList.remove("opacity-60")
+refreshMessages()
+})
+.withFailureHandler(err=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+setMessageError((err && err.message) || "Unable to send message.")
+})
+.sendMessage(token, selectedChannelID, text)
 }
 
 function triggerSOS(){

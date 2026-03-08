@@ -1,16 +1,18 @@
 /**
  * TOGBA LEGACY ERP v24
- * Phase 1 - System Stabilization
+ * Phase 2 - Secure Internal Messaging
  * Features:
  * - Atomic OTP generation with LockService
  * - Secure session tokens
  * - Spreadsheet schema safety and header validation
  * - Finance aggregation
  * - Admin registry management
+ * - Secure channel messaging
  */
 
 const SS_ID = "104VsCf8xhIFymyai9fG84RMbM6iirVcQxgTfqO4LkH4"; // Replace if needed
 const SESSION_TTL = 21600; // 6 hours
+const CHANNEL_TYPES = ['private', 'family broadcast', 'project'];
 
 let _SS_CACHE = null;
 
@@ -202,6 +204,98 @@ function getFinanceData(token) {
 }
 
 /* =====================================================
+   MESSAGING
+===================================================== */
+
+function getUserChannels(token) {
+  try {
+    const session = _auth(token);
+    const messageCtx = _getMessagingSheets();
+    const email = _norm(session.email);
+
+    const memberChannelIds = messageCtx.channelMembers.rows.reduce((acc, row) => {
+      if (_norm(row[messageCtx.channelMembers.idx.Email]) === email) {
+        const channelId = String(row[messageCtx.channelMembers.idx.ChannelID] || '').trim();
+        if (channelId) {
+          acc[channelId] = true;
+        }
+      }
+      return acc;
+    }, {});
+
+    return messageCtx.channels.rows
+      .filter(row => {
+        const channelId = String(row[messageCtx.channels.idx.ChannelID] || '').trim();
+        const isActiveRaw = String(row[messageCtx.channels.idx.IsActive] || '').toLowerCase().trim();
+        const type = String(row[messageCtx.channels.idx.Type] || '').toLowerCase().trim();
+        const isActive = isActiveRaw !== 'false' && isActiveRaw !== '0' && isActiveRaw !== 'no';
+        return !!memberChannelIds[channelId] && isActive && CHANNEL_TYPES.indexOf(type) !== -1;
+      })
+      .map(row => ({
+        ChannelID: String(row[messageCtx.channels.idx.ChannelID] || '').trim(),
+        Name: String(row[messageCtx.channels.idx.Name] || '').trim(),
+        Type: String(row[messageCtx.channels.idx.Type] || '').trim(),
+        IsActive: row[messageCtx.channels.idx.IsActive]
+      }));
+  } catch (e) {
+    throw new Error(_errMsg('getUserChannels', e));
+  }
+}
+
+function getMessages(token, channelID) {
+  try {
+    const session = _auth(token);
+    const messageCtx = _getMessagingSheets();
+    const channel = _resolveAuthorizedChannel(messageCtx, session.email, channelID);
+
+    return messageCtx.messages.rows
+      .filter(row => String(row[messageCtx.messages.idx.ChannelID] || '').trim() === channel.ChannelID)
+      .map(row => ({
+        ChannelID: String(row[messageCtx.messages.idx.ChannelID] || '').trim(),
+        SenderEmail: String(row[messageCtx.messages.idx.SenderEmail] || '').trim(),
+        Body: String(row[messageCtx.messages.idx.Body] || ''),
+        SentAt: row[messageCtx.messages.idx.SentAt]
+      }))
+      .sort((a, b) => new Date(a.SentAt).getTime() - new Date(b.SentAt).getTime());
+  } catch (e) {
+    throw new Error(_errMsg('getMessages', e));
+  }
+}
+
+function sendMessage(token, channelID, body) {
+  try {
+    const session = _auth(token);
+    const messageCtx = _getMessagingSheets();
+    const channel = _resolveAuthorizedChannel(messageCtx, session.email, channelID);
+    const messageBody = String(body || '').trim();
+
+    if (!messageBody) {
+      throw new Error('Message body is required.');
+    }
+
+    const row = new Array(messageCtx.messages.headers.length).fill('');
+    row[messageCtx.messages.idx.ChannelID] = channel.ChannelID;
+    row[messageCtx.messages.idx.SenderEmail] = _norm(session.email);
+    row[messageCtx.messages.idx.Body] = messageBody;
+    row[messageCtx.messages.idx.SentAt] = new Date().toISOString();
+
+    messageCtx.messages.sheet.appendRow(row);
+
+    return {
+      success: true,
+      message: {
+        ChannelID: row[messageCtx.messages.idx.ChannelID],
+        SenderEmail: row[messageCtx.messages.idx.SenderEmail],
+        Body: row[messageCtx.messages.idx.Body],
+        SentAt: row[messageCtx.messages.idx.SentAt]
+      }
+    };
+  } catch (e) {
+    throw new Error(_errMsg('sendMessage', e));
+  }
+}
+
+/* =====================================================
    ADMIN USER REGISTRY
 ===================================================== */
 
@@ -361,6 +455,71 @@ function _resolveRequiredHeaders(headers, requiredHeadersMap) {
   });
 
   return idx;
+}
+
+function _getMessagingSheets() {
+  return {
+    channels: _readSheet('Channels', {
+      ChannelID: ['ChannelID'],
+      Name: ['Name'],
+      Type: ['Type'],
+      IsActive: ['IsActive']
+    }),
+    channelMembers: _readSheet('ChannelMembers', {
+      ChannelID: ['ChannelID'],
+      Email: ['Email'],
+      MemberRole: ['MemberRole']
+    }),
+    messages: _readSheet('Messages', {
+      ChannelID: ['ChannelID'],
+      SenderEmail: ['SenderEmail'],
+      Body: ['Body'],
+      SentAt: ['SentAt']
+    })
+  };
+}
+
+function _resolveAuthorizedChannel(messageCtx, email, channelID) {
+  const normalizedChannelId = String(channelID || '').trim();
+
+  if (!normalizedChannelId) {
+    throw new Error('ChannelID is required.');
+  }
+
+  const channel = messageCtx.channels.rows
+    .map(row => ({
+      ChannelID: String(row[messageCtx.channels.idx.ChannelID] || '').trim(),
+      Name: String(row[messageCtx.channels.idx.Name] || '').trim(),
+      Type: String(row[messageCtx.channels.idx.Type] || '').trim(),
+      IsActive: row[messageCtx.channels.idx.IsActive]
+    }))
+    .find(item => item.ChannelID === normalizedChannelId);
+
+  if (!channel) {
+    throw new Error('Channel not found.');
+  }
+
+  const type = channel.Type.toLowerCase();
+  if (CHANNEL_TYPES.indexOf(type) === -1) {
+    throw new Error('Unsupported channel type.');
+  }
+
+  const isActiveRaw = String(channel.IsActive || '').toLowerCase().trim();
+  const isActive = isActiveRaw !== 'false' && isActiveRaw !== '0' && isActiveRaw !== 'no';
+  if (!isActive) {
+    throw new Error('Channel is inactive.');
+  }
+
+  const isMember = messageCtx.channelMembers.rows.some(row => {
+    return String(row[messageCtx.channelMembers.idx.ChannelID] || '').trim() === normalizedChannelId &&
+      _norm(row[messageCtx.channelMembers.idx.Email]) === _norm(email);
+  });
+
+  if (!isMember) {
+    throw new Error('Unauthorized channel access.');
+  }
+
+  return channel;
 }
 
 function _norm(value) {
