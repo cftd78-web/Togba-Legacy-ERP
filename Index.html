@@ -226,110 +226,107 @@ Admin
 
 <script>
 
-let token=""
+let token = ""
+let financeChartInstance = null
+
+function isSessionExpiredError(err){
+const msg = String((err && err.message) || err || "")
+return msg.toLowerCase().indexOf("session expired") !== -1
+}
+
+function resetToLogin(message){
+token = ""
+document.getElementById("step-1").classList.remove("hidden")
+document.getElementById("step-2").classList.add("hidden")
+document.getElementById("view-app").classList.add("hidden")
+document.getElementById("view-login").classList.remove("hidden")
+if(message) alert(message)
+}
+
+function onServerFailure(err){
+if(isSessionExpiredError(err)){
+resetToLogin("Your session expired. Please login again.")
+return
+}
+alert((err && err.message) || "Request failed.")
+}
 
 function handleOTP(){
-
 google.script.run
 .withSuccessHandler(()=>{
 document.getElementById("step-1").classList.add("hidden")
 document.getElementById("step-2").classList.remove("hidden")
 })
-.withFailureHandler(err=>alert(err.message))
+.withFailureHandler(onServerFailure)
 .loginStepOne(document.getElementById("email").value)
-
 }
 
 function handleVerify(){
-
 google.script.run
 .withSuccessHandler(res=>{
-
-token=res.token
-
+token = res.token
 initApp()
-
 })
-.withFailureHandler(err=>alert(err.message))
+.withFailureHandler(onServerFailure)
 .verifyStepTwo(
 document.getElementById("email").value,
 document.getElementById("otp").value
 )
-
 }
 
 function initApp(){
-
 document.getElementById("view-login").classList.add("hidden")
-
 document.getElementById("view-app").classList.remove("hidden")
 
 google.script.run
 .withSuccessHandler(data=>{
+document.getElementById("welcome-name").innerText = "Hello " + data.profile.name
 
-document.getElementById("welcome-name").innerText="Hello "+data.profile.name
-
-if(data.profile.role==="Admin")
+if(data.profile.role === "Admin")
 document.getElementById("btn-nav-admin").classList.remove("hidden")
 
 loadCharts()
-
 })
-.withFailureHandler(err=>alert(err.message))
+.withFailureHandler(onServerFailure)
 .getDashboardData(token)
-
 }
 
 function loadCharts(){
-
 google.script.run
 .withSuccessHandler(data=>{
+if(financeChartInstance){
+financeChartInstance.destroy()
+}
 
-new Chart(
-
+financeChartInstance = new Chart(
 document.getElementById("financeChart"),
-
 {
-
 type:"doughnut",
-
 data:{
-
 labels:data.labels,
-
 datasets:[{
-
 data:data.values,
-
 backgroundColor:[
 "#2563eb",
 "#9333ea",
 "#06b6d4",
 "#f59e0b"
 ]
-
 }]
-
 },
-
 options:{
 plugins:{
 legend:{position:"bottom"}
 }
 }
-
 }
-
 )
-
 })
-.withFailureHandler(err=>alert(err.message))
+.withFailureHandler(onServerFailure)
 .getFinanceData(token)
-
 }
 
 function showPage(page){
-
 document.querySelectorAll(".page")
 .forEach(p=>p.classList.remove("active"))
 
@@ -337,63 +334,43 @@ document.getElementById("page-"+page)
 .classList.add("active")
 
 if(page==="admin") loadAdmin()
-
 }
 
 function loadAdmin(){
-
 google.script.run
 .withSuccessHandler(users=>{
-
 let container=document.getElementById("user-list")
 
 container.innerHTML=users.map(u=>`
-
 <div class="bg-white p-4 rounded-2xl border flex justify-between">
-
 <div>
-
-<div class="font-bold">${u.FullName}</div>
-
-<div class="text-xs text-slate-400">${u.EmailOptional}</div>
-
+<div class="font-bold">${u.FullName || ""}</div>
+<div class="text-xs text-slate-400">${u.EmailOptional || ""}</div>
 </div>
-
 <div class="text-xs font-bold bg-slate-100 p-2 rounded-lg">
-
 ${u.OneTimeCode || "---"}
-
 </div>
-
 </div>
-
 `).join("")
-
 })
-.withFailureHandler(err=>alert(err.message))
+.withFailureHandler(onServerFailure)
 .adminGetAllUsers(token)
-
 }
 
 function triggerSOS(){
-
 if(!navigator.geolocation){
-
 alert("GPS not available")
-
 return
-
 }
 
 navigator.geolocation.getCurrentPosition(pos=>{
-
 google.script.run
 .withSuccessHandler(()=>alert("SOS sent"))
-.withFailureHandler(err=>alert(err.message))
+.withFailureHandler(onServerFailure)
 .triggerSOS(token,pos.coords.latitude,pos.coords.longitude)
-
-})
-
+}, err=>{
+alert("Unable to get location: " + ((err && err.message) || "Unknown error"))
+}, {timeout:10000, enableHighAccuracy:true})
 }
 
 </script>
