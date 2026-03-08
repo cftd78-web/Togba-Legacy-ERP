@@ -770,6 +770,222 @@ function triggerSOS(token, lat, lng) {
   }
 }
 
+
+
+/* =====================================================
+   GOVERNANCE VOTING
+===================================================== */
+
+function createVote(token, title, thresholdType, status) {
+  try {
+    const session = _auth(token);
+    const governance = _getGovernanceSheets();
+    const normalizedTitle = String(title || '').trim();
+    const normalizedThresholdType = _normalizeThresholdType(thresholdType);
+    const normalizedStatus = String(status || '').trim() || 'Open';
+
+    if (!normalizedTitle) {
+      throw new Error('Vote title is required.');
+    }
+
+    _assertVoteCreatorAuthorized(session, governance);
+
+    const voteID = 'VOTE-' + Utilities.getUuid().split('-')[0].toUpperCase();
+    const row = new Array(governance.votes.headers.length).fill('');
+    row[governance.votes.idx.VoteID] = voteID;
+    row[governance.votes.idx.Title] = normalizedTitle;
+    row[governance.votes.idx.ThresholdType] = normalizedThresholdType;
+    row[governance.votes.idx.Status] = normalizedStatus;
+
+    governance.votes.sheet.appendRow(row);
+
+    return {
+      success: true,
+      vote: {
+        VoteID: voteID,
+        Title: normalizedTitle,
+        ThresholdType: normalizedThresholdType,
+        Status: normalizedStatus
+      }
+    };
+  } catch (e) {
+    throw new Error(_errMsg('createVote', e));
+  }
+}
+
+function castVote(token, voteID, voteChoice) {
+  try {
+    const session = _auth(token);
+    const governance = _getGovernanceSheets();
+    const normalizedVoteID = String(voteID || '').trim();
+    const normalizedChoice = _normalizeVoteChoice(voteChoice);
+
+    if (!normalizedVoteID) {
+      throw new Error('VoteID is required.');
+    }
+
+    const vote = governance.votes.rows
+      .map(row => ({
+        VoteID: String(row[governance.votes.idx.VoteID] || '').trim(),
+        Title: String(row[governance.votes.idx.Title] || '').trim(),
+        ThresholdType: _safeThresholdType(row[governance.votes.idx.ThresholdType]),
+        Status: String(row[governance.votes.idx.Status] || '').trim()
+      }))
+      .find(item => item.VoteID === normalizedVoteID);
+
+    if (!vote) {
+      throw new Error('Vote not found.');
+    }
+
+    if (_norm(vote.Status) !== 'open') {
+      throw new Error('Voting is closed for this proposal.');
+    }
+
+    _assertVoterEligible(session, governance);
+
+    const existingBallot = governance.voteBallots.rows.some(row => {
+      return String(row[governance.voteBallots.idx.VoteID] || '').trim() === normalizedVoteID &&
+        _norm(row[governance.voteBallots.idx.VoterEmail]) === _norm(session.email);
+    });
+
+    if (existingBallot) {
+      throw new Error('A ballot has already been cast for this vote.');
+    }
+
+    const row = new Array(governance.voteBallots.headers.length).fill('');
+    row[governance.voteBallots.idx.VoteID] = normalizedVoteID;
+    row[governance.voteBallots.idx.VoterEmail] = _norm(session.email);
+    row[governance.voteBallots.idx.VoteChoice] = normalizedChoice;
+
+    governance.voteBallots.sheet.appendRow(row);
+
+    return {
+      success: true,
+      voteID: normalizedVoteID,
+      voteChoice: normalizedChoice
+    };
+  } catch (e) {
+    throw new Error(_errMsg('castVote', e));
+  }
+}
+
+function tallyVotes(token, voteID) {
+  try {
+    _auth(token);
+    const governance = _getGovernanceSheets();
+    const normalizedVoteID = String(voteID || '').trim();
+
+    if (!normalizedVoteID) {
+      throw new Error('VoteID is required.');
+    }
+
+    const vote = governance.votes.rows
+      .map(row => ({
+        VoteID: String(row[governance.votes.idx.VoteID] || '').trim(),
+        Title: String(row[governance.votes.idx.Title] || '').trim(),
+        ThresholdType: _safeThresholdType(row[governance.votes.idx.ThresholdType]),
+        Status: String(row[governance.votes.idx.Status] || '').trim()
+      }))
+      .find(item => item.VoteID === normalizedVoteID);
+
+    if (!vote) {
+      throw new Error('Vote not found.');
+    }
+
+    const ballotRows = governance.voteBallots.rows
+      .filter(row => String(row[governance.voteBallots.idx.VoteID] || '').trim() === normalizedVoteID);
+
+    const counts = ballotRows.reduce((acc, row) => {
+      const choice = _safeVoteChoice(row[governance.voteBallots.idx.VoteChoice]);
+      if (choice === 'Yes') acc.yes += 1;
+      else if (choice === 'No') acc.no += 1;
+      else if (choice === 'Abstain') acc.abstain += 1;
+      return acc;
+    }, { yes: 0, no: 0, abstain: 0 });
+
+    const totalBallots = counts.yes + counts.no + counts.abstain;
+    const passed = _evaluateVoteThreshold(vote.ThresholdType, counts.yes, totalBallots);
+
+    return {
+      success: true,
+      VoteID: vote.VoteID,
+      Title: vote.Title,
+      ThresholdType: vote.ThresholdType,
+      Status: vote.Status,
+      totalBallots: totalBallots,
+      yesCount: counts.yes,
+      noCount: counts.no,
+      abstainCount: counts.abstain,
+      thresholdPassed: passed
+    };
+  } catch (e) {
+    throw new Error(_errMsg('tallyVotes', e));
+  }
+}
+
+function getVotes(token) {
+  try {
+    const session = _auth(token);
+    const governance = _getGovernanceSheets();
+
+    const ballotsByVote = governance.voteBallots.rows.reduce((acc, row) => {
+      const voteID = String(row[governance.voteBallots.idx.VoteID] || '').trim();
+      if (!voteID) {
+        return acc;
+      }
+
+      if (!acc[voteID]) {
+        acc[voteID] = { yes: 0, no: 0, abstain: 0, total: 0, voterEmails: {} };
+      }
+
+      const choice = _safeVoteChoice(row[governance.voteBallots.idx.VoteChoice]);
+      const voterEmail = _norm(row[governance.voteBallots.idx.VoterEmail]);
+
+      if (choice === 'Yes') acc[voteID].yes += 1;
+      else if (choice === 'No') acc[voteID].no += 1;
+      else if (choice === 'Abstain') acc[voteID].abstain += 1;
+
+      acc[voteID].total += 1;
+      if (voterEmail) {
+        acc[voteID].voterEmails[voterEmail] = true;
+      }
+
+      return acc;
+    }, {});
+
+    const canCreate = _canCreateVote(session, governance);
+    const canCast = _isEligibleVoter(session, governance);
+
+    const votes = governance.votes.rows.map(row => {
+      const VoteID = String(row[governance.votes.idx.VoteID] || '').trim();
+      const tally = ballotsByVote[VoteID] || { yes: 0, no: 0, abstain: 0, total: 0, voterEmails: {} };
+      const ThresholdType = _safeThresholdType(row[governance.votes.idx.ThresholdType]);
+
+      return {
+        VoteID: VoteID,
+        Title: String(row[governance.votes.idx.Title] || '').trim(),
+        ThresholdType: ThresholdType,
+        Status: String(row[governance.votes.idx.Status] || '').trim(),
+        totalBallots: tally.total,
+        yesCount: tally.yes,
+        noCount: tally.no,
+        abstainCount: tally.abstain,
+        thresholdPassed: _evaluateVoteThreshold(ThresholdType, tally.yes, tally.total),
+        hasUserVoted: !!tally.voterEmails[_norm(session.email)]
+      };
+    });
+
+    return {
+      success: true,
+      canCreateVote: canCreate,
+      canCastBallot: canCast,
+      votes: votes
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getVotes', e));
+  }
+}
+
 /* =====================================================
    AUTH UTILITIES
 ===================================================== */
@@ -867,6 +1083,145 @@ function _resolveRequiredHeaders(headers, requiredHeadersMap) {
   });
 
   return idx;
+}
+
+
+
+function _getGovernanceSheets() {
+  return {
+    votes: _readSheet('Votes', {
+      VoteID: ['VoteID'],
+      Title: ['Title'],
+      ThresholdType: ['ThresholdType'],
+      Status: ['Status']
+    }),
+    voteBallots: _readSheet('VoteBallots', {
+      VoteID: ['VoteID'],
+      VoterEmail: ['VoterEmail', 'Email'],
+      VoteChoice: ['VoteChoice', 'Choice']
+    }),
+    access: _readSheet('Access', {
+      EmailOptional: ['EmailOptional', 'Email'],
+      Role: ['Role', 'RoleName']
+    }),
+    roles: _readSheet('Roles', {
+      Email: ['Email', 'EmailOptional'],
+      RoleName: ['RoleName', 'Role'],
+      IsAdult: ['IsAdult', 'Adult']
+    })
+  };
+}
+
+function _normalizeThresholdType(value) {
+  const normalized = String(value || '').replace(/\s+/g, '').toLowerCase();
+  if (normalized === 'majority') return 'Majority';
+  if (normalized === 'twothirds' || normalized === '2/3' || normalized === '66' || normalized === '66.67') return 'TwoThirds';
+  if (normalized === 'seventyfive' || normalized === '75' || normalized === '75%') return 'SeventyFive';
+  throw new Error('Unsupported threshold type. Use Majority, TwoThirds, or SeventyFive.');
+}
+
+function _safeThresholdType(value) {
+  try {
+    return _normalizeThresholdType(value);
+  } catch (e) {
+    return 'Majority';
+  }
+}
+
+function _normalizeVoteChoice(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (normalized === 'yes' || normalized === 'y') return 'Yes';
+  if (normalized === 'no' || normalized === 'n') return 'No';
+  if (normalized === 'abstain' || normalized === 'abstained') return 'Abstain';
+  throw new Error('VoteChoice must be Yes, No, or Abstain.');
+}
+
+function _safeVoteChoice(value) {
+  try {
+    return _normalizeVoteChoice(value);
+  } catch (e) {
+    return '';
+  }
+}
+
+function _evaluateVoteThreshold(thresholdType, yesCount, totalBallots) {
+  const total = Number(totalBallots) || 0;
+  const yes = Number(yesCount) || 0;
+
+  if (total <= 0) {
+    return false;
+  }
+
+  if (thresholdType === 'Majority') {
+    return yes > (total / 2);
+  }
+
+  if (thresholdType === 'TwoThirds') {
+    return yes >= Math.ceil((2 * total) / 3);
+  }
+
+  if (thresholdType === 'SeventyFive') {
+    return yes >= Math.ceil(total * 0.75);
+  }
+
+  throw new Error('Unsupported threshold type: ' + thresholdType);
+}
+
+function _assertVoteCreatorAuthorized(session, governance) {
+  if (!_canCreateVote(session, governance)) {
+    throw new Error('Unauthorized to create votes.');
+  }
+}
+
+function _assertVoterEligible(session, governance) {
+  if (!_isEligibleVoter(session, governance)) {
+    throw new Error('User is not eligible to cast ballots.');
+  }
+}
+
+function _canCreateVote(session, governance) {
+  const email = _norm(session.email);
+
+  const accessRole = governance.access.rows.reduce((found, row) => {
+    if (found) return found;
+    if (_norm(row[governance.access.idx.EmailOptional]) === email) {
+      return String(row[governance.access.idx.Role] || '').trim();
+    }
+    return '';
+  }, '');
+
+  const hasPrivilegedAccessRole = ['admin', 'governance', 'chair', 'secretary'].some(name => _norm(accessRole).indexOf(name) !== -1);
+
+  const privilegedRole = governance.roles.rows.some(row => {
+    if (_norm(row[governance.roles.idx.Email]) !== email) {
+      return false;
+    }
+    const roleName = _norm(row[governance.roles.idx.RoleName]);
+    return ['admin', 'governance', 'chair', 'secretary'].some(name => roleName.indexOf(name) !== -1);
+  });
+
+  return hasPrivilegedAccessRole || privilegedRole;
+}
+
+function _isEligibleVoter(session, governance) {
+  const email = _norm(session.email);
+
+  const hasAccessRecord = governance.access.rows.some(row => _norm(row[governance.access.idx.EmailOptional]) === email);
+  if (!hasAccessRecord) {
+    return false;
+  }
+
+  const matchingRoles = governance.roles.rows.filter(row => _norm(row[governance.roles.idx.Email]) === email);
+  if (!matchingRoles.length) {
+    return true;
+  }
+
+  return matchingRoles.some(row => {
+    const isAdult = row[governance.roles.idx.IsAdult];
+    const normalized = String(isAdult || '').toLowerCase().trim();
+    if (!normalized) return true;
+    return normalized === 'true' || normalized === 'yes' || normalized === '1';
+  });
 }
 
 function _getMessagingSheets() {
