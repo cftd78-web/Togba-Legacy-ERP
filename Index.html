@@ -146,9 +146,77 @@ Financial Distribution
 
 <div id="page-projects" class="page p-6">
 
-<h2 class="text-2xl font-bold mb-4">Projects</h2>
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-2xl font-bold">Projects</h2>
+<button onclick="loadProjects()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+</div>
 
-<div id="project-list"></div>
+<div id="project-error" class="hidden text-sm text-red-600 mb-3"></div>
+<div id="project-status" class="hidden text-sm text-blue-700 mb-3"></div>
+
+<div class="grid gap-4 lg:grid-cols-3">
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Project List</h3>
+<div id="project-list" class="space-y-2"></div>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
+<div id="project-detail" class="space-y-3"></div>
+</div>
+
+<div id="project-create-panel" class="hidden bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Create Project</h3>
+<div class="grid gap-3 md:grid-cols-4">
+<input id="project-create-title" type="text" placeholder="Project title" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+<input id="project-create-goal" type="number" min="0" step="0.01" placeholder="Goal USD" class="p-3 rounded-xl border border-slate-200" />
+<select id="project-create-status" class="p-3 rounded-xl border border-slate-200">
+<option value="Planning">Planning</option>
+<option value="In Progress">In Progress</option>
+<option value="On Hold">On Hold</option>
+<option value="Completed">Completed</option>
+</select>
+</div>
+<button id="btn-create-project" onclick="createProjectRecord()" class="mt-3 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Create Project</button>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-sm font-bold text-slate-500 uppercase">Task List</h3>
+<span id="project-task-summary" class="text-xs text-slate-500">Select a project</span>
+</div>
+<div id="task-create-panel" class="hidden grid gap-3 md:grid-cols-5 mb-4">
+<input id="task-project-id" type="text" readonly class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" />
+<select id="task-create-status" class="p-3 rounded-xl border border-slate-200">
+<option value="Pending">Pending</option>
+<option value="In Progress">In Progress</option>
+<option value="Blocked">Blocked</option>
+<option value="Done">Done</option>
+</select>
+<select id="task-create-priority" class="p-3 rounded-xl border border-slate-200">
+<option value="High">High</option>
+<option value="Medium" selected>Medium</option>
+<option value="Low">Low</option>
+</select>
+<input id="task-create-percent" type="number" min="0" max="100" placeholder="% complete" class="p-3 rounded-xl border border-slate-200" />
+<button id="btn-create-task" onclick="createTaskRecord()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Add Task</button>
+</div>
+<div id="project-task-list" class="space-y-3"></div>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-sm font-bold text-slate-500 uppercase">Update History</h3>
+<span id="project-update-summary" class="text-xs text-slate-500">Select a project</span>
+</div>
+<div id="project-update-form" class="hidden grid gap-3 md:grid-cols-5 mb-4">
+<input id="project-update-project-id" type="text" readonly class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" />
+<input id="project-update-task-id" type="text" placeholder="TaskID (optional)" class="p-3 rounded-xl border border-slate-200" />
+<input id="project-update-text" type="text" placeholder="Update details" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+<button id="btn-save-project-update" onclick="saveProjectUpdate()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Add Update</button>
+</div>
+<div id="project-update-list" class="space-y-2"></div>
+</div>
+</div>
 
 </div>
 
@@ -359,6 +427,12 @@ let selectedChannelID = ""
 let timelineLoaded = false
 let voteDataLoaded = false
 let votePermissions = {canCreateVote:false, canCastBallot:false}
+let projectPermissions = {canCreateProject:false, canEditTask:false}
+let projectsLoaded = false
+let projectsCache = []
+let selectedProjectID = ""
+let projectTasksCache = []
+let projectUpdatesCache = []
 let sosAlerts = []
 let selectedSOSID = ""
 
@@ -372,6 +446,11 @@ token = ""
 userChannels = []
 selectedChannelID = ""
 timelineLoaded = false
+projectsLoaded = false
+projectsCache = []
+selectedProjectID = ""
+projectTasksCache = []
+projectUpdatesCache = []
 document.getElementById("step-1").classList.remove("hidden")
 document.getElementById("step-2").classList.add("hidden")
 document.getElementById("view-app").classList.add("hidden")
@@ -420,6 +499,29 @@ el.innerText = message
 
 function setFinanceError(message){
 const el = document.getElementById("finance-error")
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
+}
+
+
+function setProjectError(message){
+const el = document.getElementById("project-error")
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
+}
+
+function setProjectStatus(message){
+const el = document.getElementById("project-status")
 if(!message){
 el.classList.add("hidden")
 el.innerText = ""
@@ -517,6 +619,7 @@ document.getElementById("btn-nav-admin").classList.remove("hidden")
 
 loadCharts()
 loadFinanceDashboard()
+loadProjects()
 loadUserChannels()
 loadVotes()
 })
@@ -570,8 +673,353 @@ if(page==="admin") loadAdmin()
 if(page==="messages") loadUserChannels()
 if(page==="timeline") loadTimelineData()
 if(page==="finance") loadFinanceDashboard()
+if(page==="projects") loadProjects()
 if(page==="voting") loadVotes()
 if(page==="sos") loadSOSAlerts()
+}
+
+function loadProjects(){
+setProjectError("")
+setProjectStatus("")
+const list = document.getElementById("project-list")
+if(!projectsLoaded){
+list.innerHTML = "<div class='text-sm text-slate-500'>Loading projects...</div>"
+}
+google.script.run
+.withSuccessHandler(res=>{
+projectsLoaded = true
+projectPermissions = {
+canCreateProject: !!(res && res.permissions && res.permissions.canCreateProject),
+canEditTask: !!(res && res.permissions && res.permissions.canEditTask)
+}
+projectsCache = (res && Array.isArray(res.projects)) ? res.projects : []
+if(!selectedProjectID || !projectsCache.some(p=>p.ProjectID===selectedProjectID)){
+selectedProjectID = projectsCache.length ? projectsCache[0].ProjectID : ""
+}
+renderProjects()
+if(selectedProjectID){
+loadProjectTasks(selectedProjectID)
+loadProjectUpdates(selectedProjectID)
+}else{
+renderProjectDetail(null)
+renderProjectTasks([])
+renderProjectUpdates([])
+}
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setProjectError((err && err.message) || "Unable to load projects.")
+renderProjects()
+})
+.getProjects(token)
+}
+
+function renderProjects(){
+const list = document.getElementById("project-list")
+const createPanel = document.getElementById("project-create-panel")
+if(projectPermissions.canCreateProject){
+createPanel.classList.remove("hidden")
+}else{
+createPanel.classList.add("hidden")
+}
+if(!projectsCache.length){
+list.innerHTML = "<div class='text-sm text-slate-500'>No projects found.</div>"
+renderProjectDetail(null)
+return
+}
+list.innerHTML = projectsCache.map(project=>`
+<button onclick="selectProject('${escapeHtml(project.ProjectID)}')" class="w-full text-left border rounded-xl p-3 ${project.ProjectID===selectedProjectID ? 'border-blue-300 bg-blue-50' : 'border-slate-200 bg-white'}">
+<div class="text-xs text-slate-500">${escapeHtml(project.ProjectID || "")}</div>
+<div class="font-semibold text-slate-800">${escapeHtml(project.Title || "Untitled project")}</div>
+<div class="text-xs text-slate-600 mt-1">${escapeHtml(project.Status || "Planning")} • ${formatPercent(project.ProgressPercent || 0)}</div>
+</button>
+`).join("")
+const selected = projectsCache.find(p=>p.ProjectID===selectedProjectID)
+renderProjectDetail(selected || null)
+}
+
+function renderProjectDetail(project){
+const detail = document.getElementById("project-detail")
+if(!project){
+detail.innerHTML = "<div class='text-sm text-slate-500'>Select a project to view details.</div>"
+document.getElementById("task-project-id").value = ""
+document.getElementById("project-update-project-id").value = ""
+document.getElementById("project-task-summary").innerText = "Select a project"
+document.getElementById("project-update-summary").innerText = "Select a project"
+document.getElementById("task-create-panel").classList.add("hidden")
+document.getElementById("project-update-form").classList.add("hidden")
+return
+}
+const completed = Number(project.TasksCompleted || 0)
+const total = Number(project.TaskCount || 0)
+detail.innerHTML = `
+<div class="text-xs text-slate-500 uppercase">Project Detail</div>
+<div class="text-2xl font-bold text-slate-800">${escapeHtml(project.Title || "Untitled")}</div>
+<div class="grid sm:grid-cols-3 gap-3">
+<div class="rounded-xl border border-slate-200 p-3"><div class="text-xs text-slate-500">ProjectID</div><div class="font-semibold text-slate-800">${escapeHtml(project.ProjectID || "")}</div></div>
+<div class="rounded-xl border border-slate-200 p-3"><div class="text-xs text-slate-500">Goal USD</div><div class="font-semibold text-slate-800">${formatCurrency(project.GoalUSD || 0)}</div></div>
+<div class="rounded-xl border border-slate-200 p-3"><div class="text-xs text-slate-500">Status</div><div class="font-semibold text-slate-800">${escapeHtml(project.Status || "Planning")}</div></div>
+</div>
+<div>
+<div class="flex justify-between text-xs text-slate-500 mb-1"><span>Progress</span><span>${formatPercent(project.ProgressPercent || 0)}</span></div>
+<div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden"><div class="h-full bg-blue-600" style="width:${Math.max(0, Math.min(100, Number(project.ProgressPercent || 0)))}%"></div></div>
+<div class="text-xs text-slate-500 mt-2">Tasks completed: ${completed} / ${total}</div>
+</div>
+`
+document.getElementById("task-project-id").value = project.ProjectID || ""
+document.getElementById("project-update-project-id").value = project.ProjectID || ""
+document.getElementById("project-task-summary").innerText = `${project.ProjectID} • ${project.TaskCount || 0} tasks`
+document.getElementById("project-update-summary").innerText = `${project.ProjectID} • updates`
+if(projectPermissions.canEditTask){
+document.getElementById("task-create-panel").classList.remove("hidden")
+document.getElementById("project-update-form").classList.remove("hidden")
+}else{
+document.getElementById("task-create-panel").classList.add("hidden")
+document.getElementById("project-update-form").classList.add("hidden")
+}
+}
+
+function selectProject(projectID){
+selectedProjectID = projectID
+setProjectError("")
+setProjectStatus("")
+renderProjects()
+if(selectedProjectID){
+loadProjectTasks(selectedProjectID)
+loadProjectUpdates(selectedProjectID)
+}
+}
+
+function loadProjectTasks(projectID){
+google.script.run
+.withSuccessHandler(res=>{
+projectTasksCache = (res && Array.isArray(res.tasks)) ? res.tasks : []
+renderProjectTasks(projectTasksCache)
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setProjectError((err && err.message) || "Unable to load project tasks.")
+renderProjectTasks([])
+})
+.getProjectTasks(token, projectID)
+}
+
+function renderProjectTasks(tasks){
+const list = document.getElementById("project-task-list")
+if(!selectedProjectID){
+list.innerHTML = "<div class='text-sm text-slate-500'>Select a project to view tasks.</div>"
+return
+}
+if(!tasks || !tasks.length){
+list.innerHTML = "<div class='text-sm text-slate-500'>No tasks found for this project.</div>"
+return
+}
+list.innerHTML = tasks.map(task=>{
+const canEdit = projectPermissions.canEditTask
+const taskID = escapeHtml(task.TaskID || "")
+return `
+<div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div>
+<div class="text-xs text-slate-500">TaskID: ${taskID}</div>
+<div class="text-sm text-slate-700">Status: <strong>${escapeHtml(task.Status || "Pending")}</strong> • Priority: <strong>${escapeHtml(task.Priority || "Medium")}</strong></div>
+</div>
+<div class="text-sm font-semibold text-slate-700">${formatPercent(task.PercentComplete || 0)}</div>
+</div>
+<div class="w-full bg-slate-200 rounded-full h-2 mt-2 overflow-hidden"><div class="h-full bg-emerald-600" style="width:${Math.max(0, Math.min(100, Number(task.PercentComplete || 0)))}%"></div></div>
+<div class="grid gap-2 md:grid-cols-4 mt-3">
+<input id="task-percent-${taskID}" type="number" min="0" max="100" value="${Number(task.PercentComplete || 0)}" class="p-2 rounded-lg border border-slate-200 text-sm" ${canEdit ? "" : "disabled"} />
+<select id="task-status-${taskID}" class="p-2 rounded-lg border border-slate-200 text-sm" ${canEdit ? "" : "disabled"}>
+<option value="Pending" ${String(task.Status||"")==="Pending" ? "selected" : ""}>Pending</option>
+<option value="In Progress" ${String(task.Status||"")==="In Progress" ? "selected" : ""}>In Progress</option>
+<option value="Blocked" ${String(task.Status||"")==="Blocked" ? "selected" : ""}>Blocked</option>
+<option value="Done" ${String(task.Status||"")==="Done" ? "selected" : ""}>Done</option>
+</select>
+<select id="task-priority-${taskID}" class="p-2 rounded-lg border border-slate-200 text-sm" ${canEdit ? "" : "disabled"}>
+<option value="High" ${String(task.Priority||"")==="High" ? "selected" : ""}>High</option>
+<option value="Medium" ${String(task.Priority||"")==="Medium" ? "selected" : ""}>Medium</option>
+<option value="Low" ${String(task.Priority||"")==="Low" ? "selected" : ""}>Low</option>
+</select>
+<button onclick="updateTaskRecord('${taskID}')" class="px-3 py-2 rounded-lg text-sm font-semibold ${canEdit ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-500 cursor-not-allowed"}" ${canEdit ? "" : "disabled"}>Update Task</button>
+</div>
+</div>
+`
+}).join("")
+}
+
+function loadProjectUpdates(projectID){
+google.script.run
+.withSuccessHandler(res=>{
+projectUpdatesCache = (res && Array.isArray(res.updates)) ? res.updates : []
+renderProjectUpdates(projectUpdatesCache)
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setProjectError((err && err.message) || "Unable to load project updates.")
+renderProjectUpdates([])
+})
+.getProjectUpdates(token, projectID)
+}
+
+function renderProjectUpdates(updates){
+const list = document.getElementById("project-update-list")
+if(!selectedProjectID){
+list.innerHTML = "<div class='text-sm text-slate-500'>Select a project to view updates.</div>"
+return
+}
+if(!updates || !updates.length){
+list.innerHTML = "<div class='text-sm text-slate-500'>No updates recorded for this project.</div>"
+return
+}
+list.innerHTML = updates.map(item=>`
+<div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+<div class="text-xs text-slate-500">${escapeHtml(item.UpdateID || "")}${item.TaskID ? ` • Task: ${escapeHtml(item.TaskID)}` : ""}</div>
+<div class="text-sm text-slate-800 mt-1 whitespace-pre-wrap">${escapeHtml(item.UpdateText || "")}</div>
+</div>
+`).join("")
+}
+
+function createProjectRecord(){
+const btn = document.getElementById("btn-create-project")
+const title = document.getElementById("project-create-title").value
+const goalUSD = document.getElementById("project-create-goal").value
+const status = document.getElementById("project-create-status").value
+if(!String(title||"").trim()){
+setProjectError("Project title is required.")
+return
+}
+btn.disabled = true
+btn.classList.add("opacity-60")
+setProjectError("")
+setProjectStatus("")
+google.script.run
+.withSuccessHandler(()=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+document.getElementById("project-create-title").value = ""
+document.getElementById("project-create-goal").value = ""
+setProjectStatus("Project created successfully.")
+loadProjects()
+})
+.withFailureHandler(err=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setProjectError((err && err.message) || "Unable to create project.")
+})
+.createProject(token, title, goalUSD, status)
+}
+
+function createTaskRecord(){
+if(!selectedProjectID){
+setProjectError("Select a project before creating a task.")
+return
+}
+const btn = document.getElementById("btn-create-task")
+const status = document.getElementById("task-create-status").value
+const priority = document.getElementById("task-create-priority").value
+const percentComplete = document.getElementById("task-create-percent").value
+btn.disabled = true
+btn.classList.add("opacity-60")
+setProjectError("")
+setProjectStatus("")
+google.script.run
+.withSuccessHandler(()=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+document.getElementById("task-create-percent").value = ""
+setProjectStatus("Project task created.")
+loadProjectTasks(selectedProjectID)
+loadProjects()
+})
+.withFailureHandler(err=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setProjectError((err && err.message) || "Unable to create task.")
+})
+.createProjectTask(token, selectedProjectID, status, priority, percentComplete)
+}
+
+function updateTaskRecord(taskID){
+if(!taskID){
+setProjectError("TaskID is required.")
+return
+}
+const percentInput = document.getElementById(`task-percent-${taskID}`)
+const statusInput = document.getElementById(`task-status-${taskID}`)
+const priorityInput = document.getElementById(`task-priority-${taskID}`)
+const percentComplete = percentInput ? percentInput.value : ""
+const status = statusInput ? statusInput.value : ""
+const priority = priorityInput ? priorityInput.value : ""
+setProjectError("")
+setProjectStatus("")
+google.script.run
+.withSuccessHandler(()=>{
+setProjectStatus("Task updated.")
+loadProjectTasks(selectedProjectID)
+loadProjects()
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setProjectError((err && err.message) || "Unable to update task.")
+})
+.updateProjectTask(token, taskID, percentComplete, status, priority)
+}
+
+function saveProjectUpdate(){
+if(!selectedProjectID){
+setProjectError("Select a project before adding an update.")
+return
+}
+const btn = document.getElementById("btn-save-project-update")
+const taskID = String(document.getElementById("project-update-task-id").value || "").trim()
+const updateText = document.getElementById("project-update-text").value
+if(!String(updateText || "").trim()){
+setProjectError("Update text is required.")
+return
+}
+btn.disabled = true
+btn.classList.add("opacity-60")
+setProjectError("")
+setProjectStatus("")
+google.script.run
+.withSuccessHandler(()=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+document.getElementById("project-update-task-id").value = ""
+document.getElementById("project-update-text").value = ""
+setProjectStatus("Project update saved.")
+loadProjectUpdates(selectedProjectID)
+})
+.withFailureHandler(err=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setProjectError((err && err.message) || "Unable to save project update.")
+})
+.addProjectUpdate(token, selectedProjectID, taskID, updateText)
 }
 
 function loadFinanceDashboard(){

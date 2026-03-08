@@ -707,6 +707,326 @@ function sendMessage(token, channelID, body) {
   }
 }
 
+
+/* =====================================================
+   PROJECT MANAGEMENT
+===================================================== */
+
+function createProject(token, title, goalUSD, status) {
+  try {
+    const session = _auth(token);
+    const projectsCtx = _getProjectSheets();
+    _assertProjectEditor(session, projectsCtx);
+
+    const normalizedTitle = String(title || '').trim();
+    if (!normalizedTitle) {
+      throw new Error('Project title is required.');
+    }
+
+    const numericGoal = Number(goalUSD);
+    if (isNaN(numericGoal) || numericGoal < 0) {
+      throw new Error('GoalUSD must be a valid non-negative number.');
+    }
+
+    const projectID = 'PRJ-' + Utilities.getUuid().split('-')[0].toUpperCase();
+    const row = new Array(projectsCtx.projects.headers.length).fill('');
+    row[projectsCtx.projects.idx.ProjectID] = projectID;
+    row[projectsCtx.projects.idx.Title] = normalizedTitle;
+    row[projectsCtx.projects.idx.GoalUSD] = numericGoal;
+    row[projectsCtx.projects.idx.Status] = _normalizeProjectStatus(status);
+
+    projectsCtx.projects.sheet.appendRow(row);
+
+    return {
+      success: true,
+      project: {
+        ProjectID: projectID,
+        Title: normalizedTitle,
+        GoalUSD: numericGoal,
+        Status: row[projectsCtx.projects.idx.Status]
+      }
+    };
+  } catch (e) {
+    throw new Error(_errMsg('createProject', e));
+  }
+}
+
+function getProjects(token) {
+  try {
+    const session = _auth(token);
+    const projectsCtx = _getProjectSheets();
+
+    const tasksByProject = projectsCtx.tasks.rows.reduce((acc, row, i) => {
+      const rowIndex = i + 2;
+      const projectID = String(row[projectsCtx.tasks.idx.ProjectID] || '').trim();
+      if (!projectID) {
+        return acc;
+      }
+
+      const task = {
+        TaskID: _deriveProjectTaskID(projectsCtx.tasks, row, rowIndex),
+        ProjectID: projectID,
+        PercentComplete: _clampPercent(row[projectsCtx.tasks.idx.PercentComplete]),
+        Status: _normalizeTaskStatus(row[projectsCtx.tasks.idx.Status]),
+        Priority: _normalizeTaskPriority(row[projectsCtx.tasks.idx.Priority]),
+        SortOrder: rowIndex,
+        Gantt: {
+          id: _deriveProjectTaskID(projectsCtx.tasks, row, rowIndex),
+          parent: projectID,
+          progress: _clampPercent(row[projectsCtx.tasks.idx.PercentComplete]),
+          status: _normalizeTaskStatus(row[projectsCtx.tasks.idx.Status]),
+          priority: _normalizeTaskPriority(row[projectsCtx.tasks.idx.Priority]),
+          sortOrder: rowIndex
+        }
+      };
+
+      if (!acc[projectID]) {
+        acc[projectID] = [];
+      }
+
+      acc[projectID].push(task);
+      return acc;
+    }, {});
+
+    const projects = projectsCtx.projects.rows.map(row => {
+      const projectID = String(row[projectsCtx.projects.idx.ProjectID] || '').trim();
+      const projectTasks = tasksByProject[projectID] || [];
+      const avgProgress = projectTasks.length
+        ? (projectTasks.reduce((sum, task) => sum + task.PercentComplete, 0) / projectTasks.length)
+        : 0;
+
+      return {
+        ProjectID: projectID,
+        Title: String(row[projectsCtx.projects.idx.Title] || '').trim(),
+        GoalUSD: Number(row[projectsCtx.projects.idx.GoalUSD]) || 0,
+        Status: _normalizeProjectStatus(row[projectsCtx.projects.idx.Status]),
+        ProgressPercent: Number(avgProgress.toFixed(2)),
+        TaskCount: projectTasks.length,
+        TasksCompleted: projectTasks.filter(task => task.PercentComplete >= 100 || _norm(task.Status) === 'done').length,
+        Gantt: {
+          id: projectID,
+          progress: Number(avgProgress.toFixed(2)),
+          children: projectTasks.map(task => task.Gantt)
+        }
+      };
+    });
+
+    return {
+      success: true,
+      permissions: _getProjectPermissions(session, projectsCtx),
+      projects: projects
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getProjects', e));
+  }
+}
+
+function createProjectTask(token, projectID, status, priority, percentComplete) {
+  try {
+    const session = _auth(token);
+    const projectsCtx = _getProjectSheets();
+    _assertProjectEditor(session, projectsCtx);
+
+    const normalizedProjectID = String(projectID || '').trim();
+    if (!normalizedProjectID) {
+      throw new Error('ProjectID is required.');
+    }
+
+    const projectExists = projectsCtx.projects.rows.some(row => String(row[projectsCtx.projects.idx.ProjectID] || '').trim() === normalizedProjectID);
+    if (!projectExists) {
+      throw new Error('Project not found.');
+    }
+
+    const row = new Array(projectsCtx.tasks.headers.length).fill('');
+    row[projectsCtx.tasks.idx.ProjectID] = normalizedProjectID;
+    row[projectsCtx.tasks.idx.PercentComplete] = _clampPercent(percentComplete);
+    row[projectsCtx.tasks.idx.Status] = _normalizeTaskStatus(status);
+    row[projectsCtx.tasks.idx.Priority] = _normalizeTaskPriority(priority);
+
+    const taskIDHeaderIndex = projectsCtx.tasks.headers.indexOf('TaskID');
+    const generatedTaskID = 'TASK-' + Utilities.getUuid().split('-')[0].toUpperCase();
+    if (taskIDHeaderIndex !== -1) {
+      row[taskIDHeaderIndex] = generatedTaskID;
+    }
+
+    projectsCtx.tasks.sheet.appendRow(row);
+    const appendedRowIndex = projectsCtx.tasks.rows.length + 2;
+    const taskID = taskIDHeaderIndex !== -1 ? generatedTaskID : ('TASK-' + appendedRowIndex);
+
+    return {
+      success: true,
+      task: {
+        TaskID: taskID,
+        ProjectID: normalizedProjectID,
+        PercentComplete: row[projectsCtx.tasks.idx.PercentComplete],
+        Status: row[projectsCtx.tasks.idx.Status],
+        Priority: row[projectsCtx.tasks.idx.Priority]
+      }
+    };
+  } catch (e) {
+    throw new Error(_errMsg('createProjectTask', e));
+  }
+}
+
+function updateProjectTask(token, taskID, percentComplete, status, priority) {
+  try {
+    const session = _auth(token);
+    const projectsCtx = _getProjectSheets();
+    _assertProjectEditor(session, projectsCtx);
+
+    const normalizedTaskID = String(taskID || '').trim();
+    if (!normalizedTaskID) {
+      throw new Error('TaskID is required.');
+    }
+
+    const target = _findProjectTaskRow(projectsCtx.tasks, normalizedTaskID);
+    if (!target) {
+      throw new Error('Task not found.');
+    }
+
+    const percentValue = _clampPercent(percentComplete);
+    const statusValue = _normalizeTaskStatus(status);
+    const priorityValue = _normalizeTaskPriority(priority);
+
+    projectsCtx.tasks.sheet.getRange(target.rowIndex, projectsCtx.tasks.idx.PercentComplete + 1).setValue(percentValue);
+    projectsCtx.tasks.sheet.getRange(target.rowIndex, projectsCtx.tasks.idx.Status + 1).setValue(statusValue);
+    projectsCtx.tasks.sheet.getRange(target.rowIndex, projectsCtx.tasks.idx.Priority + 1).setValue(priorityValue);
+
+    return {
+      success: true,
+      task: {
+        TaskID: normalizedTaskID,
+        ProjectID: target.row[target.ctx.idx.ProjectID],
+        PercentComplete: percentValue,
+        Status: statusValue,
+        Priority: priorityValue
+      }
+    };
+  } catch (e) {
+    throw new Error(_errMsg('updateProjectTask', e));
+  }
+}
+
+function getProjectTasks(token, projectID) {
+  try {
+    _auth(token);
+    const projectsCtx = _getProjectSheets();
+    const normalizedProjectID = String(projectID || '').trim();
+
+    if (!normalizedProjectID) {
+      throw new Error('ProjectID is required.');
+    }
+
+    const tasks = projectsCtx.tasks.rows
+      .map((row, i) => ({ row: row, rowIndex: i + 2 }))
+      .filter(item => String(item.row[projectsCtx.tasks.idx.ProjectID] || '').trim() === normalizedProjectID)
+      .map(item => ({
+        TaskID: _deriveProjectTaskID(projectsCtx.tasks, item.row, item.rowIndex),
+        ProjectID: normalizedProjectID,
+        PercentComplete: _clampPercent(item.row[projectsCtx.tasks.idx.PercentComplete]),
+        Status: _normalizeTaskStatus(item.row[projectsCtx.tasks.idx.Status]),
+        Priority: _normalizeTaskPriority(item.row[projectsCtx.tasks.idx.Priority]),
+        Gantt: {
+          id: _deriveProjectTaskID(projectsCtx.tasks, item.row, item.rowIndex),
+          parent: normalizedProjectID,
+          progress: _clampPercent(item.row[projectsCtx.tasks.idx.PercentComplete]),
+          status: _normalizeTaskStatus(item.row[projectsCtx.tasks.idx.Status]),
+          priority: _normalizeTaskPriority(item.row[projectsCtx.tasks.idx.Priority]),
+          sortOrder: item.rowIndex
+        }
+      }));
+
+    return {
+      success: true,
+      tasks: tasks
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getProjectTasks', e));
+  }
+}
+
+function addProjectUpdate(token, projectID, taskID, updateText) {
+  try {
+    const session = _auth(token);
+    const projectsCtx = _getProjectSheets();
+    _assertProjectEditor(session, projectsCtx);
+
+    const normalizedProjectID = String(projectID || '').trim();
+    const normalizedTaskID = String(taskID || '').trim();
+    const normalizedUpdateText = String(updateText || '').trim();
+
+    if (!normalizedProjectID) {
+      throw new Error('ProjectID is required.');
+    }
+
+    if (!normalizedUpdateText) {
+      throw new Error('UpdateText is required.');
+    }
+
+    const projectExists = projectsCtx.projects.rows.some(row => String(row[projectsCtx.projects.idx.ProjectID] || '').trim() === normalizedProjectID);
+    if (!projectExists) {
+      throw new Error('Project not found.');
+    }
+
+    if (normalizedTaskID) {
+      const task = _findProjectTaskRow(projectsCtx.tasks, normalizedTaskID);
+      if (!task || String(task.row[task.ctx.idx.ProjectID] || '').trim() !== normalizedProjectID) {
+        throw new Error('Task does not belong to this project.');
+      }
+    }
+
+    const generatedUpdateID = 'UPD-' + Utilities.getUuid().split('-')[0].toUpperCase();
+    const row = new Array(projectsCtx.updates.headers.length).fill('');
+    row[projectsCtx.updates.idx.UpdateID] = generatedUpdateID;
+    row[projectsCtx.updates.idx.ProjectID] = normalizedProjectID;
+    row[projectsCtx.updates.idx.TaskID] = normalizedTaskID;
+    row[projectsCtx.updates.idx.UpdateText] = normalizedUpdateText;
+
+    projectsCtx.updates.sheet.appendRow(row);
+
+    return {
+      success: true,
+      update: {
+        UpdateID: generatedUpdateID,
+        ProjectID: normalizedProjectID,
+        TaskID: normalizedTaskID,
+        UpdateText: normalizedUpdateText
+      }
+    };
+  } catch (e) {
+    throw new Error(_errMsg('addProjectUpdate', e));
+  }
+}
+
+function getProjectUpdates(token, projectID) {
+  try {
+    _auth(token);
+    const projectsCtx = _getProjectSheets();
+    const normalizedProjectID = String(projectID || '').trim();
+
+    if (!normalizedProjectID) {
+      throw new Error('ProjectID is required.');
+    }
+
+    const updates = projectsCtx.updates.rows
+      .filter(row => String(row[projectsCtx.updates.idx.ProjectID] || '').trim() === normalizedProjectID)
+      .map((row, i) => ({
+        UpdateID: String(row[projectsCtx.updates.idx.UpdateID] || '').trim() || ('UPD-' + (i + 2)),
+        ProjectID: normalizedProjectID,
+        TaskID: String(row[projectsCtx.updates.idx.TaskID] || '').trim(),
+        UpdateText: String(row[projectsCtx.updates.idx.UpdateText] || '').trim()
+      }));
+
+    return {
+      success: true,
+      updates: updates
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getProjectUpdates', e));
+  }
+}
+
+
 /* =====================================================
    ADMIN USER REGISTRY
 ===================================================== */
@@ -1252,6 +1572,128 @@ function _getGovernanceSheets() {
       IsAdult: ['IsAdult', 'Adult']
     })
   };
+}
+
+
+function _getProjectSheets() {
+  return {
+    projects: _readSheet('Projects', {
+      ProjectID: ['ProjectID'],
+      Title: ['Title'],
+      GoalUSD: ['GoalUSD'],
+      Status: ['Status']
+    }),
+    tasks: _readSheet('ProjectTasks', {
+      ProjectID: ['ProjectID'],
+      PercentComplete: ['PercentComplete'],
+      Status: ['Status'],
+      Priority: ['Priority']
+    }),
+    updates: _readSheet('ProjectUpdates', {
+      UpdateID: ['UpdateID'],
+      ProjectID: ['ProjectID'],
+      TaskID: ['TaskID'],
+      UpdateText: ['UpdateText']
+    }),
+    access: _readSheet('Access', {
+      EmailOptional: ['EmailOptional', 'Email'],
+      Role: ['Role', 'RoleName']
+    }),
+    roles: _readSheet('Roles', {
+      Email: ['Email', 'EmailOptional'],
+      RoleName: ['RoleName', 'Role'],
+      IsAdult: ['IsAdult', 'Adult']
+    })
+  };
+}
+
+function _getProjectPermissions(session, projectsCtx) {
+  const email = _norm(session.email);
+
+  const accessRole = projectsCtx.access.rows.reduce((found, row) => {
+    if (found) return found;
+    if (_norm(row[projectsCtx.access.idx.EmailOptional]) === email) {
+      return String(row[projectsCtx.access.idx.Role] || '').trim();
+    }
+    return '';
+  }, '');
+
+  const privilegedNames = ['admin', 'project', 'pm', 'governance', 'chair', 'secretary'];
+
+  const hasPrivilegedAccessRole = privilegedNames.some(name => _norm(accessRole).indexOf(name) !== -1);
+
+  const hasPrivilegedRole = projectsCtx.roles.rows.some(row => {
+    if (_norm(row[projectsCtx.roles.idx.Email]) !== email) {
+      return false;
+    }
+
+    const roleName = _norm(row[projectsCtx.roles.idx.RoleName]);
+    return privilegedNames.some(name => roleName.indexOf(name) !== -1);
+  });
+
+  const canEdit = hasPrivilegedAccessRole || hasPrivilegedRole;
+
+  return {
+    canCreateProject: canEdit,
+    canEditTask: canEdit
+  };
+}
+
+function _assertProjectEditor(session, projectsCtx) {
+  const permissions = _getProjectPermissions(session, projectsCtx);
+  if (!permissions.canEditTask) {
+    throw new Error('Unauthorized to manage projects.');
+  }
+}
+
+function _normalizeProjectStatus(value) {
+  const normalized = String(value || '').trim();
+  return normalized || 'Planning';
+}
+
+function _normalizeTaskStatus(value) {
+  const normalized = String(value || '').trim();
+  return normalized || 'Pending';
+}
+
+function _normalizeTaskPriority(value) {
+  const normalized = String(value || '').trim();
+  return normalized || 'Medium';
+}
+
+function _clampPercent(value) {
+  const parsed = Number(value);
+  if (isNaN(parsed)) {
+    return 0;
+  }
+  return Math.max(0, Math.min(100, parsed));
+}
+
+function _deriveProjectTaskID(tasksCtx, row, rowIndex) {
+  const taskIDHeaderIndex = tasksCtx.headers.indexOf('TaskID');
+  const explicitTaskID = taskIDHeaderIndex !== -1 ? String(row[taskIDHeaderIndex] || '').trim() : '';
+  return explicitTaskID || ('TASK-' + rowIndex);
+}
+
+function _findProjectTaskRow(tasksCtx, taskID) {
+  const normalizedTaskID = String(taskID || '').trim();
+  if (!normalizedTaskID) {
+    return null;
+  }
+
+  for (let i = 0; i < tasksCtx.rows.length; i += 1) {
+    const row = tasksCtx.rows[i];
+    const rowIndex = i + 2;
+    if (_deriveProjectTaskID(tasksCtx, row, rowIndex) === normalizedTaskID) {
+      return {
+        ctx: tasksCtx,
+        row: row,
+        rowIndex: rowIndex
+      };
+    }
+  }
+
+  return null;
 }
 
 function _normalizeThresholdType(value) {
