@@ -358,10 +358,51 @@ Financial Distribution
 
 <div id="page-admin" class="page p-6">
 
-<h2 class="text-2xl font-bold mb-4">Registry Management</h2>
+<div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+<h2 class="text-2xl font-bold">Admin & System Controls</h2>
+<button onclick="loadAdmin()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+</div>
 
+<div id="admin-error" class="hidden text-sm text-red-600 mb-3"></div>
+<div id="admin-status" class="hidden text-sm text-emerald-700 mb-3"></div>
+
+<div class="grid gap-4 lg:grid-cols-4 mb-4">
+<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+<div class="text-xs text-slate-500 uppercase">Users</div>
+<div id="admin-stat-users" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+</div>
+<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+<div class="text-xs text-slate-500 uppercase">Admins</div>
+<div id="admin-stat-admins" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+</div>
+<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+<div class="text-xs text-slate-500 uppercase">Settings Entries</div>
+<div id="admin-stat-settings" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+</div>
+<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+<div class="text-xs text-slate-500 uppercase">Health Issues</div>
+<div id="admin-stat-issues" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+</div>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-3">
+<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Settings Summary</h3>
+<div id="admin-settings-summary" class="space-y-2 text-sm"></div>
+</div>
+<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Institution Settings</h3>
+<div id="admin-inst-settings-summary" class="space-y-2 text-sm"></div>
+</div>
+<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">System Health</h3>
+<div id="admin-health-summary" class="space-y-2 text-sm"></div>
+</div>
+</div>
+
+<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow mt-4">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Access Registry</h3>
 <div id="user-list" class="space-y-2"></div>
-
 </div>
 
 </div>
@@ -1126,25 +1167,167 @@ document.getElementById("finance-founder-lock-list").innerHTML = founderLockRows
 `).join("")
 }
 
-function loadAdmin(){
-google.script.run
-.withSuccessHandler(users=>{
-let container=document.getElementById("user-list")
+function setAdminError(message){
+const el = document.getElementById("admin-error")
+if(!el) return
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
+}
 
-container.innerHTML=users.map(u=>`
-<div class="bg-white p-4 rounded-2xl border flex justify-between">
+function setAdminStatus(message){
+const el = document.getElementById("admin-status")
+if(!el) return
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
+}
+
+function renderAdminUserList(users){
+const container = document.getElementById("user-list")
+if(!users || !users.length){
+container.innerHTML = "<div class='text-sm text-slate-500'>No users found in Access yet.</div>"
+return
+}
+container.innerHTML = users.map(u=>`
+<div class="bg-white p-4 rounded-2xl border flex justify-between gap-3">
 <div>
 <div class="font-bold">${escapeHtml(u.FullName || "")}</div>
-<div class="text-xs text-slate-400">${escapeHtml(u.EmailOptional || "")}</div>
+<div class="text-xs text-slate-500">${escapeHtml(u.EmailOptional || "")}</div>
 </div>
-<div class="text-xs font-bold bg-slate-100 p-2 rounded-lg">
-${escapeHtml(u.OneTimeCode || "---")}
-</div>
+<div class="text-xs font-bold bg-slate-100 p-2 rounded-lg">${escapeHtml(u.Role || "No role")}</div>
 </div>
 `).join("")
+}
+
+function renderSettingsSummary(data){
+const container = document.getElementById("admin-settings-summary")
+if(!data || !Array.isArray(data.entries) || !data.entries.length){
+container.innerHTML = "<div class='text-sm text-slate-500'>No settings data available yet.</div>"
+return
+}
+const missing = Array.isArray(data.missingRequiredKeys) ? data.missingRequiredKeys : []
+container.innerHTML = `
+<div class="text-xs text-slate-500">Entries: <strong>${Number(data.totalEntries || 0)}</strong></div>
+${missing.length ? `<div class="text-xs text-amber-700">Missing keys: ${escapeHtml(missing.join(", "))}</div>` : `<div class="text-xs text-emerald-700">Required settings keys present.</div>`}
+<div class="space-y-2 mt-2">${data.entries.slice(0,8).map(item=>`<div class="border border-slate-200 rounded-lg p-2"><div class="text-xs text-slate-500">${escapeHtml(item.key)}</div><div class="text-sm text-slate-800 break-all">${escapeHtml(String(item.value || ""))}</div></div>`).join("")}</div>
+`
+}
+
+function renderInstitutionSettingsSummary(data){
+const container = document.getElementById("admin-inst-settings-summary")
+if(!data || !Array.isArray(data.entries) || !data.entries.length){
+container.innerHTML = "<div class='text-sm text-slate-500'>No institution settings available yet.</div>"
+return
+}
+const missing = Array.isArray(data.missingRequiredKeys) ? data.missingRequiredKeys : []
+container.innerHTML = `
+<div class="text-xs text-slate-500">Entries: <strong>${Number(data.totalEntries || 0)}</strong></div>
+<div class="text-xs ${data.allocationIsValid ? 'text-emerald-700' : 'text-red-600'}">Allocation total: ${formatPercent(data.allocationTotal || 0)}</div>
+${missing.length ? `<div class="text-xs text-amber-700">Missing keys: ${escapeHtml(missing.join(", "))}</div>` : `<div class="text-xs text-emerald-700">Allocation keys available.</div>`}
+<div class="space-y-2 mt-2">${(data.allocations||[]).map(item=>`<div class="border border-slate-200 rounded-lg p-2"><div class="text-xs text-slate-500">${escapeHtml(item.key)}</div><div class="text-sm text-slate-800">${formatPercent(item.value || 0)}</div></div>`).join("")}</div>
+`
+}
+
+function renderSystemHealth(data){
+const container = document.getElementById("admin-health-summary")
+if(!data){
+container.innerHTML = "<div class='text-sm text-slate-500'>System health unavailable.</div>"
+return
+}
+const issues = Array.isArray(data.issues) ? data.issues : []
+container.innerHTML = `
+<div class="text-xs ${data.healthy ? 'text-emerald-700' : 'text-red-600'}">${data.healthy ? 'Healthy' : 'Issues detected'} (${Number(data.issueCount || 0)})</div>
+${issues.length ? `<div class="space-y-1 mt-2">${issues.slice(0,10).map(item=>`<div class="text-xs text-red-600">• ${escapeHtml(item)}</div>`).join("")}</div>` : `<div class="text-xs text-emerald-700 mt-2">No health issues found.</div>`}
+`
+}
+
+function loadAdmin(){
+setAdminError("")
+setAdminStatus("Loading admin dashboard...")
+
+google.script.run
+.withSuccessHandler(users=>{
+renderAdminUserList(Array.isArray(users) ? users : [])
 })
-.withFailureHandler(onServerFailure)
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setAdminError((err && err.message) || "Unable to load Access registry.")
+renderAdminUserList([])
+})
 .adminGetAllUsers(token)
+
+google.script.run
+.withSuccessHandler(data=>{
+document.getElementById("admin-stat-users").innerText = Number(data && data.userOverview ? data.userOverview.totalUsers : 0)
+document.getElementById("admin-stat-admins").innerText = Number(data && data.userOverview ? data.userOverview.adminUsers : 0)
+document.getElementById("admin-stat-settings").innerText = Number(data && data.settingsOverview ? data.settingsOverview.totalEntries : 0)
+setAdminStatus("Admin dashboard loaded.")
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setAdminError((err && err.message) || "Unable to load admin dashboard summary.")
+setAdminStatus("")
+})
+.getAdminDashboardData(token)
+
+google.script.run
+.withSuccessHandler(data=>{
+renderSettingsSummary(data)
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setAdminError((err && err.message) || "Unable to load settings summary.")
+renderSettingsSummary({entries:[]})
+})
+.getSettingsSummary(token)
+
+google.script.run
+.withSuccessHandler(data=>{
+renderInstitutionSettingsSummary(data)
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setAdminError((err && err.message) || "Unable to load institution settings summary.")
+renderInstitutionSettingsSummary({entries:[]})
+})
+.getInstitutionSettingsSummary(token)
+
+google.script.run
+.withSuccessHandler(data=>{
+renderSystemHealth(data)
+document.getElementById("admin-stat-issues").innerText = Number(data && data.issueCount ? data.issueCount : 0)
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setAdminError((err && err.message) || "Unable to load system health.")
+renderSystemHealth({healthy:false,issueCount:1,issues:["System health could not be loaded."]})
+document.getElementById("admin-stat-issues").innerText = "--"
+})
+.getSystemHealth(token)
 }
 
 function loadUserChannels(){

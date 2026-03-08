@@ -13,8 +13,10 @@
 const SS_ID = "104VsCf8xhIFymyai9fG84RMbM6iirVcQxgTfqO4LkH4"; // Replace if needed
 const SESSION_TTL = 21600; // 6 hours
 const CHANNEL_TYPES = ['private', 'family broadcast', 'project'];
+const ADMIN_CACHE_TTL_SECONDS = 120;
 
 let _SS_CACHE = null;
+let _SHEET_CACHE = {};
 
 /* =====================================================
    WEB APP ENTRY
@@ -1059,6 +1061,327 @@ function adminGetAllUsers(token) {
   }
 }
 
+function getAdminDashboardData(token) {
+  try {
+    const session = _auth(token);
+    _assertAdminSession(session);
+
+    const cacheKey = 'ADMIN_DASHBOARD::' + _norm(session.email);
+    const cache = CacheService.getScriptCache();
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    const access = _readSheet('Access', {
+      EmailOptional: ['EmailOptional', 'Email'],
+      FullName: ['FullName', 'Name'],
+      Role: ['Role', 'RoleName']
+    });
+
+    const roles = _readSheet('Roles', {
+      Email: ['Email', 'EmailOptional'],
+      RoleName: ['RoleName', 'Role'],
+      IsAdult: ['IsAdult', 'Adult']
+    });
+
+    const settings = _readSheet('Settings', {
+      Key: ['Key', 'SettingKey'],
+      Value: ['Value', 'SettingValue']
+    });
+
+    const institution = _readSheet('InstitutionSettings', {
+      SettingKey: ['SettingKey', 'Key'],
+      SettingValue: ['SettingValue', 'Value']
+    });
+
+    const users = access.rows.map(row => ({
+      email: _norm(row[access.idx.EmailOptional]),
+      role: String(row[access.idx.Role] || '').trim(),
+      name: String(row[access.idx.FullName] || '').trim()
+    }));
+
+    const roleMap = roles.rows.reduce((acc, row) => {
+      const email = _norm(row[roles.idx.Email]);
+      if (!email) return acc;
+      if (!acc[email]) {
+        acc[email] = [];
+      }
+      acc[email].push({
+        roleName: String(row[roles.idx.RoleName] || '').trim(),
+        isAdult: _toBoolean(row[roles.idx.IsAdult])
+      });
+      return acc;
+    }, {});
+
+    const totalUsers = users.length;
+    const adminUsers = users.filter(u => _norm(u.role) === 'admin').length;
+    const userOverview = {
+      totalUsers: totalUsers,
+      adminUsers: adminUsers,
+      usersWithoutRoleValue: users.filter(u => !u.role).length,
+      usersWithoutMatchingRoleRecord: users.filter(u => !(roleMap[u.email] || []).length).length,
+      adultsInRoles: Object.keys(roleMap).reduce((sum, email) => {
+        const hasAdult = (roleMap[email] || []).some(r => r.isAdult);
+        return sum + (hasAdult ? 1 : 0);
+      }, 0)
+    };
+
+    const result = {
+      success: true,
+      generatedAt: new Date().toISOString(),
+      userOverview: userOverview,
+      settingsOverview: {
+        totalEntries: settings.rows.length
+      },
+      institutionSettingsOverview: {
+        totalEntries: institution.rows.length
+      },
+      notices: [
+        totalUsers ? '' : 'Access sheet has no user records yet.',
+        settings.rows.length ? '' : 'Settings sheet has no entries yet.',
+        institution.rows.length ? '' : 'InstitutionSettings sheet has no entries yet.'
+      ].filter(Boolean)
+    };
+
+    cache.put(cacheKey, JSON.stringify(result), ADMIN_CACHE_TTL_SECONDS);
+    return result;
+  } catch (e) {
+    throw new Error(_errMsg('getAdminDashboardData', e));
+  }
+}
+
+function getSettingsSummary(token) {
+  try {
+    const session = _auth(token);
+    _assertAdminSession(session);
+
+    const settings = _readSheet('Settings', {
+      Key: ['Key', 'SettingKey'],
+      Value: ['Value', 'SettingValue']
+    });
+
+    const entries = settings.rows
+      .map(row => ({
+        key: String(row[settings.idx.Key] || '').trim(),
+        value: row[settings.idx.Value]
+      }))
+      .filter(item => item.key);
+
+    const requiredKeys = ['InstitutionName', 'SupportEmail', 'DefaultCurrency', 'EmergencyContact'];
+    const keyMap = entries.reduce((acc, item) => {
+      acc[_norm(item.key)] = item.value;
+      return acc;
+    }, {});
+
+    const missingRequiredKeys = requiredKeys.filter(key => !Object.prototype.hasOwnProperty.call(keyMap, _norm(key)));
+
+    return {
+      success: true,
+      totalEntries: entries.length,
+      missingRequiredKeys: missingRequiredKeys,
+      entries: entries,
+      message: entries.length ? '' : 'Settings sheet has no data yet.'
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getSettingsSummary', e));
+  }
+}
+
+function getInstitutionSettingsSummary(token) {
+  try {
+    const session = _auth(token);
+    _assertAdminSession(session);
+
+    const institution = _readSheet('InstitutionSettings', {
+      SettingKey: ['SettingKey', 'Key'],
+      SettingValue: ['SettingValue', 'Value']
+    });
+
+    const entries = institution.rows
+      .map(row => ({
+        key: String(row[institution.idx.SettingKey] || '').trim(),
+        value: row[institution.idx.SettingValue]
+      }))
+      .filter(item => item.key);
+
+    const map = entries.reduce((acc, item) => {
+      acc[_norm(item.key)] = item.value;
+      return acc;
+    }, {});
+
+    const allocationKeys = ['EquityPercent', 'FixedIncomePercent', 'CashPercent', 'AlternativePercent'];
+    const allocations = allocationKeys.map(key => ({
+      key: key,
+      value: _numSetting(map, [key], 0)
+    }));
+
+    const allocationTotal = allocations.reduce((sum, item) => sum + (Number(item.value) || 0), 0);
+    const allocationIsValid = Math.abs(allocationTotal - 100) < 0.0001;
+
+    const requiredKeys = ['ProjectionRate'].concat(allocationKeys);
+    const missingRequiredKeys = requiredKeys.filter(key => !Object.prototype.hasOwnProperty.call(map, _norm(key)));
+
+    return {
+      success: true,
+      totalEntries: entries.length,
+      entries: entries,
+      allocations: allocations,
+      allocationTotal: allocationTotal,
+      allocationIsValid: allocationIsValid,
+      missingRequiredKeys: missingRequiredKeys,
+      message: entries.length ? '' : 'InstitutionSettings sheet has no data yet.'
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getInstitutionSettingsSummary', e));
+  }
+}
+
+function getSystemHealth(token) {
+  try {
+    const session = _auth(token);
+    _assertAdminSession(session);
+
+    const expectedSheets = {
+      Access: ['EmailOptional', 'OneTimeCode', 'FullName', 'Role'],
+      Roles: ['Email', 'RoleName', 'IsAdult'],
+      Settings: ['Key', 'Value'],
+      InstitutionSettings: ['SettingKey', 'SettingValue'],
+      Contributions: ['AmountUSD', 'ContributionType'],
+      FounderLocks: ['AmountUSD', 'ExpiryDate', 'LockYears', 'Released'],
+      Votes: ['VoteID', 'Title', 'ThresholdType', 'Status'],
+      VoteBallots: ['VoteID', 'VoterEmail', 'VoteChoice'],
+      Messages: ['ChannelID', 'SenderEmail', 'Body', 'SentAt'],
+      Channels: ['ChannelID', 'Name', 'Type', 'IsActive'],
+      ChannelMembers: ['ChannelID', 'Email', 'MemberRole'],
+      SOSAlerts: ['ReporterEmail', 'Lat', 'Lng', 'Status', 'WhatsAppLink'],
+      SOSMedia: ['SOSID', 'MediaType', 'FileURL'],
+      Projects: ['ProjectID', 'Title', 'GoalUSD', 'Status'],
+      ProjectTasks: ['ProjectID', 'PercentComplete', 'Status', 'Priority'],
+      ProjectUpdates: ['UpdateID', 'ProjectID', 'TaskID', 'UpdateText'],
+      History: ['Title', 'EventDate', 'EventType', 'Description'],
+      Events: ['EventID', 'Title', 'EventDate', 'Recurrence']
+    };
+
+    const perSheet = Object.keys(expectedSheets).map(sheetName => _validateSheetHealth(sheetName, expectedSheets[sheetName]));
+    const missingSheets = perSheet.filter(item => !item.exists).map(item => item.sheet);
+    const missingHeaders = perSheet.filter(item => item.exists && item.missingHeaders.length);
+
+    const institutionHealth = _checkInstitutionAllocationHealth();
+    const settingsHealth = _checkSettingsHealthKeys();
+
+    const issues = [];
+    missingSheets.forEach(name => issues.push('Missing required sheet: ' + name));
+    missingHeaders.forEach(item => {
+      item.missingHeaders.forEach(header => issues.push(item.sheet + ' missing header: ' + header));
+    });
+    if (!institutionHealth.valid) {
+      issues.push(institutionHealth.message);
+    }
+    settingsHealth.missingKeys.forEach(key => {
+      issues.push('Settings missing expected key: ' + key);
+    });
+
+    return {
+      success: true,
+      generatedAt: new Date().toISOString(),
+      healthy: issues.length === 0,
+      issueCount: issues.length,
+      issues: issues,
+      missingSheets: missingSheets,
+      sheetsWithMissingHeaders: missingHeaders,
+      allocationHealth: institutionHealth,
+      settingsHealth: settingsHealth,
+      sheets: perSheet
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getSystemHealth', e));
+  }
+}
+
+function _assertAdminSession(session) {
+  const role = _norm(session && session.role);
+  if (role !== 'admin') {
+    throw new Error('Unauthorized');
+  }
+}
+
+function _validateSheetHealth(sheetName, requiredHeaders) {
+  const sheet = _ss().getSheetByName(sheetName);
+  if (!sheet) {
+    return {
+      sheet: sheetName,
+      exists: false,
+      headerCount: 0,
+      missingHeaders: requiredHeaders.slice()
+    };
+  }
+
+  const values = sheet.getDataRange().getValues();
+  const headers = (values[0] || []).map(h => String(h || '').trim());
+  const headerMap = headers.reduce((acc, header) => {
+    acc[header] = true;
+    return acc;
+  }, {});
+
+  const missingHeaders = requiredHeaders.filter(header => !Object.prototype.hasOwnProperty.call(headerMap, header));
+
+  return {
+    sheet: sheetName,
+    exists: true,
+    headerCount: headers.length,
+    missingHeaders: missingHeaders
+  };
+}
+
+function _checkInstitutionAllocationHealth() {
+  const sheet = _readSheet('InstitutionSettings', {
+    SettingKey: ['SettingKey', 'Key'],
+    SettingValue: ['SettingValue', 'Value']
+  });
+
+  const map = sheet.rows.reduce((acc, row) => {
+    const key = _norm(row[sheet.idx.SettingKey]);
+    if (key) {
+      acc[key] = row[sheet.idx.SettingValue];
+    }
+    return acc;
+  }, {});
+
+  const keys = ['EquityPercent', 'FixedIncomePercent', 'CashPercent', 'AlternativePercent'];
+  const total = keys.reduce((sum, key) => sum + _numSetting(map, [key], 0), 0);
+  const valid = Math.abs(total - 100) < 0.0001;
+
+  return {
+    valid: valid,
+    total: total,
+    message: valid ? '' : 'Institution allocation total must equal 100. Current total is ' + total + '.'
+  };
+}
+
+function _checkSettingsHealthKeys() {
+  const sheet = _readSheet('Settings', {
+    Key: ['Key', 'SettingKey'],
+    Value: ['Value', 'SettingValue']
+  });
+
+  const requiredKeys = ['InstitutionName', 'SupportEmail', 'DefaultCurrency', 'EmergencyContact'];
+  const keyMap = sheet.rows.reduce((acc, row) => {
+    const key = _norm(row[sheet.idx.Key]);
+    if (key) {
+      acc[key] = true;
+    }
+    return acc;
+  }, {});
+
+  const missingKeys = requiredKeys.filter(key => !Object.prototype.hasOwnProperty.call(keyMap, _norm(key)));
+
+  return {
+    requiredKeys: requiredKeys,
+    missingKeys: missingKeys
+  };
+}
+
 /* =====================================================
    SOS ALERT
 ===================================================== */
@@ -1488,11 +1811,17 @@ function _ss() {
 
 function _sh(name) {
   try {
+    if (_SHEET_CACHE[name]) {
+      return _SHEET_CACHE[name];
+    }
+
     const sh = _ss().getSheetByName(name);
 
     if (!sh) {
       throw new Error('Missing sheet: ' + name);
     }
+
+    _SHEET_CACHE[name] = sh;
 
     return sh;
   } catch (e) {
@@ -1505,16 +1834,21 @@ function _readSheet(name, requiredHeadersMap) {
     const sheet = _sh(name);
     const data = sheet.getDataRange().getValues();
     const headers = (data[0] || []).map(h => String(h).trim());
+    const headerMap = headers.reduce((acc, header, index) => {
+      acc[header] = index;
+      return acc;
+    }, {});
 
     if (!headers.length) {
       throw new Error('Sheet has no headers: ' + name);
     }
 
-    const idx = _resolveRequiredHeaders(headers, requiredHeadersMap || {});
+    const idx = _resolveRequiredHeaders(headers, requiredHeadersMap || {}, headerMap);
 
     return {
       sheet: sheet,
       headers: headers,
+      headerMap: headerMap,
       idx: idx,
       rows: data.slice(1)
     };
@@ -1523,8 +1857,12 @@ function _readSheet(name, requiredHeadersMap) {
   }
 }
 
-function _resolveRequiredHeaders(headers, requiredHeadersMap) {
+function _resolveRequiredHeaders(headers, requiredHeadersMap, headerMap) {
   const idx = {};
+  const normalizedHeaderMap = headerMap || headers.reduce((acc, header, index) => {
+    acc[header] = index;
+    return acc;
+  }, {});
 
   Object.keys(requiredHeadersMap).forEach(key => {
     const aliases = requiredHeadersMap[key] || [];
@@ -1534,7 +1872,9 @@ function _resolveRequiredHeaders(headers, requiredHeadersMap) {
         return foundIndex;
       }
 
-      return headers.indexOf(alias);
+      return Object.prototype.hasOwnProperty.call(normalizedHeaderMap, alias)
+        ? normalizedHeaderMap[alias]
+        : -1;
     }, -1);
 
     if (found === -1) {
