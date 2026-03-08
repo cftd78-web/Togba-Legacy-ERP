@@ -103,7 +103,42 @@ Financial Distribution
 
 <h2 class="text-2xl font-bold mb-4">Finance</h2>
 
-<div id="finance-data" class="bg-white p-6 rounded-3xl shadow"></div>
+<div id="finance-error" class="hidden text-sm text-red-600 mb-3"></div>
+
+<div class="grid gap-4 lg:grid-cols-3">
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+<div class="text-xs text-slate-500 uppercase font-bold mb-1">Total Contributions</div>
+<div id="finance-total-contributions" class="text-2xl font-bold text-slate-800">$0.00</div>
+</div>
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+<div class="text-xs text-slate-500 uppercase font-bold mb-1">Founder Locked Capital</div>
+<div id="finance-total-locked" class="text-2xl font-bold text-slate-800">$0.00</div>
+</div>
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+<div class="text-xs text-slate-500 uppercase font-bold mb-1">Projected Distribution</div>
+<div id="finance-total-projected" class="text-2xl font-bold text-slate-800">$0.00</div>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-sm font-bold text-slate-500 uppercase">Investment Allocation</h3>
+<span id="finance-allocation-validation" class="text-xs font-semibold text-slate-500"></span>
+</div>
+<canvas id="finance-allocation-chart" height="180"></canvas>
+<div id="finance-allocation-breakdown" class="grid grid-cols-2 gap-2 mt-4 text-sm"></div>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Founder Capital Status</h3>
+<canvas id="finance-founder-lock-chart" height="180"></canvas>
+<div id="finance-founder-lock-summary" class="mt-3 space-y-2 text-sm text-slate-700"></div>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Founder Lock Records</h3>
+<div id="finance-founder-lock-list" class="space-y-3"></div>
+</div>
+</div>
 
 </div>
 
@@ -266,6 +301,8 @@ Admin
 
 let token = ""
 let financeChartInstance = null
+let financeAllocationChartInstance = null
+let founderLockChartInstance = null
 let userChannels = []
 let selectedChannelID = ""
 let timelineLoaded = false
@@ -326,11 +363,31 @@ el.classList.remove("hidden")
 el.innerText = message
 }
 
+function setFinanceError(message){
+const el = document.getElementById("finance-error")
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
+}
+
 function formatDate(value){
 if(!value) return "Unknown date"
 const d = new Date(value)
 if(Number.isNaN(d.getTime())) return "Unknown date"
 return d.toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})
+}
+
+function formatCurrency(value){
+const amount = Number(value) || 0
+return amount.toLocaleString(undefined,{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2})
+}
+
+function formatPercent(value){
+return `${Number(value || 0).toFixed(2)}%`
 }
 
 function handleOTP(){
@@ -368,6 +425,7 @@ if(data.profile.role === "Admin")
 document.getElementById("btn-nav-admin").classList.remove("hidden")
 
 loadCharts()
+loadFinanceDashboard()
 loadUserChannels()
 })
 .withFailureHandler(onServerFailure)
@@ -419,6 +477,111 @@ document.getElementById("page-"+page)
 if(page==="admin") loadAdmin()
 if(page==="messages") loadUserChannels()
 if(page==="timeline") loadTimelineData()
+if(page==="finance") loadFinanceDashboard()
+}
+
+function loadFinanceDashboard(){
+setFinanceError("")
+const lockList = document.getElementById("finance-founder-lock-list")
+if(lockList && !lockList.innerHTML.trim()){
+lockList.innerHTML = "<div class='text-sm text-slate-500'>Loading finance dashboard...</div>"
+}
+
+google.script.run
+.withSuccessHandler(data=>{
+renderFinanceDashboard(data || {})
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setFinanceError((err && err.message) || "Unable to load finance dashboard.")
+})
+.getFinanceDashboardData(token)
+}
+
+function renderFinanceDashboard(data){
+const totals = data.totals || {}
+const allocation = data.allocation || {}
+const founderLocks = data.founderLocks || {}
+const projection = data.projection || {}
+
+document.getElementById("finance-total-contributions").innerText = formatCurrency(totals.totalContributions)
+document.getElementById("finance-total-locked").innerText = formatCurrency(founderLocks.totalLocked)
+document.getElementById("finance-total-projected").innerText = formatCurrency(projection.totalProjected)
+
+const validationEl = document.getElementById("finance-allocation-validation")
+validationEl.innerText = allocation.isValid ? "Allocation total is valid (100%)" : `Allocation total is ${Number(allocation.totalPercent || 0).toFixed(2)}%`
+validationEl.className = `text-xs font-semibold ${allocation.isValid ? 'text-emerald-600' : 'text-amber-600'}`
+
+const labels = (allocation.breakdown || []).map(item=>item.label)
+const percents = (allocation.breakdown || []).map(item=>item.percent)
+
+if(financeAllocationChartInstance){
+financeAllocationChartInstance.destroy()
+}
+financeAllocationChartInstance = new Chart(document.getElementById("finance-allocation-chart"), {
+type:"doughnut",
+data:{
+labels:labels,
+datasets:[{
+data:percents,
+backgroundColor:["#2563eb", "#9333ea", "#f59e0b", "#0f766e"]
+}]
+},
+options:{plugins:{legend:{position:"bottom"}}}
+})
+
+document.getElementById("finance-allocation-breakdown").innerHTML = (allocation.breakdown || []).map(item=>`
+<div class="rounded-lg border border-slate-100 bg-slate-50 p-2">
+<div class="text-xs text-slate-500 uppercase">${escapeHtml(item.label)}</div>
+<div class="font-semibold text-slate-800">${formatPercent(item.percent)}</div>
+<div class="text-xs text-slate-600">Projected: ${formatCurrency(item.projectedAmount)}</div>
+</div>
+`).join("")
+
+if(founderLockChartInstance){
+founderLockChartInstance.destroy()
+}
+founderLockChartInstance = new Chart(document.getElementById("finance-founder-lock-chart"), {
+type:"bar",
+data:{
+labels:["Locked", "Released"],
+datasets:[{
+label:"Founder Capital",
+data:[Number(founderLocks.activeLocked || 0), Number(founderLocks.totalReleased || 0)],
+backgroundColor:["#1d4ed8", "#16a34a"]
+}]
+},
+options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+})
+
+document.getElementById("finance-founder-lock-summary").innerHTML = `
+<div><span class="text-slate-500">Active Locked:</span> <strong>${formatCurrency(founderLocks.activeLocked)}</strong></div>
+<div><span class="text-slate-500">Released:</span> <strong>${formatCurrency(founderLocks.totalReleased)}</strong></div>
+<div><span class="text-slate-500">Lock Records:</span> <strong>${Number(founderLocks.totalRecords || 0)}</strong></div>
+`
+
+const founderLockRows = founderLocks.locks || []
+if(!founderLockRows.length){
+document.getElementById("finance-founder-lock-list").innerHTML = "<div class='text-sm text-slate-500'>No founder lock records found.</div>"
+return
+}
+
+document.getElementById("finance-founder-lock-list").innerHTML = founderLockRows.map(item=>`
+<div class="border border-slate-200 rounded-xl p-3">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+<div class="font-semibold text-slate-800">${formatCurrency(item.AmountUSD)}</div>
+<div class="text-xs px-2 py-1 rounded-full ${item.Released ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${item.Released ? 'Released' : 'Locked'}</div>
+</div>
+<div class="text-xs text-slate-500 mb-1">Expiry: ${escapeHtml(formatDate(item.ExpiryDate))} • Term: ${escapeHtml(String(item.LockYears || 'N/A'))} years</div>
+<div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-2 bg-blue-600" style="width:${Math.max(0, Math.min(100, Number(item.progressPercent || 0)))}%"></div>
+</div>
+<div class="text-xs text-slate-500 mt-1">Vesting Progress: ${formatPercent(item.progressPercent || 0)}</div>
+</div>
+`).join("")
 }
 
 function loadAdmin(){
