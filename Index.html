@@ -340,6 +340,10 @@ Financial Distribution
 <button onclick="refreshMessages()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
 </div>
 <div id="message-error" class="hidden text-sm text-red-600 mb-2"></div>
+<div class="mb-3">
+<input id="message-recipient-input" type="text" placeholder="To: search family member by name" class="w-full p-3 rounded-xl border border-slate-200" oninput="handleRecipientSearchInput()" autocomplete="off" />
+<div id="message-recipient-results" class="mt-2 space-y-1"></div>
+</div>
 <div id="message-history" class="flex-1 overflow-y-auto space-y-2 bg-slate-50 rounded-xl p-3"></div>
 <div class="mt-3 flex gap-2">
 <input id="message-input" type="text" placeholder="Type a message..." class="flex-1 p-3 rounded-xl border border-slate-200" />
@@ -620,6 +624,8 @@ let founderLockChartInstance = null
 let userChannels = []
 let selectedChannelID = ""
 let channelDirectory = []
+let messagingRecipients = []
+let selectedRecipientEmail = ""
 let timelineLoaded = false
 let voteDataLoaded = false
 let votePermissions = {canCreateVote:false, canCastBallot:false}
@@ -1696,6 +1702,7 @@ renderChannelList()
 refreshMessages()
 }
 loadChannelDirectory()
+loadMessagingRecipients()
 })
 .withFailureHandler(err=>{
 if(isSessionExpiredError(err)){
@@ -1722,6 +1729,79 @@ setMessageError((err && err.message) || "Unable to load channel directory.")
 renderChannelDirectory()
 })
 .getChannelDirectory(token)
+}
+
+
+function loadMessagingRecipients(query){
+google.script.run
+.withSuccessHandler(res=>{
+messagingRecipients = (res && Array.isArray(res.recipients)) ? res.recipients : []
+renderRecipientResults(String(query || '').trim())
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setMessageError((err && err.message) || "Unable to load recipients.")
+messagingRecipients = []
+renderRecipientResults("")
+})
+.getMessagingRecipients(token, String(query || '').trim())
+}
+
+function handleRecipientSearchInput(){
+const input = document.getElementById("message-recipient-input")
+const query = String((input && input.value) || "").trim()
+if(!query){
+selectedRecipientEmail = ""
+renderRecipientResults("")
+return
+}
+loadMessagingRecipients(query)
+}
+
+function renderRecipientResults(query){
+const container = document.getElementById("message-recipient-results")
+if(!container) return
+const normalized = String(query || '').toLowerCase().trim()
+if(!normalized){
+container.innerHTML = ""
+return
+}
+const results = messagingRecipients.filter(item=>{
+const name = String(item.FullName || '').toLowerCase()
+const email = String(item.Email || '').toLowerCase()
+return name.includes(normalized) || email.includes(normalized)
+}).slice(0,8)
+if(!results.length){
+container.innerHTML = "<div class='text-xs text-slate-500 px-1'>No matching family members.</div>"
+return
+}
+container.innerHTML = results.map(item=>`
+<button onclick="selectMessagingRecipient('${escapeHtml(item.Email)}')" class="w-full text-left px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100">
+<div class="text-sm font-semibold text-slate-700">${escapeHtml(item.FullName || item.Email)}</div>
+<div class="text-xs text-slate-500">${escapeHtml(item.Email)}${item.ChannelID ? '' : ' • no private channel yet'}</div>
+</button>
+`).join("")
+}
+
+function selectMessagingRecipient(email){
+const selected = messagingRecipients.find(item=>String(item.Email||'').toLowerCase()===String(email||'').toLowerCase())
+selectedRecipientEmail = selected ? String(selected.Email || '') : ""
+const input = document.getElementById("message-recipient-input")
+if(input){
+input.value = selected ? (selected.FullName || selected.Email || '') : ""
+}
+document.getElementById("message-recipient-results").innerHTML = ""
+if(selected && selected.ChannelID){
+selectChannel(selected.ChannelID)
+setMessageError("")
+return
+}
+if(selected){
+setMessageError("Selected recipient has no active private channel. Create one or join by ChannelID.")
+}
 }
 
 function createChannelUI(){
@@ -2103,7 +2183,7 @@ history.innerHTML = sosAlerts.map(alert=>`
 <div class="flex items-center justify-between gap-2">
 <div>
 <div class="text-xs text-slate-500">${escapeHtml(alert.SOSID || '')}</div>
-<div class="font-semibold text-slate-800">${escapeHtml(alert.ReporterEmail || 'Unknown reporter')}</div>
+<div class="font-semibold text-slate-800">${escapeHtml(alert.ReporterName || alert.ReporterEmail || 'Unknown reporter')}</div>
 <div class="text-xs text-slate-600 mt-1">Lat: ${Number(alert.Lat||0).toFixed(5)} • Lng: ${Number(alert.Lng||0).toFixed(5)}</div>
 </div>
 <div class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700">${escapeHtml(alert.Status || 'Open')}</div>
