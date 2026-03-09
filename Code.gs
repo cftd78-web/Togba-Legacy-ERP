@@ -2061,7 +2061,7 @@ function _safeReadAssigneeType(value) {
   try {
     return _normalizeAssigneeType(raw);
   } catch (e) {
-    return raw;
+    return '';
   }
 }
 
