@@ -730,7 +730,7 @@ function sendMessage(token, channelID, body) {
    PROJECT MANAGEMENT
 ===================================================== */
 
-function createProject(token, title, goalUSD, status, description, imageURL) {
+function createProject(token, title, goalUSD, status) {
   try {
     const session = _auth(token);
     const projectsCtx = _getProjectSheets();
@@ -753,15 +753,6 @@ function createProject(token, title, goalUSD, status, description, imageURL) {
     row[projectsCtx.projects.idx.GoalUSD] = numericGoal;
     row[projectsCtx.projects.idx.Status] = _normalizeProjectStatus(status);
 
-    const descriptionIndex = _optionalHeaderIndex(projectsCtx.projects, ['Description', 'ProjectDescription']);
-    const imageIndex = _optionalHeaderIndex(projectsCtx.projects, ['ImageURL', 'ThumbnailURL', 'ProjectImageURL']);
-    if (descriptionIndex !== -1) {
-      row[descriptionIndex] = String(description || '').trim();
-    }
-    if (imageIndex !== -1) {
-      row[imageIndex] = String(imageURL || '').trim();
-    }
-
     projectsCtx.projects.sheet.appendRow(row);
 
     return {
@@ -769,8 +760,6 @@ function createProject(token, title, goalUSD, status, description, imageURL) {
       project: {
         ProjectID: projectID,
         Title: normalizedTitle,
-        Description: descriptionIndex === -1 ? '' : row[descriptionIndex],
-        ImageURL: imageIndex === -1 ? '' : row[imageIndex],
         GoalUSD: numericGoal,
         Status: row[projectsCtx.projects.idx.Status]
       }
@@ -785,12 +774,6 @@ function getProjects(token) {
     const session = _auth(token);
     const projectsCtx = _getProjectSheets();
 
-    const taskTitleIdx = _optionalHeaderIndex(projectsCtx.tasks, ['TaskTitle', 'Title']);
-    const assigneeTypeIdx = _optionalHeaderIndex(projectsCtx.tasks, ['AssigneeType', 'AssignedType']);
-    const assigneeValueIdx = _optionalHeaderIndex(projectsCtx.tasks, ['Assignee', 'AssignedTo', 'AssigneeValue']);
-    const descriptionIndex = _optionalHeaderIndex(projectsCtx.projects, ['Description', 'ProjectDescription']);
-    const imageIndex = _optionalHeaderIndex(projectsCtx.projects, ['ImageURL', 'ThumbnailURL', 'ProjectImageURL']);
-
     const tasksByProject = projectsCtx.tasks.rows.reduce((acc, row, i) => {
       const rowIndex = i + 2;
       const projectID = String(row[projectsCtx.tasks.idx.ProjectID] || '').trim();
@@ -804,9 +787,6 @@ function getProjects(token) {
         PercentComplete: _clampPercent(row[projectsCtx.tasks.idx.PercentComplete]),
         Status: _normalizeTaskStatus(row[projectsCtx.tasks.idx.Status]),
         Priority: _normalizeTaskPriority(row[projectsCtx.tasks.idx.Priority]),
-        TaskTitle: taskTitleIdx === -1 ? '' : String(row[taskTitleIdx] || '').trim(),
-        AssigneeType: assigneeTypeIdx === -1 ? '' : _normalizeAssigneeType(row[assigneeTypeIdx]),
-        Assignee: assigneeValueIdx === -1 ? '' : String(row[assigneeValueIdx] || '').trim(),
         SortOrder: rowIndex,
         Gantt: {
           id: _deriveProjectTaskID(projectsCtx.tasks, row, rowIndex),
@@ -836,8 +816,6 @@ function getProjects(token) {
       return {
         ProjectID: projectID,
         Title: String(row[projectsCtx.projects.idx.Title] || '').trim(),
-        Description: descriptionIndex === -1 ? '' : String(row[descriptionIndex] || '').trim(),
-        ImageURL: imageIndex === -1 ? '' : String(row[imageIndex] || '').trim(),
         GoalUSD: Number(row[projectsCtx.projects.idx.GoalUSD]) || 0,
         Status: _normalizeProjectStatus(row[projectsCtx.projects.idx.Status]),
         ProgressPercent: Number(avgProgress.toFixed(2)),
@@ -957,10 +935,6 @@ function getProjectTasks(token, projectID) {
       throw new Error('ProjectID is required.');
     }
 
-    const taskTitleIdx = _optionalHeaderIndex(projectsCtx.tasks, ['TaskTitle', 'Title']);
-    const assigneeTypeIdx = _optionalHeaderIndex(projectsCtx.tasks, ['AssigneeType', 'AssignedType']);
-    const assigneeValueIdx = _optionalHeaderIndex(projectsCtx.tasks, ['Assignee', 'AssignedTo', 'AssigneeValue']);
-
     const tasks = projectsCtx.tasks.rows
       .map((row, i) => ({ row: row, rowIndex: i + 2 }))
       .filter(item => String(item.row[projectsCtx.tasks.idx.ProjectID] || '').trim() === normalizedProjectID)
@@ -970,9 +944,6 @@ function getProjectTasks(token, projectID) {
         PercentComplete: _clampPercent(item.row[projectsCtx.tasks.idx.PercentComplete]),
         Status: _normalizeTaskStatus(item.row[projectsCtx.tasks.idx.Status]),
         Priority: _normalizeTaskPriority(item.row[projectsCtx.tasks.idx.Priority]),
-        TaskTitle: taskTitleIdx === -1 ? '' : String(item.row[taskTitleIdx] || '').trim(),
-        AssigneeType: assigneeTypeIdx === -1 ? '' : _normalizeAssigneeType(item.row[assigneeTypeIdx]),
-        Assignee: assigneeValueIdx === -1 ? '' : String(item.row[assigneeValueIdx] || '').trim(),
         Gantt: {
           id: _deriveProjectTaskID(projectsCtx.tasks, item.row, item.rowIndex),
           parent: normalizedProjectID,
@@ -2047,14 +2018,6 @@ function _normalizeTaskPriority(value) {
   return normalized || 'Medium';
 }
 
-function _normalizeAssigneeType(value) {
-  const normalized = String(value || '').trim().toLowerCase();
-  if (!normalized) return '';
-  if (normalized === 'member' || normalized === 'internal') return 'internal';
-  if (normalized === 'external') return 'external';
-  throw new Error('AssigneeType must be internal or external.');
-}
-
 function _clampPercent(value) {
   const parsed = Number(value);
   if (isNaN(parsed)) {
@@ -2638,49 +2601,19 @@ function createProjectTaskEnhanced(token, payload) {
     const priority = _normalizeTaskPriority(payload.priority);
     const percentComplete = _clampPercent(payload.percentComplete);
     const title = String(payload.taskTitle || '').trim();
-    const assigneeType = _normalizeAssigneeType(payload.assigneeType);
+    const assigneeType = String(payload.assigneeType || '').trim();
     const assignee = String(payload.assignee || '').trim();
     const created = createProjectTask(token, projectID, status, priority, percentComplete);
-    const rowIndex = ctx.tasks.rows.length + 2;
+    const rowIndex = ctx.tasks.rows.length + 1;
     const taskTitleIdx = _optionalHeaderIndex(ctx.tasks, ['TaskTitle', 'Title']);
     const assigneeTypeIdx = _optionalHeaderIndex(ctx.tasks, ['AssigneeType', 'AssignedType']);
     const assigneeValueIdx = _optionalHeaderIndex(ctx.tasks, ['Assignee', 'AssignedTo', 'AssigneeValue']);
-    if (taskTitleIdx !== -1) ctx.tasks.sheet.getRange(rowIndex, taskTitleIdx + 1).setValue(title);
-    if (assigneeTypeIdx !== -1) ctx.tasks.sheet.getRange(rowIndex, assigneeTypeIdx + 1).setValue(assigneeType);
-    if (assigneeValueIdx !== -1) ctx.tasks.sheet.getRange(rowIndex, assigneeValueIdx + 1).setValue(assignee);
+    if (taskTitleIdx !== -1) ctx.tasks.sheet.getRange(rowIndex + 1, taskTitleIdx + 1).setValue(title);
+    if (assigneeTypeIdx !== -1) ctx.tasks.sheet.getRange(rowIndex + 1, assigneeTypeIdx + 1).setValue(assigneeType);
+    if (assigneeValueIdx !== -1) ctx.tasks.sheet.getRange(rowIndex + 1, assigneeValueIdx + 1).setValue(assignee);
     return created;
   } catch (e) {
     throw new Error(_errMsg('createProjectTaskEnhanced', e));
-  }
-}
-
-function updateProjectTaskEnhanced(token, payload) {
-  try {
-    const session = _auth(token);
-    const ctx = _getProjectSheets();
-    _assertProjectEditor(session, ctx);
-    payload = payload || {};
-    const taskID = String(payload.taskID || '').trim();
-    if (!taskID) throw new Error('taskID is required.');
-
-    const updated = updateProjectTask(token, taskID, payload.percentComplete, payload.status, payload.priority);
-    const target = _findProjectTaskRow(ctx.tasks, taskID);
-    if (!target) throw new Error('Task not found after update.');
-
-    const taskTitleIdx = _optionalHeaderIndex(ctx.tasks, ['TaskTitle', 'Title']);
-    const assigneeTypeIdx = _optionalHeaderIndex(ctx.tasks, ['AssigneeType', 'AssignedType']);
-    const assigneeValueIdx = _optionalHeaderIndex(ctx.tasks, ['Assignee', 'AssignedTo', 'AssigneeValue']);
-    const assigneeType = _normalizeAssigneeType(payload.assigneeType);
-    const assignee = String(payload.assignee || '').trim();
-    const taskTitle = String(payload.taskTitle || '').trim();
-
-    if (taskTitleIdx !== -1) ctx.tasks.sheet.getRange(target.rowIndex, taskTitleIdx + 1).setValue(taskTitle);
-    if (assigneeTypeIdx !== -1) ctx.tasks.sheet.getRange(target.rowIndex, assigneeTypeIdx + 1).setValue(assigneeType);
-    if (assigneeValueIdx !== -1) ctx.tasks.sheet.getRange(target.rowIndex, assigneeValueIdx + 1).setValue(assignee);
-
-    return updated;
-  } catch (e) {
-    throw new Error(_errMsg('updateProjectTaskEnhanced', e));
   }
 }
 
@@ -2715,11 +2648,8 @@ function joinChannel(token, channelID) {
     const ctx = _getMessagingSheets();
     const cid = String(channelID || '').trim();
     if (!cid) throw new Error('ChannelID is required.');
-    const channel = ctx.channels.rows.find(r => String(r[ctx.channels.idx.ChannelID] || '').trim() === cid);
-    if (!channel) throw new Error('Channel not found.');
-    const isActiveRaw = String(channel[ctx.channels.idx.IsActive] || '').toLowerCase().trim();
-    const isActive = isActiveRaw !== 'false' && isActiveRaw !== '0' && isActiveRaw !== 'no';
-    if (!isActive) throw new Error('Channel is inactive.');
+    const channelExists = ctx.channels.rows.some(r => String(r[ctx.channels.idx.ChannelID] || '').trim() === cid);
+    if (!channelExists) throw new Error('Channel not found.');
     const exists = ctx.channelMembers.rows.some(r => String(r[ctx.channelMembers.idx.ChannelID] || '').trim() === cid && _norm(r[ctx.channelMembers.idx.Email]) === _norm(session.email));
     if (!exists) {
       const row = new Array(ctx.channelMembers.headers.length).fill('');
@@ -2734,30 +2664,16 @@ function joinChannel(token, channelID) {
 
 function getChannelDirectory(token) {
   try {
-    const session = _auth(token);
+    _auth(token);
     const ctx = _getMessagingSheets();
-    const email = _norm(session.email);
     return {
       success: true,
-      channels: ctx.channels.rows
-        .map(r => ({
-          ChannelID: String(r[ctx.channels.idx.ChannelID] || '').trim(),
-          Name: String(r[ctx.channels.idx.Name] || '').trim(),
-          Type: String(r[ctx.channels.idx.Type] || '').trim(),
-          IsActive: r[ctx.channels.idx.IsActive]
-        }))
-        .filter(ch => {
-          const isActiveRaw = String(ch.IsActive || '').toLowerCase().trim();
-          const isActive = isActiveRaw !== 'false' && isActiveRaw !== '0' && isActiveRaw !== 'no';
-          return isActive;
-        })
-        .map(ch => {
-          const joined = ctx.channelMembers.rows.some(r =>
-            String(r[ctx.channelMembers.idx.ChannelID] || '').trim() === ch.ChannelID &&
-            _norm(r[ctx.channelMembers.idx.Email]) === email
-          );
-          return { ChannelID: ch.ChannelID, Name: ch.Name, Type: ch.Type, IsActive: ch.IsActive, Joined: joined };
-        })
+      channels: ctx.channels.rows.map(r => ({
+        ChannelID: String(r[ctx.channels.idx.ChannelID] || '').trim(),
+        Name: String(r[ctx.channels.idx.Name] || '').trim(),
+        Type: String(r[ctx.channels.idx.Type] || '').trim(),
+        IsActive: r[ctx.channels.idx.IsActive]
+      }))
     };
   } catch (e) { throw new Error(_errMsg('getChannelDirectory', e)); }
 }
