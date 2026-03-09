@@ -86,6 +86,14 @@ border:1px solid rgb(191 219 254);
 background:linear-gradient(180deg,#eff6ff 0%,#ffffff 100%);
 }
 
+.family-tree-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.75rem;}
+
+.family-member-card{border:1px solid rgb(226 232 240);border-radius:.75rem;padding:.75rem;background:#fff;}
+
+.family-avatar{width:52px;height:52px;border-radius:9999px;object-fit:cover;border:2px solid rgb(226 232 240);background:rgb(248 250 252);}
+
+.family-link-chip{display:inline-block;padding:.125rem .45rem;border-radius:9999px;background:#f1f5f9;color:#334155;font-size:.7rem;margin:.125rem .125rem 0 0;}
+
 </style>
 
 </head>
@@ -496,10 +504,21 @@ Financial Distribution
 <input id="family-spouse" class="p-2 rounded-lg border" placeholder="SpouseFullNameOptional" />
 <button onclick="saveFamilyMember()" class="bg-blue-600 text-white p-2 rounded-lg">Save</button>
 </div>
+<div class="mt-5 border-t border-slate-200 pt-4">
+<h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Member Photo</h4>
+<div class="grid gap-2">
+<input id="family-photo-person-id" class="p-2 rounded-lg border" placeholder="PersonID (required)" />
+<input id="family-photo-file" type="file" accept="image/*" class="p-2 rounded-lg border" />
+<input id="family-photo-url" class="p-2 rounded-lg border" placeholder="Or paste PhotoFileURL" />
+<input id="family-photo-type" class="p-2 rounded-lg border" placeholder="PhotoType (default: profile)" />
+<button onclick="saveFamilyPhoto()" class="bg-slate-800 text-white p-2 rounded-lg">Save Photo</button>
+</div>
+<p class="text-xs text-slate-500 mt-2">Photos are stored in the existing Photos sheet and displayed on family cards.</p>
+</div>
 </div>
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Family Tree View</h3>
-<div class="text-xs text-slate-500 mb-3">Patriarch/root appears at the top, followed by generation layers.</div>
+<div class="text-xs text-slate-500 mb-3">Root/patriarch is pinned at top. Each card shows member photo plus ancestor/descendant links from current FatherID/MotherID data.</div>
 <div id="family-tree" class="space-y-2"></div>
 </div>
 </div>
@@ -1586,12 +1605,24 @@ if(!members.length){
 el.innerHTML="<div class='text-sm text-slate-500'>No family members found.</div>"
 return
 }
-const sorted=[...members].sort((a,b)=>Number(a.GenerationTier||99)-Number(b.GenerationTier||99))
-const root=sorted.find(m=>String(m.RelationshipToPatriarch||'').toLowerCase().includes('patriarch'))||sorted[0]
+const memberMap={}
+members.forEach(m=>{memberMap[String(m.PersonID||'').trim()]=m})
+const childMap={}
+members.forEach(m=>{
+const pid=String(m.PersonID||'').trim()
+;[m.FatherID,m.MotherID].forEach(parentID=>{
+const parent=String(parentID||'').trim()
+if(!parent) return
+if(!childMap[parent]) childMap[parent]=[]
+childMap[parent].push(pid)
+})
+})
+const withGen=members.map(m=>Object.assign({},m,{_gen:Number(m.GenerationTier||99)})).sort((a,b)=>a._gen-b._gen)
+const root=withGen.find(m=>String(m.RelationshipToPatriarch||'').toLowerCase().includes('patriarch'))||withGen.find(m=>!String(m.FatherID||'').trim()&&!String(m.MotherID||'').trim())||withGen[0]
+const rootCard=root?`<div class="family-root-card rounded-xl p-4 mb-4"><div class="text-xs uppercase text-blue-700 font-bold">Patriarch / Root</div><div class="flex items-center gap-3 mt-2"><img src="${escapeHtml(root.PhotoFileURL||'https://via.placeholder.com/96?text=Photo')}" class="family-avatar" alt="root photo" onerror="this.src='https://via.placeholder.com/96?text=Photo'" /><div><div class="font-semibold text-slate-800">${escapeHtml(root.FullName||root.PersonID)}</div><div class="text-xs text-slate-600 mt-1">${escapeHtml(root.PersonID||'')} • Gen ${escapeHtml(root.GenerationTier||'-')}</div></div></div></div>`:''
 const byGen={}
-sorted.forEach(m=>{const g=String(m.GenerationTier||'Unknown'); if(!byGen[g]) byGen[g]=[]; byGen[g].push(m)})
-const rootCard=root?`<div class="family-root-card rounded-xl p-4 mb-4"><div class="text-xs uppercase text-blue-700 font-bold">Patriarch / Root</div><div class="font-semibold text-slate-800 mt-1">${escapeHtml(root.FullName||root.PersonID)}</div><div class="text-xs text-slate-600 mt-1">${escapeHtml(root.PersonID||'')} • Gen ${escapeHtml(root.GenerationTier||'-')}</div></div>`:''
-const generationBlocks=Object.keys(byGen).sort((a,b)=>Number(a)-Number(b)).map(g=>`<div class="mb-4"><div class="text-xs uppercase font-bold text-slate-500 mb-2">Generation ${escapeHtml(g)}</div><div class="grid gap-2 sm:grid-cols-2">${byGen[g].map(m=>`<div class="border rounded-lg p-2 bg-white"><div class="font-semibold">${escapeHtml(m.FullName||m.PersonID)}</div><div class="text-xs text-slate-500">${escapeHtml(m.PersonID)} • ${escapeHtml(m.RelationshipToPatriarch||'Member')}</div><div class="text-xs mt-1">Parents: ${escapeHtml(m.FatherID||'-')} / ${escapeHtml(m.MotherID||'-')}</div></div>`).join('')}</div></div>`).join('')
+withGen.forEach(m=>{const g=String(m.GenerationTier||'Unknown'); if(!byGen[g]) byGen[g]=[]; byGen[g].push(m)})
+const generationBlocks=Object.keys(byGen).sort((a,b)=>Number(a)-Number(b)).map(g=>`<div class="mb-4"><div class="text-xs uppercase font-bold text-slate-500 mb-2">Generation ${escapeHtml(g)}</div><div class="family-tree-grid">${byGen[g].map(m=>renderFamilyMemberCard(m, memberMap, childMap)).join('')}</div></div>`).join('')
 el.innerHTML=`${rootCard}${generationBlocks}`
 })
 .withFailureHandler(err=>{
@@ -1604,6 +1635,53 @@ setFamilyError((err&&err.message)||'Unable to load family data.')
 })
 .getFamilyData(token)
 }
+
+function renderFamilyMemberCard(member, memberMap, childMap){
+const father=String(member.FatherID||'').trim()
+const mother=String(member.MotherID||'').trim()
+const children=(childMap[String(member.PersonID||'').trim()]||[])
+const parentLinks=[father,mother].filter(Boolean).map(pid=>formatRelativeChip('Ancestor', pid, memberMap[pid]))
+const childLinks=children.map(pid=>formatRelativeChip('Descendant', pid, memberMap[pid]))
+return `<div class="family-member-card"><div class="flex gap-3"><img src="${escapeHtml(member.PhotoFileURL||'https://via.placeholder.com/96?text=Photo')}" class="family-avatar" alt="member photo" onerror="this.src='https://via.placeholder.com/96?text=Photo'" /><div class="min-w-0"><div class="font-semibold truncate">${escapeHtml(member.FullName||member.PersonID)}</div><div class="text-xs text-slate-500">${escapeHtml(member.PersonID||'')} • ${escapeHtml(member.RelationshipToPatriarch||'Member')}</div><div class="text-xs text-slate-500 mt-1">Spouse: ${escapeHtml(member.SpouseFullNameOptional||'-')}</div></div></div><div class="mt-2 text-xs"><div class="text-slate-600">Ancestors</div><div>${parentLinks.length?parentLinks.join(''):'<span class="text-slate-400">No linked parents</span>'}</div></div><div class="mt-2 text-xs"><div class="text-slate-600">Descendants</div><div>${childLinks.length?childLinks.join(''):'<span class="text-slate-400">No linked children</span>'}</div></div></div>`
+}
+
+function formatRelativeChip(label,pid,member){
+const name=member?(member.FullName||member.PersonID):pid
+return `<span class="family-link-chip" title="${escapeHtml(label)} ${escapeHtml(pid)}">${escapeHtml(name||pid)}</span>`
+}
+
+function saveFamilyPhoto(){
+const personID=(document.getElementById('family-photo-person-id').value||'').trim()
+const url=(document.getElementById('family-photo-url').value||'').trim()
+const photoType=(document.getElementById('family-photo-type').value||'profile').trim()||'profile'
+const fileInput=document.getElementById('family-photo-file')
+const file=fileInput&&fileInput.files&&fileInput.files[0]?fileInput.files[0]:null
+if(!personID){
+setFamilyError('Photo PersonID is required.')
+return
+}
+if(!file && !url){
+setFamilyError('Choose an image file or provide PhotoFileURL.')
+return
+}
+if(file){
+const reader=new FileReader()
+reader.onload=()=>{
+google.script.run
+.withSuccessHandler(()=>{setFamilyError('');loadFamilyData()})
+.withFailureHandler(err=>setFamilyError((err&&err.message)||'Unable to save family photo.'))
+.upsertFamilyPhoto(token,{PersonID:personID,PhotoType:photoType,PhotoBase64:String(reader.result||''),MimeType:file.type||'image/jpeg'})
+}
+reader.onerror=()=>setFamilyError('Unable to read the selected image file.')
+reader.readAsDataURL(file)
+return
+}
+google.script.run
+.withSuccessHandler(()=>{setFamilyError('');loadFamilyData()})
+.withFailureHandler(err=>setFamilyError((err&&err.message)||'Unable to save family photo.'))
+.upsertFamilyPhoto(token,{PersonID:personID,PhotoType:photoType,PhotoFileURL:url})
+}
+
 function saveFamilyMember(){
 const payload={PersonID:document.getElementById('family-person-id').value,FullName:document.getElementById('family-full-name').value,RelationshipToPatriarch:document.getElementById('family-relationship').value,GenerationTier:document.getElementById('family-generation').value,FatherID:document.getElementById('family-father').value,MotherID:document.getElementById('family-mother').value,SpouseFullNameOptional:document.getElementById('family-spouse').value}
 google.script.run.withSuccessHandler(()=>{loadFamilyData()}).withFailureHandler(err=>setFamilyError((err&&err.message)||'Unable to save family member.')).upsertFamilyMember(token,payload)
