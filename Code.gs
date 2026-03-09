@@ -1455,12 +1455,15 @@ function triggerSOS(token, lat, lng) {
       throw new Error('Valid longitude is required.');
     }
 
+    const reporterEmail = _norm(session.email);
+    const reporterName = _resolveFullNameByEmail(reporterEmail) || reporterEmail;
+
     const row = new Array(sos.alerts.headers.length).fill('');
-    row[sos.alerts.idx.ReporterEmail] = _norm(session.email);
+    row[sos.alerts.idx.ReporterEmail] = reporterEmail;
     row[sos.alerts.idx.Lat] = latNum;
     row[sos.alerts.idx.Lng] = lngNum;
     row[sos.alerts.idx.Status] = 'Open';
-    row[sos.alerts.idx.WhatsAppLink] = _buildSOSWhatsAppLink(sos.settings, session.email, latNum, lngNum);
+    row[sos.alerts.idx.WhatsAppLink] = _buildSOSWhatsAppLink(sos.settings, reporterEmail, reporterName, latNum, lngNum);
 
     sos.alerts.sheet.appendRow(row);
 
@@ -1470,7 +1473,8 @@ function triggerSOS(token, lat, lng) {
       success: true,
       alert: {
         SOSID: _deriveSOSID(sos.alerts, row, alertRowIndex),
-        ReporterEmail: _norm(session.email),
+        ReporterEmail: reporterEmail,
+        ReporterName: reporterName,
         Lat: latNum,
         Lng: lngNum,
         Status: 'Open',
@@ -2279,7 +2283,7 @@ function _deriveSOSID(alertsCtx, row, rowIndex) {
   return fromHeader || ('SOS-' + rowIndex);
 }
 
-function _buildSOSWhatsAppLink(settingsCtx, reporterEmail, lat, lng) {
+function _buildSOSWhatsAppLink(settingsCtx, reporterEmail, reporterName, lat, lng) {
   const settingsMap = settingsCtx.rows.reduce((acc, row) => {
     const key = _norm(row[settingsCtx.idx.Key]);
     if (!key) {
@@ -2307,6 +2311,7 @@ function _buildSOSWhatsAppLink(settingsCtx, reporterEmail, lat, lng) {
   ]) || 'Emergency SOS from {name} ({email}). Location: {lat}, {lng}. Map: {map}';
 
   const message = template
+    .replace(/\{name\}/gi, String(reporterName || reporterEmail || '').trim())
     .replace(/\{email\}/gi, reporterEmail)
     .replace(/\{lat\}/gi, String(lat))
     .replace(/\{lng\}/gi, String(lng));
@@ -2792,6 +2797,86 @@ function getChannelDirectory(token) {
         })
     };
   } catch (e) { throw new Error(_errMsg('getChannelDirectory', e)); }
+}
+
+
+function getMessagingRecipients(token, query) {
+  try {
+    const session = _auth(token);
+    const ctx = _getMessagingSheets();
+    const access = _readSheet('Access', {
+      EmailOptional: ['EmailOptional', 'Email'],
+      FullName: ['FullName', 'Name']
+    });
+
+    const normalizedSessionEmail = _norm(session.email);
+    const normalizedQuery = _norm(query);
+
+    const privateChannelIds = ctx.channels.rows.reduce((acc, row) => {
+      const channelID = String(row[ctx.channels.idx.ChannelID] || '').trim();
+      const type = String(row[ctx.channels.idx.Type] || '').toLowerCase().trim();
+      const isActiveRaw = String(row[ctx.channels.idx.IsActive] || '').toLowerCase().trim();
+      const isActive = isActiveRaw !== 'false' && isActiveRaw !== '0' && isActiveRaw !== 'no';
+      if (channelID && type === 'private' && isActive) {
+        acc[channelID] = true;
+      }
+      return acc;
+    }, {});
+
+    const privateChannelMembers = ctx.channelMembers.rows.reduce((acc, row) => {
+      const channelID = String(row[ctx.channelMembers.idx.ChannelID] || '').trim();
+      const email = _norm(row[ctx.channelMembers.idx.Email]);
+      if (!privateChannelIds[channelID] || !email) {
+        return acc;
+      }
+      if (!acc[channelID]) {
+        acc[channelID] = {};
+      }
+      acc[channelID][email] = true;
+      return acc;
+    }, {});
+
+    const recipients = access.rows
+      .map(row => {
+        const emailRaw = String(row[access.idx.EmailOptional] || '').trim();
+        const email = _norm(emailRaw);
+        const fullName = String(row[access.idx.FullName] || '').trim();
+        if (!email || email === normalizedSessionEmail) {
+          return null;
+        }
+
+        const channelID = Object.keys(privateChannelMembers).find(id => {
+          const members = privateChannelMembers[id] || {};
+          return !!members[normalizedSessionEmail] && !!members[email];
+        }) || '';
+
+        return {
+          Email: emailRaw,
+          FullName: fullName,
+          ChannelID: channelID
+        };
+      })
+      .filter(item => !!item)
+      .filter(item => {
+        if (!normalizedQuery) {
+          return true;
+        }
+        return _norm(item.FullName).indexOf(normalizedQuery) !== -1 || _norm(item.Email).indexOf(normalizedQuery) !== -1;
+      })
+      .sort((a, b) => {
+        const left = _norm(a.FullName || a.Email);
+        const right = _norm(b.FullName || b.Email);
+        return left.localeCompare(right);
+      })
+      .slice(0, 50);
+
+    return {
+      success: true,
+      recipients: recipients
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getMessagingRecipients', e));
+  }
 }
 
 function getMemberDirectory(token) {
