@@ -2939,36 +2939,8 @@ function getFamilyData(token) {
   try {
     _auth(token);
     const people = _readSheet('People', { PersonID:['PersonID'], RelationshipToPatriarch:['RelationshipToPatriarch'], GenerationTier:['GenerationTier'], FatherID:['FatherID'], MotherID:['MotherID'], SpouseFullNameOptional:['SpouseFullNameOptional'] });
-    const photos = _readSheet('Photos', { PersonID:['PersonID'], PhotoFileURL:['PhotoFileURL', 'FileURL', 'PhotoURL', 'URL'], PhotoType:['PhotoType', 'Type'] });
     const nameIdx = _optionalHeaderIndex(people, ['FullName', 'Name']);
-    const photoMap = {};
-    photos.rows.forEach(r => {
-      const personID = String(r[photos.idx.PersonID] || '').trim();
-      if (!personID) {
-        return;
-      }
-      const photoURL = String(r[photos.idx.PhotoFileURL] || '').trim();
-      if (!photoURL) {
-        return;
-      }
-      const photoType = String(r[photos.idx.PhotoType] || '').trim().toLowerCase();
-      if (!photoMap[personID] || photoType === 'profile' || photoType === 'primary') {
-        photoMap[personID] = photoURL;
-      }
-    });
-    return { success: true, members: people.rows.map(r => {
-      const personID = String(r[people.idx.PersonID]||'').trim();
-      return {
-        PersonID: personID,
-        FullName:nameIdx===-1?'':String(r[nameIdx]||'').trim(),
-        RelationshipToPatriarch:String(r[people.idx.RelationshipToPatriarch]||'').trim(),
-        GenerationTier:String(r[people.idx.GenerationTier]||'').trim(),
-        FatherID:String(r[people.idx.FatherID]||'').trim(),
-        MotherID:String(r[people.idx.MotherID]||'').trim(),
-        SpouseFullNameOptional:String(r[people.idx.SpouseFullNameOptional]||'').trim(),
-        PhotoFileURL:photoMap[personID] || ''
-      };
-    }) };
+    return { success: true, members: people.rows.map(r => ({ PersonID:String(r[people.idx.PersonID]||'').trim(), FullName:nameIdx===-1?'':String(r[nameIdx]||'').trim(), RelationshipToPatriarch:String(r[people.idx.RelationshipToPatriarch]||'').trim(), GenerationTier:String(r[people.idx.GenerationTier]||'').trim(), FatherID:String(r[people.idx.FatherID]||'').trim(), MotherID:String(r[people.idx.MotherID]||'').trim(), SpouseFullNameOptional:String(r[people.idx.SpouseFullNameOptional]||'').trim() })) };
   } catch (e) { throw new Error(_errMsg('getFamilyData', e)); }
 }
 
@@ -2994,62 +2966,6 @@ function upsertFamilyMember(token, payload) {
     if (idx === -1) people.sheet.appendRow(row); else people.sheet.getRange(idx + 2, 1, 1, row.length).setValues([row]);
     return { success: true, PersonID: pid };
   } catch (e) { throw new Error(_errMsg('upsertFamilyMember', e)); }
-}
-
-function upsertFamilyPhoto(token, payload) {
-  try {
-    _auth(token);
-    payload = payload || {};
-
-    const personID = String(payload.PersonID || '').trim();
-    if (!personID) {
-      throw new Error('PersonID is required for photo updates.');
-    }
-
-    const people = _readSheet('People', { PersonID:['PersonID'] });
-    const personExists = people.rows.some(r => String(r[people.idx.PersonID] || '').trim() === personID);
-    if (!personExists) {
-      throw new Error('Person record not found. Save member details first.');
-    }
-
-    const photos = _readSheet('Photos', { PersonID:['PersonID'], PhotoFileURL:['PhotoFileURL', 'FileURL', 'PhotoURL', 'URL'], PhotoType:['PhotoType', 'Type'] });
-    const photoType = String(payload.PhotoType || 'profile').trim() || 'profile';
-    let photoURL = String(payload.PhotoFileURL || '').trim();
-
-    const base64 = String(payload.PhotoBase64 || '').trim();
-    if (!photoURL && base64) {
-      const commaIdx = base64.indexOf(',');
-      const encoded = commaIdx === -1 ? base64 : base64.substring(commaIdx + 1);
-      const mimeType = String(payload.MimeType || 'image/jpeg').trim() || 'image/jpeg';
-      const extension = mimeType.indexOf('png') !== -1 ? 'png' : (mimeType.indexOf('webp') !== -1 ? 'webp' : 'jpg');
-      const blob = Utilities.newBlob(Utilities.base64Decode(encoded), mimeType, personID + '_' + Date.now() + '.' + extension);
-      const folder = DriveApp.getRootFolder();
-      const file = folder.createFile(blob);
-      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-      photoURL = 'https://drive.google.com/uc?export=view&id=' + file.getId();
-    }
-
-    if (!photoURL) {
-      throw new Error('Photo file URL or image upload is required.');
-    }
-
-    const existingIdx = photos.rows.findIndex(r => String(r[photos.idx.PersonID] || '').trim() === personID && String(r[photos.idx.PhotoType] || '').trim().toLowerCase() === photoType.toLowerCase());
-    const row = new Array(photos.headers.length).fill('');
-    if (existingIdx !== -1) {
-      for (let i=0;i<photos.headers.length;i+=1) row[i] = photos.rows[existingIdx][i];
-    }
-    row[photos.idx.PersonID] = personID;
-    row[photos.idx.PhotoFileURL] = photoURL;
-    row[photos.idx.PhotoType] = photoType;
-
-    if (existingIdx === -1) {
-      photos.sheet.appendRow(row);
-    } else {
-      photos.sheet.getRange(existingIdx + 2, 1, 1, row.length).setValues([row]);
-    }
-
-    return { success: true, PersonID: personID, PhotoFileURL: photoURL, PhotoType: photoType };
-  } catch (e) { throw new Error(_errMsg('upsertFamilyPhoto', e)); }
 }
 
 function getFamilyTree(token) {
