@@ -911,10 +911,28 @@ renderProjectDetail(null)
 return
 }
 list.innerHTML = projectsCache.map(project=>`
-<button onclick="selectProject('${escapeHtml(project.ProjectID)}')" class="w-full text-left border rounded-xl p-3 ${project.ProjectID===selectedProjectID ? 'border-blue-300 bg-blue-50' : 'border-slate-200 bg-white'}">
+<button onclick="selectProject('${escapeHtml(project.ProjectID)}')" class="w-full text-left border rounded-2xl p-3 transition hover:shadow-sm ${project.ProjectID===selectedProjectID ? 'border-blue-300 bg-blue-50/70 ring-1 ring-blue-200' : 'border-slate-200 bg-white'}">
+<div class="flex items-start gap-3">
+<div class="h-16 w-16 shrink-0 rounded-xl border border-slate-200 bg-slate-100 overflow-hidden">
+${project.ImageURL ? `<img src="${escapeHtml(project.ImageURL)}" alt="Project thumbnail" class="h-full w-full object-cover"/>` : `<div class="h-full w-full flex items-center justify-center text-[10px] text-slate-500 px-1 text-center">No Image</div>`}
+</div>
+<div class="min-w-0 flex-1">
+<div class="flex items-center justify-between gap-2">
 <div class="text-xs text-slate-500">${escapeHtml(project.ProjectID || "")}</div>
-<div class="font-semibold text-slate-800">${escapeHtml(project.Title || "Untitled project")}</div>
-<div class="text-xs text-slate-600 mt-1">${escapeHtml(project.Status || "Planning")} • ${formatPercent(project.ProgressPercent || 0)}</div>
+<div class="text-[11px] px-2 py-1 rounded-full bg-slate-100 text-slate-600">${escapeHtml(project.Status || "Planning")}</div>
+</div>
+<div class="font-semibold text-slate-800 mt-1 truncate">${escapeHtml(project.Title || "Untitled project")}</div>
+<div class="text-xs text-slate-600 mt-1 line-clamp-2">${escapeHtml(project.Description || "No description provided.")}</div>
+</div>
+</div>
+<div class="mt-3">
+<div class="flex justify-between text-xs text-slate-500 mb-1"><span>Progress</span><span>${formatPercent(project.ProgressPercent || 0)}</span></div>
+<div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="h-full bg-blue-600" style="width:${Math.max(0, Math.min(100, Number(project.ProgressPercent || 0)))}%"></div></div>
+</div>
+<div class="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-2 py-2">
+<div class="text-[11px] font-semibold text-slate-500 uppercase mb-1">Task Assignments</div>
+<div class="text-xs text-slate-600">${Number(project.AssignedTaskCount || 0)} assigned • ${Number(project.TaskCount || 0)} total tasks</div>
+</div>
 </button>
 `).join("")
 const selected = projectsCache.find(p=>p.ProjectID===selectedProjectID)
@@ -937,9 +955,13 @@ const completed = Number(project.TasksCompleted || 0)
 const total = Number(project.TaskCount || 0)
 detail.innerHTML = `
 <div class="text-xs text-slate-500 uppercase">Project Detail</div>
+<div class="rounded-2xl border border-slate-200 overflow-hidden bg-white">
+${project.ImageURL ? `<img src="${escapeHtml(project.ImageURL)}" class="max-h-56 object-cover w-full" alt="Project image"/>` : `<div class="h-24 w-full bg-slate-100 flex items-center justify-center text-xs text-slate-500">No project image provided</div>`}
+<div class="p-4 space-y-2">
 <div class="text-2xl font-bold text-slate-800">${escapeHtml(project.Title || "Untitled")}</div>
-${project.ImageURL ? `<img src="${escapeHtml(project.ImageURL)}" class="rounded-xl max-h-44 object-cover w-full mt-2" alt="Project image"/>` : ""}
 <div class="text-sm text-slate-600">${escapeHtml(project.Description || "No description provided.")}</div>
+</div>
+</div>
 <div class="grid sm:grid-cols-3 gap-3">
 <div class="rounded-xl border border-slate-200 p-3"><div class="text-xs text-slate-500">ProjectID</div><div class="font-semibold text-slate-800">${escapeHtml(project.ProjectID || "")}</div></div>
 <div class="rounded-xl border border-slate-200 p-3"><div class="text-xs text-slate-500">Goal USD</div><div class="font-semibold text-slate-800">${formatCurrency(project.GoalUSD || 0)}</div></div>
