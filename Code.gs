@@ -1727,6 +1727,8 @@ function tallyVotes(token, voteID) {
       .map(row => ({
         VoteID: String(row[governance.votes.idx.VoteID] || '').trim(),
         Title: String(row[governance.votes.idx.Title] || '').trim(),
+        Description: _readVoteDescription(governance.votes, row),
+        ImageURL: _readVoteImageURL(governance.votes, row),
         ThresholdType: _safeThresholdType(row[governance.votes.idx.ThresholdType]),
         Status: String(row[governance.votes.idx.Status] || '').trim()
       }))
@@ -1754,6 +1756,8 @@ function tallyVotes(token, voteID) {
       success: true,
       VoteID: vote.VoteID,
       Title: vote.Title,
+      Description: vote.Description,
+      ImageURL: vote.ImageURL,
       ThresholdType: vote.ThresholdType,
       Status: vote.Status,
       totalBallots: totalBallots,
@@ -1808,6 +1812,8 @@ function getVotes(token) {
       return {
         VoteID: VoteID,
         Title: String(row[governance.votes.idx.Title] || '').trim(),
+        Description: _readVoteDescription(governance.votes, row),
+        ImageURL: _readVoteImageURL(governance.votes, row),
         ThresholdType: ThresholdType,
         Status: String(row[governance.votes.idx.Status] || '').trim(),
         totalBallots: tally.total,
@@ -2977,13 +2983,7 @@ function getVotingDashboard(token) {
   try {
     _auth(token);
     const votes = getVotes(token);
-    const ctx = _getGovernanceSheets();
-    const imageIdx = _optionalHeaderIndex(ctx.votes, ['ImageURL', 'ProposalImageURL', 'ThumbnailURL']);
-    const rows = (votes.votes || []).map(v => {
-      const source = ctx.votes.rows.find(r => String(r[ctx.votes.idx.VoteID] || '').trim() === v.VoteID) || [];
-      return Object.assign({}, v, { ImageURL: imageIdx === -1 ? '' : String(source[imageIdx] || '').trim() });
-    });
-    return { success: true, canCreateVote: votes.canCreateVote, canCastBallot: votes.canCastBallot, votes: rows };
+    return { success: true, canCreateVote: votes.canCreateVote, canCastBallot: votes.canCastBallot, votes: votes.votes || [] };
   } catch (e) { throw new Error(_errMsg('getVotingDashboard', e)); }
 }
 
@@ -2992,13 +2992,43 @@ function createVoteEnhanced(token, payload) {
     payload = payload || {};
     const res = createVote(token, payload.title, payload.thresholdType, payload.status);
     const ctx = _getGovernanceSheets();
+    const imageURL = String(payload.imageURL || '').trim();
+    const description = String(payload.description || '').trim();
     const imageIdx = _optionalHeaderIndex(ctx.votes, ['ImageURL', 'ProposalImageURL', 'ThumbnailURL']);
-    if (imageIdx !== -1) {
-      const idx = ctx.votes.rows.findIndex(r => String(r[ctx.votes.idx.VoteID] || '').trim() === res.vote.VoteID);
-      if (idx !== -1) ctx.votes.sheet.getRange(idx + 2, imageIdx + 1).setValue(String(payload.imageURL || '').trim());
+    const descriptionIdx = _optionalHeaderIndex(ctx.votes, ['Description', 'ProposalDescription', 'Details']);
+    const idx = ctx.votes.rows.findIndex(r => String(r[ctx.votes.idx.VoteID] || '').trim() === res.vote.VoteID);
+    if (idx !== -1) {
+      if (imageIdx !== -1) {
+        ctx.votes.sheet.getRange(idx + 2, imageIdx + 1).setValue(imageURL);
+      }
+      if (descriptionIdx !== -1) {
+        ctx.votes.sheet.getRange(idx + 2, descriptionIdx + 1).setValue(description);
+      }
     }
-    return res;
+    return {
+      success: true,
+      vote: Object.assign({}, res.vote, {
+        Description: description,
+        ImageURL: imageURL
+      })
+    };
   } catch (e) { throw new Error(_errMsg('createVoteEnhanced', e)); }
+}
+
+function _readVoteImageURL(votesCtx, row) {
+  const imageIdx = _optionalHeaderIndex(votesCtx, ['ImageURL', 'ProposalImageURL', 'ThumbnailURL']);
+  if (imageIdx === -1) {
+    return '';
+  }
+  return String(row[imageIdx] || '').trim();
+}
+
+function _readVoteDescription(votesCtx, row) {
+  const descriptionIdx = _optionalHeaderIndex(votesCtx, ['Description', 'ProposalDescription', 'Details']);
+  if (descriptionIdx === -1) {
+    return '';
+  }
+  return String(row[descriptionIdx] || '').trim();
 }
 
 function getTimelineCalendarData(token) {

@@ -36,6 +36,11 @@ height:210px;
 max-width:340px;
 }
 
+.vote-chart-shell{
+height:180px;
+max-width:300px;
+}
+
 .dashboard-tile{
 display:block;
 border:1px solid rgb(226 232 240);
@@ -420,7 +425,12 @@ Financial Distribution
 <option value="TwoThirds">TwoThirds</option>
 <option value="SeventyFive">SeventyFive</option>
 </select>
+<textarea id="vote-description" placeholder="Proposal description (optional)" class="md:col-span-4 p-3 rounded-xl border border-slate-200 min-h-[96px]"></textarea>
 <input id="vote-image" type="url" placeholder="Proposal image URL (optional)" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+<div class="md:col-span-2 flex flex-col gap-2">
+<input id="vote-image-file" type="file" accept="image/*" class="p-2 rounded-xl border border-slate-200 bg-white text-sm" onchange="handleVoteImageSelected(event)" />
+<div class="text-xs text-slate-500">Optional: select an image file to auto-fill the image URL field (base64 data URL).</div>
+</div>
 <select id="vote-status" class="p-3 rounded-xl border border-slate-200">
 <option value="Open">Open</option>
 <option value="Closed">Closed</option>
@@ -429,7 +439,7 @@ Financial Distribution
 <button id="btn-create-vote" onclick="createVote()" class="mt-3 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Create Vote</button>
 </div>
 
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 mb-4"><h3 class="text-sm font-bold text-slate-500 uppercase mb-2">Results Chart</h3><div class="chart-shell chart-shell-sm"><canvas id="vote-results-chart" height="120"></canvas></div></div>
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 mb-4"><h3 class="text-sm font-bold text-slate-500 uppercase mb-2">Results Chart</h3><div class="chart-shell chart-shell-sm vote-chart-shell"><canvas id="vote-results-chart"></canvas></div></div>
 <div id="vote-list" class="space-y-3"></div>
 
 </div>
@@ -1946,6 +1956,10 @@ google.script.run
 btn.disabled = false
 btn.classList.remove("opacity-60")
 document.getElementById("vote-title").value = ""
+document.getElementById("vote-description").value = ""
+document.getElementById("vote-image").value = ""
+const fileInput = document.getElementById("vote-image-file")
+if(fileInput){ fileInput.value = "" }
 loadVotes()
 })
 .withFailureHandler(err=>{
@@ -1957,7 +1971,41 @@ return
 }
 setVoteError((err && err.message) || "Unable to create vote.")
 })
-.createVoteEnhanced(token, {title:title, thresholdType:thresholdType, status:status, imageURL:document.getElementById("vote-image").value})
+.createVoteEnhanced(token, {title:title, thresholdType:thresholdType, status:status, description:document.getElementById("vote-description").value, imageURL:document.getElementById("vote-image").value})
+}
+
+function handleVoteImageSelected(event){
+const input = event && event.target
+if(!input || !input.files || !input.files.length){
+return
+}
+const file = input.files[0]
+if(!file || !String(file.type || "").toLowerCase().startsWith("image/")){
+setVoteError("Please select a valid image file.")
+return
+}
+const maxBytes = 1024 * 1024
+if(file.size > maxBytes){
+setVoteError("Image file is too large. Please use a file under 1MB.")
+return
+}
+const reader = new FileReader()
+reader.onload = (e)=>{
+const result = e && e.target ? String(e.target.result || "") : ""
+if(!result){
+setVoteError("Unable to read selected image.")
+return
+}
+const imageInput = document.getElementById("vote-image")
+if(imageInput){
+imageInput.value = result
+}
+setVoteError("")
+}
+reader.onerror = ()=>{
+setVoteError("Unable to process selected image.")
+}
+reader.readAsDataURL(file)
 }
 
 function castBallot(voteID){
@@ -2031,7 +2079,9 @@ return `
 <div class="flex items-start justify-between gap-2">
 <div>
 <div class="text-xs text-slate-500 uppercase">${escapeHtml(v.VoteID || "")}</div>
-<div class="font-semibold text-slate-800">${escapeHtml(v.Title || "Untitled vote")}</div>${v.ImageURL ? `<img src="${escapeHtml(v.ImageURL)}" class="mt-2 h-24 w-full object-cover rounded-lg"/>` : ""}
+<div class="font-semibold text-slate-800">${escapeHtml(v.Title || "Untitled vote")}</div>
+${v.Description ? `<div class="text-sm text-slate-700 mt-2 whitespace-pre-wrap">${escapeHtml(v.Description)}</div>` : ""}
+${v.ImageURL ? `<img src="${escapeHtml(v.ImageURL)}" class="mt-2 h-24 w-full object-cover rounded-lg"/>` : ""}
 <div class="text-xs text-slate-500 mt-1">Threshold: ${escapeHtml(v.ThresholdType || "Majority")} • Status: ${escapeHtml(v.Status || "Unknown")}</div>
 </div>
 <div class="text-xs font-semibold ${v.thresholdPassed ? "text-emerald-600" : "text-amber-600"}">${v.thresholdPassed ? "Passed" : "Not passed"}</div>
