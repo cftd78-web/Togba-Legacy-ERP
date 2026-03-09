@@ -169,6 +169,8 @@ Financial Distribution
 <div class="grid gap-3 md:grid-cols-4">
 <input id="project-create-title" type="text" placeholder="Project title" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
 <input id="project-create-goal" type="number" min="0" step="0.01" placeholder="Goal USD" class="p-3 rounded-xl border border-slate-200" />
+<input id="project-create-description" type="text" placeholder="Project description (optional)" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+<input id="project-create-image" type="url" placeholder="Project image URL (optional)" class="p-3 rounded-xl border border-slate-200" />
 <select id="project-create-status" class="p-3 rounded-xl border border-slate-200">
 <option value="Planning">Planning</option>
 <option value="In Progress">In Progress</option>
@@ -198,6 +200,9 @@ Financial Distribution
 <option value="Low">Low</option>
 </select>
 <input id="task-create-percent" type="number" min="0" max="100" placeholder="% complete" class="p-3 rounded-xl border border-slate-200" />
+<input id="task-create-title" type="text" placeholder="Task title" class="p-3 rounded-xl border border-slate-200" />
+<select id="task-create-assignee-type" class="p-3 rounded-xl border border-slate-200"><option value="">Assignee Type</option><option value="internal">internal</option><option value="external">external</option></select>
+<input id="task-create-assignee" type="text" placeholder="Assignee name/email" class="p-3 rounded-xl border border-slate-200" />
 <button id="btn-create-task" onclick="createTaskRecord()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Add Task</button>
 </div>
 <div id="project-task-list" class="space-y-3"></div>
@@ -230,6 +235,13 @@ Financial Distribution
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Channels</h3>
+<div class="grid gap-2 mb-3">
+<input id="channel-create-name" class="p-2 rounded-lg border" placeholder="New channel name" />
+<select id="channel-create-type" class="p-2 rounded-lg border"><option value="private">private</option><option value="family broadcast">family broadcast</option><option value="project">project</option></select>
+<button onclick="createChannelUI()" class="bg-blue-600 text-white p-2 rounded-lg text-sm">Create Channel</button>
+<input id="channel-join-id" class="p-2 rounded-lg border" placeholder="ChannelID to join" />
+<button onclick="joinChannelUI()" class="bg-slate-900 text-white p-2 rounded-lg text-sm">Join Channel</button>
+</div>
 <div id="channel-list" class="space-y-2 max-h-[52vh] overflow-y-auto"></div>
 </div>
 
@@ -272,6 +284,7 @@ Financial Distribution
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Alert History</h3>
 <div id="sos-alert-history" class="space-y-2"></div>
+<div id="sos-map" class="mt-3"></div>
 </div>
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
@@ -314,6 +327,7 @@ Financial Distribution
 <option value="TwoThirds">TwoThirds</option>
 <option value="SeventyFive">SeventyFive</option>
 </select>
+<input id="vote-image" type="url" placeholder="Proposal image URL (optional)" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
 <select id="vote-status" class="p-3 rounded-xl border border-slate-200">
 <option value="Open">Open</option>
 <option value="Closed">Closed</option>
@@ -322,6 +336,7 @@ Financial Distribution
 <button id="btn-create-vote" onclick="createVote()" class="mt-3 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Create Vote</button>
 </div>
 
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 mb-4"><h3 class="text-sm font-bold text-slate-500 uppercase mb-2">Results Chart</h3><canvas id="vote-results-chart" height="120"></canvas></div>
 <div id="vote-list" class="space-y-3"></div>
 
 </div>
@@ -339,6 +354,8 @@ Financial Distribution
 
 <div class="grid gap-4 lg:grid-cols-3">
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Calendar View</h3><div id="timeline-calendar" class="grid gap-2 md:grid-cols-4 text-sm"></div></div>
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Unified Timeline</h3>
 <div id="timeline-list" class="space-y-3"></div>
 </div>
@@ -352,6 +369,36 @@ Financial Distribution
 </div>
 </div>
 
+</div>
+
+
+<!-- FAMILY PAGE -->
+
+<div id="page-family" class="page p-6">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-2xl font-bold">Family Data & Tree</h2>
+<button onclick="loadFamilyData()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+</div>
+<div id="family-error" class="hidden text-sm text-red-600 mb-3"></div>
+<div class="grid gap-4 lg:grid-cols-3">
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Add / Update Member</h3>
+<div class="grid gap-2">
+<input id="family-person-id" class="p-2 rounded-lg border" placeholder="PersonID (optional for new)" />
+<input id="family-full-name" class="p-2 rounded-lg border" placeholder="Full name" />
+<input id="family-relationship" class="p-2 rounded-lg border" placeholder="RelationshipToPatriarch" />
+<input id="family-generation" class="p-2 rounded-lg border" placeholder="GenerationTier" />
+<input id="family-father" class="p-2 rounded-lg border" placeholder="FatherID" />
+<input id="family-mother" class="p-2 rounded-lg border" placeholder="MotherID" />
+<input id="family-spouse" class="p-2 rounded-lg border" placeholder="SpouseFullNameOptional" />
+<button onclick="saveFamilyMember()" class="bg-blue-600 text-white p-2 rounded-lg">Save</button>
+</div>
+</div>
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Family Tree View</h3>
+<div id="family-tree" class="space-y-2"></div>
+</div>
+</div>
 </div>
 
 <!-- ADMIN PAGE -->
@@ -401,8 +448,20 @@ Financial Distribution
 </div>
 
 <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow mt-4">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Member Management</h3>
+<div class="grid gap-2 md:grid-cols-5 mb-3">
+<input id="admin-member-email" class="p-2 rounded-lg border" placeholder="email"/>
+<input id="admin-member-name" class="p-2 rounded-lg border" placeholder="full name"/>
+<input id="admin-member-role" class="p-2 rounded-lg border" placeholder="role"/>
+<button onclick="adminAddMember()" class="bg-blue-600 text-white p-2 rounded-lg">Add</button>
+<button onclick="adminDeactivateMember()" class="bg-red-600 text-white p-2 rounded-lg">Deactivate</button>
+</div>
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Access Registry</h3>
 <div id="user-list" class="space-y-2"></div>
+</div>
+<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow mt-4">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Emergency Configuration Guide</h3>
+<div id="admin-guide" class="text-sm text-slate-700 space-y-2"></div>
 </div>
 
 </div>
@@ -446,6 +505,11 @@ Voting
 Timeline
 </button>
 
+<button onclick="showPage('family')">
+<span class="material-icons-round">account_tree</span>
+Family
+</button>
+
 <button id="btn-nav-admin"
 onclick="showPage('admin')"
 class="hidden">
@@ -468,6 +532,7 @@ let selectedChannelID = ""
 let timelineLoaded = false
 let voteDataLoaded = false
 let votePermissions = {canCreateVote:false, canCastBallot:false}
+let voteResultsChartInstance = null
 let projectPermissions = {canCreateProject:false, canEditTask:false}
 let projectsLoaded = false
 let projectsCache = []
@@ -626,9 +691,12 @@ return `${Number(value || 0).toFixed(2)}%`
 
 function handleOTP(){
 google.script.run
-.withSuccessHandler(()=>{
+.withSuccessHandler(res=>{
 document.getElementById("step-1").classList.add("hidden")
 document.getElementById("step-2").classList.remove("hidden")
+if(res && res.deliveredByEmail===false){
+alert("OTP generated. Email delivery failed in this environment; you can still use the generated OTP from Access sheet as fallback.")
+}
 })
 .withFailureHandler(onServerFailure)
 .loginStepOne(document.getElementById("email").value)
@@ -717,6 +785,7 @@ if(page==="finance") loadFinanceDashboard()
 if(page==="projects") loadProjects()
 if(page==="voting") loadVotes()
 if(page==="sos") loadSOSAlerts()
+if(page==="family") loadFamilyData()
 }
 
 function loadProjects(){
@@ -755,7 +824,7 @@ return
 setProjectError((err && err.message) || "Unable to load projects.")
 renderProjects()
 })
-.getProjects(token)
+.getProjectBoard(token)
 }
 
 function renderProjects(){
@@ -799,6 +868,8 @@ const total = Number(project.TaskCount || 0)
 detail.innerHTML = `
 <div class="text-xs text-slate-500 uppercase">Project Detail</div>
 <div class="text-2xl font-bold text-slate-800">${escapeHtml(project.Title || "Untitled")}</div>
+${project.ImageURL ? `<img src="${escapeHtml(project.ImageURL)}" class="rounded-xl max-h-44 object-cover w-full mt-2"/>` : ""}
+<div class="text-sm text-slate-600">${escapeHtml(project.Description || "")}</div>
 <div class="grid sm:grid-cols-3 gap-3">
 <div class="rounded-xl border border-slate-200 p-3"><div class="text-xs text-slate-500">ProjectID</div><div class="font-semibold text-slate-800">${escapeHtml(project.ProjectID || "")}</div></div>
 <div class="rounded-xl border border-slate-200 p-3"><div class="text-xs text-slate-500">Goal USD</div><div class="font-semibold text-slate-800">${formatCurrency(project.GoalUSD || 0)}</div></div>
@@ -869,7 +940,7 @@ return `
 <div class="flex flex-wrap items-center justify-between gap-2">
 <div>
 <div class="text-xs text-slate-500">TaskID: ${taskID}</div>
-<div class="text-sm text-slate-700">Status: <strong>${escapeHtml(task.Status || "Pending")}</strong> • Priority: <strong>${escapeHtml(task.Priority || "Medium")}</strong></div>
+<div class="text-sm text-slate-700">${escapeHtml(task.TaskTitle || task.TaskID || "Task")}<br/>Status: <strong>${escapeHtml(task.Status || "Pending")}</strong> • Priority: <strong>${escapeHtml(task.Priority || "Medium")}</strong><br/>Assignee: <strong>${escapeHtml(task.AssigneeType || "-")}</strong> ${escapeHtml(task.Assignee || "") }</div>
 </div>
 <div class="text-sm font-semibold text-slate-700">${formatPercent(task.PercentComplete || 0)}</div>
 </div>
@@ -934,67 +1005,38 @@ const btn = document.getElementById("btn-create-project")
 const title = document.getElementById("project-create-title").value
 const goalUSD = document.getElementById("project-create-goal").value
 const status = document.getElementById("project-create-status").value
-if(!String(title||"").trim()){
-setProjectError("Project title is required.")
-return
-}
 btn.disabled = true
-btn.classList.add("opacity-60")
-setProjectError("")
-setProjectStatus("")
+setProjectStatus("Creating project...")
 google.script.run
 .withSuccessHandler(()=>{
 btn.disabled = false
-btn.classList.remove("opacity-60")
+setProjectStatus("Project created.")
 document.getElementById("project-create-title").value = ""
 document.getElementById("project-create-goal").value = ""
-setProjectStatus("Project created successfully.")
+document.getElementById("project-create-description").value = ""
+document.getElementById("project-create-image").value = ""
 loadProjects()
 })
-.withFailureHandler(err=>{
-btn.disabled = false
-btn.classList.remove("opacity-60")
-if(isSessionExpiredError(err)){
-onServerFailure(err)
-return
-}
-setProjectError((err && err.message) || "Unable to create project.")
-})
+.withFailureHandler(err=>{ btn.disabled = false; setProjectError((err && err.message) || "Unable to create project.") })
 .createProject(token, title, goalUSD, status)
 }
 
 function createTaskRecord(){
-if(!selectedProjectID){
-setProjectError("Select a project before creating a task.")
-return
-}
 const btn = document.getElementById("btn-create-task")
-const status = document.getElementById("task-create-status").value
-const priority = document.getElementById("task-create-priority").value
-const percentComplete = document.getElementById("task-create-percent").value
-btn.disabled = true
-btn.classList.add("opacity-60")
-setProjectError("")
-setProjectStatus("")
-google.script.run
-.withSuccessHandler(()=>{
-btn.disabled = false
-btn.classList.remove("opacity-60")
-document.getElementById("task-create-percent").value = ""
-setProjectStatus("Project task created.")
-loadProjectTasks(selectedProjectID)
-loadProjects()
-})
-.withFailureHandler(err=>{
-btn.disabled = false
-btn.classList.remove("opacity-60")
-if(isSessionExpiredError(err)){
-onServerFailure(err)
-return
+const payload = {
+projectID: document.getElementById("task-project-id").value,
+status: document.getElementById("task-create-status").value,
+priority: document.getElementById("task-create-priority").value,
+percentComplete: document.getElementById("task-create-percent").value,
+taskTitle: document.getElementById("task-create-title").value,
+assigneeType: document.getElementById("task-create-assignee-type").value,
+assignee: document.getElementById("task-create-assignee").value
 }
-setProjectError((err && err.message) || "Unable to create task.")
-})
-.createProjectTask(token, selectedProjectID, status, priority, percentComplete)
+btn.disabled = true
+google.script.run
+.withSuccessHandler(()=>{btn.disabled=false; setProjectStatus("Task created."); loadProjects()})
+.withFailureHandler(err=>{btn.disabled=false; setProjectError((err&&err.message)||"Unable to create task.")})
+.createProjectTaskEnhanced(token, payload)
 }
 
 function updateTaskRecord(taskID){
@@ -1250,9 +1292,48 @@ ${issues.length ? `<div class="space-y-1 mt-2">${issues.slice(0,10).map(item=>`<
 `
 }
 
+
+function adminAddMember(){
+const email=document.getElementById("admin-member-email").value
+const fullName=document.getElementById("admin-member-name").value
+const role=document.getElementById("admin-member-role").value
+google.script.run.withSuccessHandler(()=>{setAdminStatus("Member added.");loadAdmin()}).withFailureHandler(onServerFailure).addMember(token,{email,fullName,role})
+}
+function adminDeactivateMember(){
+const email=document.getElementById("admin-member-email").value
+google.script.run.withSuccessHandler(()=>{setAdminStatus("Member deactivated.");loadAdmin()}).withFailureHandler(onServerFailure).deactivateMember(token,email)
+}
+function renderTimelineCalendar(calendar){
+const el=document.getElementById("timeline-calendar"); if(!el) return
+const keys=Object.keys(calendar||{}).sort(); if(!keys.length){el.innerHTML="<div class='text-sm text-slate-500'>No upcoming events for calendar.</div>";return}
+el.innerHTML=keys.map(k=>`<div class="border rounded-lg p-2"><div class="font-semibold text-xs text-slate-500">${escapeHtml(k)}</div><div class="text-sm">${(calendar[k]||[]).map(e=>escapeHtml(e.Title||'Event')).join('<br/>')}</div></div>`).join('')
+}
+function renderSOSMap(alert){
+const el=document.getElementById("sos-map"); if(!el) return
+if(!alert){el.innerHTML=''; return}
+const mapLink=`https://maps.google.com/?q=${encodeURIComponent((alert.Lat||0)+','+(alert.Lng||0))}`
+el.innerHTML=`<a class="text-blue-600 text-sm underline" target="_blank" href="${mapLink}">Open location map for ${escapeHtml(alert.SOSID||'alert')}</a><iframe class="w-full h-48 mt-2 rounded-lg" loading="lazy" src="https://maps.google.com/maps?q=${encodeURIComponent((alert.Lat||0)+','+(alert.Lng||0))}&z=14&output=embed"></iframe>`
+}
+function renderVoteChart(votes){
+const totals={yes:0,no:0,abstain:0};(votes||[]).forEach(v=>{totals.yes+=Number(v.yesCount||0);totals.no+=Number(v.noCount||0);totals.abstain+=Number(v.abstainCount||0)})
+const canvas=document.getElementById('vote-results-chart'); if(!canvas) return
+if(voteResultsChartInstance){voteResultsChartInstance.destroy()}
+voteResultsChartInstance=new Chart(canvas,{type:'doughnut',data:{labels:['Yes','No','Abstain'],datasets:[{data:[totals.yes,totals.no,totals.abstain],backgroundColor:['#16a34a','#dc2626','#64748b']}]},options:{plugins:{legend:{position:'bottom'}}}})
+}
+function setFamilyError(message){const el=document.getElementById('family-error'); if(!el) return; if(!message){el.classList.add('hidden'); el.innerText=''; return;} el.classList.remove('hidden'); el.innerText=message}
+function loadFamilyData(){
+setFamilyError('')
+google.script.run.withSuccessHandler(data=>{const members=(data&&data.members)||[];const el=document.getElementById('family-tree'); if(!members.length){el.innerHTML="<div class='text-sm text-slate-500'>No family members found.</div>"; return;} el.innerHTML=members.map(m=>`<div class="border rounded-lg p-2"><div class="font-semibold">${escapeHtml(m.FullName||m.PersonID)}</div><div class="text-xs text-slate-500">${escapeHtml(m.PersonID)} • Gen ${escapeHtml(m.GenerationTier)}</div><div class="text-xs">Parents: ${escapeHtml(m.FatherID||'-')} / ${escapeHtml(m.MotherID||'-')}</div></div>`).join('')}).withFailureHandler(err=>setFamilyError((err&&err.message)||'Unable to load family data.')).getFamilyData(token)
+}
+function saveFamilyMember(){
+const payload={PersonID:document.getElementById('family-person-id').value,FullName:document.getElementById('family-full-name').value,RelationshipToPatriarch:document.getElementById('family-relationship').value,GenerationTier:document.getElementById('family-generation').value,FatherID:document.getElementById('family-father').value,MotherID:document.getElementById('family-mother').value,SpouseFullNameOptional:document.getElementById('family-spouse').value}
+google.script.run.withSuccessHandler(()=>{loadFamilyData()}).withFailureHandler(err=>setFamilyError((err&&err.message)||'Unable to save family member.')).upsertFamilyMember(token,payload)
+}
+
 function loadAdmin(){
 setAdminError("")
 setAdminStatus("Loading admin dashboard...")
+google.script.run.withSuccessHandler(g=>{const el=document.getElementById("admin-guide"); if(el){el.innerHTML=`<div><strong>OTP Email:</strong><ul class="list-disc ml-4">${(g.otpEmailInstructions||[]).map(i=>`<li>${escapeHtml(i)}</li>`).join("")}</ul></div><div><strong>WhatsApp Emergency:</strong><ul class="list-disc ml-4">${(g.whatsappConfigInstructions||[]).map(i=>`<li>${escapeHtml(i)}</li>`).join("")}</ul></div>`}}).withFailureHandler(()=>{}).getSOSAdminGuide(token)
 
 google.script.run
 .withSuccessHandler(users=>{
@@ -1359,6 +1440,15 @@ setMessageError((err && err.message) || "Unable to load channels.")
 .getUserChannels(token)
 }
 
+function createChannelUI(){
+const name = document.getElementById("channel-create-name").value
+const type = document.getElementById("channel-create-type").value
+google.script.run.withSuccessHandler(()=>{document.getElementById("channel-create-name").value="";loadUserChannels()}).withFailureHandler(onServerFailure).createChannel(token,name,type)
+}
+function joinChannelUI(){
+const channelID = document.getElementById("channel-join-id").value
+google.script.run.withSuccessHandler(()=>{document.getElementById("channel-join-id").value="";loadUserChannels()}).withFailureHandler(onServerFailure).joinChannel(token,channelID)
+}
 function renderChannelList(){
 const container = document.getElementById("channel-list")
 if(!userChannels.length){
@@ -1480,7 +1570,7 @@ return
 }
 setVoteError((err && err.message) || "Unable to create vote.")
 })
-.createVote(token, title, thresholdType, status)
+.createVoteEnhanced(token, {title:title, thresholdType:thresholdType, status:status, imageURL:document.getElementById("vote-image").value})
 }
 
 function castBallot(voteID){
@@ -1530,7 +1620,7 @@ if(!voteDataLoaded){
 renderVotes([])
 }
 })
-.getVotes(token)
+.getVotingDashboard(token)
 }
 
 function renderVotes(votes){
@@ -1545,6 +1635,7 @@ if(!votes || !votes.length){
 list.innerHTML = "<div class='text-sm text-slate-500'>No votes found.</div>"
 return
 }
+renderVoteChart(votes)
 list.innerHTML = votes.map(v=>{
 const isOpen = String(v.Status || "").toLowerCase() === "open"
 const canCast = votePermissions.canCastBallot && isOpen && !v.hasUserVoted
@@ -1553,7 +1644,7 @@ return `
 <div class="flex items-start justify-between gap-2">
 <div>
 <div class="text-xs text-slate-500 uppercase">${escapeHtml(v.VoteID || "")}</div>
-<div class="font-semibold text-slate-800">${escapeHtml(v.Title || "Untitled vote")}</div>
+<div class="font-semibold text-slate-800">${escapeHtml(v.Title || "Untitled vote")}</div>${v.ImageURL ? `<img src="${escapeHtml(v.ImageURL)}" class="mt-2 h-24 w-full object-cover rounded-lg"/>` : ""}
 <div class="text-xs text-slate-500 mt-1">Threshold: ${escapeHtml(v.ThresholdType || "Majority")} • Status: ${escapeHtml(v.Status || "Unknown")}</div>
 </div>
 <div class="text-xs font-semibold ${v.thresholdPassed ? "text-emerald-600" : "text-amber-600"}">${v.thresholdPassed ? "Passed" : "Not passed"}</div>
@@ -1639,6 +1730,7 @@ timelineLoaded = true
 renderTimelineList((data && data.timeline) || [])
 renderHistoryList((data && data.historical) || [])
 renderUpcomingList((data && data.upcoming) || [])
+renderTimelineCalendar((data && data.calendar) || {})
 })
 .withFailureHandler(err=>{
 if(isSessionExpiredError(err)){
@@ -1652,7 +1744,7 @@ renderHistoryList([])
 renderUpcomingList([])
 }
 })
-.getTimelineData(token)
+.getTimelineCalendarData(token)
 }
 
 function loadSOSAlerts(){
@@ -1670,8 +1762,11 @@ if(!selectedSOSID || !sosAlerts.some(a=>a.SOSID===selectedSOSID)){
 selectedSOSID = sosAlerts.length ? sosAlerts[0].SOSID : ""
 }
 renderSOSAlerts()
+const selected = sosAlerts.find(a=>a.SOSID===selectedSOSID)
+renderSOSMap(selected)
 if(selectedSOSID){
 loadSOSMedia(selectedSOSID)
+renderSOSMap(selected)
 }else{
 renderSOSMedia([])
 renderSOSWhatsAppAction("")
@@ -1716,6 +1811,7 @@ renderSOSAlerts()
 const selected = sosAlerts.find(a=>a.SOSID===selectedSOSID)
 renderSOSWhatsAppAction((selected && selected.WhatsAppLink) || "")
 loadSOSMedia(selectedSOSID)
+renderSOSMap(selected)
 }
 
 function renderSOSWhatsAppAction(link){
@@ -1799,6 +1895,7 @@ btn.classList.remove("opacity-60")
 document.getElementById("sos-media-url").value = ""
 setSOSStatus("Media reference saved.")
 loadSOSMedia(selectedSOSID)
+renderSOSMap(selected)
 })
 .withFailureHandler(err=>{
 btn.disabled = false
