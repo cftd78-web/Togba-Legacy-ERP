@@ -180,15 +180,6 @@ function getDashboardData(token) {
   }
 }
 
-
-function getStartupBootstrap(token) {
-  try {
-    return getDashboardData(token);
-  } catch (e) {
-    throw new Error(_errMsg('getStartupBootstrap', e));
-  }
-}
-
 /* =====================================================
    FINANCE AGGREGATION
 ===================================================== */

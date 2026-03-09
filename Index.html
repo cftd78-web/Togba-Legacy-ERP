@@ -85,8 +85,6 @@ Verify
 
 <h2 id="welcome-name" class="text-2xl font-bold mb-4"></h2>
 
-<div id="home-error" class="hidden text-sm text-red-600 mb-3"></div>
-
 <div class="bg-white p-6 rounded-3xl shadow border border-slate-100">
 
 <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">
@@ -548,10 +546,6 @@ let projectTasksCache = []
 let projectUpdatesCache = []
 let sosAlerts = []
 let selectedSOSID = ""
-let homeLoaded = false
-let financeLoaded = false
-let adminLoaded = false
-let familyLoaded = false
 
 function isSessionExpiredError(err){
 const msg = String((err && err.message) || err || "")
@@ -569,10 +563,6 @@ projectsCache = []
 selectedProjectID = ""
 projectTasksCache = []
 projectUpdatesCache = []
-homeLoaded = false
-financeLoaded = false
-adminLoaded = false
-familyLoaded = false
 document.getElementById("step-1").classList.remove("hidden")
 document.getElementById("step-2").classList.add("hidden")
 document.getElementById("view-app").classList.add("hidden")
@@ -595,19 +585,6 @@ return String(value || "")
 .replaceAll(">", "&gt;")
 .replaceAll('"', "&quot;")
 .replaceAll("'", "&#39;")
-}
-
-
-function setHomeError(message){
-const el = document.getElementById("home-error")
-if(!el) return
-if(!message){
-el.classList.add("hidden")
-el.innerText = ""
-return
-}
-el.classList.remove("hidden")
-el.innerText = message
 }
 
 function setMessageError(message){
@@ -747,29 +724,25 @@ document.getElementById("otp").value
 function initApp(){
 document.getElementById("view-login").classList.add("hidden")
 document.getElementById("view-app").classList.remove("hidden")
-setHomeError("")
-document.getElementById("btn-nav-admin").classList.add("hidden")
 
 google.script.run
 .withSuccessHandler(data=>{
-document.getElementById("welcome-name").innerText = "Hello " + ((data && data.profile && data.profile.name) || "")
+document.getElementById("welcome-name").innerText = "Hello " + data.profile.name
 
-if(data && data.profile && data.profile.role === "Admin"){
+if(data.profile.role === "Admin")
 document.getElementById("btn-nav-admin").classList.remove("hidden")
-}
 
-showPage("home")
-loadHomeEssentials()
+loadCharts()
+loadFinanceDashboard()
+loadProjects()
+loadUserChannels()
+loadVotes()
 })
 .withFailureHandler(onServerFailure)
-.getStartupBootstrap(token)
+.getDashboardData(token)
 }
 
-function loadHomeEssentials(){
-if(homeLoaded) return
-homeLoaded = true
-setHomeError("")
-
+function loadCharts(){
 google.script.run
 .withSuccessHandler(data=>{
 if(financeChartInstance){
@@ -800,14 +773,7 @@ legend:{position:"bottom"}
 }
 )
 })
-.withFailureHandler(err=>{
-if(isSessionExpiredError(err)){
-onServerFailure(err)
-return
-}
-homeLoaded = false
-setHomeError((err && err.message) || "Unable to load home dashboard.")
-})
+.withFailureHandler(onServerFailure)
 .getFinanceData(token)
 }
 
@@ -818,44 +784,14 @@ document.querySelectorAll(".page")
 document.getElementById("page-"+page)
 .classList.add("active")
 
-if(page==="home") loadHomeEssentials()
-if(page==="admin"){
-if(!adminLoaded){
-loadAdmin()
-}
-return
-}
-if(page==="messages"){
-loadUserChannels()
-return
-}
-if(page==="timeline"){
-loadTimelineData()
-return
-}
-if(page==="finance"){
-if(!financeLoaded){
-loadFinanceDashboard()
-}
-return
-}
-if(page==="projects"){
-loadProjects()
-return
-}
-if(page==="voting"){
-loadVotes()
-return
-}
-if(page==="sos"){
-loadSOSAlerts()
-return
-}
-if(page==="family"){
-if(!familyLoaded){
-loadFamilyData()
-}
-}
+if(page==="admin") loadAdmin()
+if(page==="messages") loadUserChannels()
+if(page==="timeline") loadTimelineData()
+if(page==="finance") loadFinanceDashboard()
+if(page==="projects") loadProjects()
+if(page==="voting") loadVotes()
+if(page==="sos") loadSOSAlerts()
+if(page==="family") loadFamilyData()
 }
 
 function loadProjects(){
@@ -1217,7 +1153,6 @@ lockList.innerHTML = "<div class='text-sm text-slate-500'>Loading finance dashbo
 
 google.script.run
 .withSuccessHandler(data=>{
-financeLoaded = true
 renderFinanceDashboard(data || {})
 })
 .withFailureHandler(err=>{
@@ -1225,7 +1160,6 @@ if(isSessionExpiredError(err)){
 onServerFailure(err)
 return
 }
-financeLoaded = false
 setFinanceError((err && err.message) || "Unable to load finance dashboard.")
 })
 .getFinanceDashboardData(token)
@@ -1402,11 +1336,11 @@ function adminAddMember(){
 const email=document.getElementById("admin-member-email").value
 const fullName=document.getElementById("admin-member-name").value
 const role=document.getElementById("admin-member-role").value
-google.script.run.withSuccessHandler(()=>{setAdminStatus("Member added.");loadAdmin()}).withFailureHandler(err=>{ if(isSessionExpiredError(err)){ onServerFailure(err); return; } setAdminError((err && err.message) || 'Unable to add member.'); }).addMember(token,{email,fullName,role})
+google.script.run.withSuccessHandler(()=>{setAdminStatus("Member added.");loadAdmin()}).withFailureHandler(onServerFailure).addMember(token,{email,fullName,role})
 }
 function adminDeactivateMember(){
 const email=document.getElementById("admin-member-email").value
-google.script.run.withSuccessHandler(()=>{setAdminStatus("Member deactivated.");loadAdmin()}).withFailureHandler(err=>{ if(isSessionExpiredError(err)){ onServerFailure(err); return; } setAdminError((err && err.message) || 'Unable to deactivate member.'); }).deactivateMember(token,email)
+google.script.run.withSuccessHandler(()=>{setAdminStatus("Member deactivated.");loadAdmin()}).withFailureHandler(onServerFailure).deactivateMember(token,email)
 }
 function renderTimelineCalendar(calendar){
 const el=document.getElementById("timeline-calendar"); if(!el) return
@@ -1427,28 +1361,8 @@ voteResultsChartInstance=new Chart(canvas,{type:'doughnut',data:{labels:['Yes','
 }
 function setFamilyError(message){const el=document.getElementById('family-error'); if(!el) return; if(!message){el.classList.add('hidden'); el.innerText=''; return;} el.classList.remove('hidden'); el.innerText=message}
 function loadFamilyData(){
-familyLoaded = false
 setFamilyError('')
-google.script.run
-.withSuccessHandler(data=>{
-familyLoaded = true
-const members=(data&&data.members)||[]
-const el=document.getElementById('family-tree')
-if(!members.length){
-el.innerHTML="<div class='text-sm text-slate-500'>No family members found.</div>"
-return
-}
-el.innerHTML=members.map(m=>`<div class="border rounded-lg p-2"><div class="font-semibold">${escapeHtml(m.FullName||m.PersonID)}</div><div class="text-xs text-slate-500">${escapeHtml(m.PersonID)} • Gen ${escapeHtml(m.GenerationTier)}</div><div class="text-xs">Parents: ${escapeHtml(m.FatherID||'-')} / ${escapeHtml(m.MotherID||'-')}</div></div>`).join('')
-})
-.withFailureHandler(err=>{
-if(isSessionExpiredError(err)){
-onServerFailure(err)
-return
-}
-familyLoaded = false
-setFamilyError((err&&err.message)||'Unable to load family data.')
-})
-.getFamilyData(token)
+google.script.run.withSuccessHandler(data=>{const members=(data&&data.members)||[];const el=document.getElementById('family-tree'); if(!members.length){el.innerHTML="<div class='text-sm text-slate-500'>No family members found.</div>"; return;} el.innerHTML=members.map(m=>`<div class="border rounded-lg p-2"><div class="font-semibold">${escapeHtml(m.FullName||m.PersonID)}</div><div class="text-xs text-slate-500">${escapeHtml(m.PersonID)} • Gen ${escapeHtml(m.GenerationTier)}</div><div class="text-xs">Parents: ${escapeHtml(m.FatherID||'-')} / ${escapeHtml(m.MotherID||'-')}</div></div>`).join('')}).withFailureHandler(err=>setFamilyError((err&&err.message)||'Unable to load family data.')).getFamilyData(token)
 }
 function saveFamilyMember(){
 const payload={PersonID:document.getElementById('family-person-id').value,FullName:document.getElementById('family-full-name').value,RelationshipToPatriarch:document.getElementById('family-relationship').value,GenerationTier:document.getElementById('family-generation').value,FatherID:document.getElementById('family-father').value,MotherID:document.getElementById('family-mother').value,SpouseFullNameOptional:document.getElementById('family-spouse').value}
@@ -1456,7 +1370,6 @@ google.script.run.withSuccessHandler(()=>{loadFamilyData()}).withFailureHandler(
 }
 
 function loadAdmin(){
-adminLoaded = false
 setAdminError("")
 setAdminStatus("Loading admin dashboard...")
 google.script.run.withSuccessHandler(g=>{const el=document.getElementById("admin-guide"); if(el){el.innerHTML=`<div><strong>OTP Email:</strong><ul class="list-disc ml-4">${(g.otpEmailInstructions||[]).map(i=>`<li>${escapeHtml(i)}</li>`).join("")}</ul></div><div><strong>WhatsApp Emergency:</strong><ul class="list-disc ml-4">${(g.whatsappConfigInstructions||[]).map(i=>`<li>${escapeHtml(i)}</li>`).join("")}</ul></div>`}}).withFailureHandler(()=>{}).getSOSAdminGuide(token)
@@ -1480,7 +1393,6 @@ google.script.run
 document.getElementById("admin-stat-users").innerText = Number(data && data.userOverview ? data.userOverview.totalUsers : 0)
 document.getElementById("admin-stat-admins").innerText = Number(data && data.userOverview ? data.userOverview.adminUsers : 0)
 document.getElementById("admin-stat-settings").innerText = Number(data && data.settingsOverview ? data.settingsOverview.totalEntries : 0)
-adminLoaded = true
 setAdminStatus("Admin dashboard loaded.")
 })
 .withFailureHandler(err=>{
@@ -1488,7 +1400,6 @@ if(isSessionExpiredError(err)){
 onServerFailure(err)
 return
 }
-adminLoaded = false
 setAdminError((err && err.message) || "Unable to load admin dashboard summary.")
 setAdminStatus("")
 })
