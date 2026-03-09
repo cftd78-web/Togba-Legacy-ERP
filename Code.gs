@@ -2597,7 +2597,7 @@ function getProjectBoard(token) {
         PercentComplete: _clampPercent(row[ctx.tasks.idx.PercentComplete]),
         Status: _normalizeTaskStatus(row[ctx.tasks.idx.Status]),
         Priority: _normalizeTaskPriority(row[ctx.tasks.idx.Priority]),
-        AssigneeType: assigneeTypeIdx === -1 ? '' : String(row[assigneeTypeIdx] || '').trim(),
+        AssigneeType: assigneeTypeIdx === -1 ? '' : _normalizeAssigneeType(row[assigneeTypeIdx]),
         Assignee: assigneeValueIdx === -1 ? '' : String(row[assigneeValueIdx] || '').trim()
       });
     });
@@ -2609,6 +2609,17 @@ function getProjectBoard(token) {
         const projectID = String(row[ctx.projects.idx.ProjectID] || '').trim();
         const tasks = tasksByProject[projectID] || [];
         const progress = tasks.length ? tasks.reduce((s,t)=>s+t.PercentComplete,0)/tasks.length : 0;
+        const assignedTasks = tasks
+          .filter(task => task.Assignee)
+          .map(task => ({
+            TaskID: task.TaskID,
+            TaskTitle: task.TaskTitle,
+            AssigneeType: task.AssigneeType,
+            Assignee: task.Assignee,
+            Status: task.Status,
+            Priority: task.Priority,
+            PercentComplete: task.PercentComplete
+          }));
         return {
           ProjectID: projectID,
           Title: String(row[ctx.projects.idx.Title] || '').trim(),
@@ -2617,6 +2628,8 @@ function getProjectBoard(token) {
           GoalUSD: Number(row[ctx.projects.idx.GoalUSD]) || 0,
           Status: _normalizeProjectStatus(row[ctx.projects.idx.Status]),
           ProgressPercent: Number(progress.toFixed(2)),
+          AssignedTaskCount: assignedTasks.length,
+          AssignedTasks: assignedTasks,
           tasks: tasks
         };
       })

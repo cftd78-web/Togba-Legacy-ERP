@@ -638,6 +638,7 @@ Projects enhancements implemented backward-compatibly:
 
 - Project creation now supports optional Description and ImageURL aliases.
 - Project board and project list responses now surface description and image metadata when headers are present.
+- Project board response now includes AssignedTasks and AssignedTaskCount (derived from existing ProjectTasks data) to display assignment details without schema changes.
 - Task payloads now support TaskTitle, AssigneeType, and Assignee/AssignedTo aliases for both create and update flows.
 - AssigneeType is normalized and validated to internal or external.
 - No locked baseline header names were changed; optional alias logic is used where available.
