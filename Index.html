@@ -23,6 +23,64 @@ align-items:center;
 font-size:12px;
 }
 
+.chart-shell{
+position:relative;
+width:100%;
+max-width:380px;
+height:240px;
+margin:0 auto;
+}
+
+.chart-shell.chart-shell-sm{
+height:210px;
+max-width:340px;
+}
+
+.dashboard-tile{
+display:block;
+border:1px solid rgb(226 232 240);
+border-radius:1rem;
+padding:0.9rem;
+background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);
+transition:all .2s ease;
+cursor:pointer;
+}
+
+.dashboard-tile:hover{
+transform:translateY(-2px);
+box-shadow:0 10px 20px rgba(15,23,42,.08);
+border-color:rgb(191 219 254);
+}
+
+.calendar-shell{
+border:1px solid rgb(226 232 240);
+border-radius:1rem;
+overflow:hidden;
+}
+
+.calendar-grid{
+display:grid;
+grid-template-columns:repeat(7,minmax(0,1fr));
+}
+
+.calendar-cell{
+min-height:88px;
+padding:.45rem;
+border-right:1px solid rgb(241 245 249);
+border-top:1px solid rgb(241 245 249);
+background:#fff;
+}
+
+.calendar-cell:nth-child(7n){border-right:none;}
+
+.calendar-cell.faded{background:#f8fafc;color:#94a3b8;}
+.calendar-cell.today{outline:2px solid #3b82f6;outline-offset:-2px;}
+
+.family-root-card{
+border:1px solid rgb(191 219 254);
+background:linear-gradient(180deg,#eff6ff 0%,#ffffff 100%);
+}
+
 </style>
 
 </head>
@@ -87,13 +145,34 @@ Verify
 
 <div id="home-error" class="hidden text-sm text-red-600 mb-3"></div>
 
+<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-4">
+<button onclick="showPage('finance')" class="dashboard-tile text-left">
+<div class="text-xs uppercase text-slate-500 font-bold">Finance Snapshot</div>
+<div class="text-sm text-slate-700 mt-1">View capital, locks, and allocation trends.</div>
+</button>
+<button onclick="showPage('projects')" class="dashboard-tile text-left">
+<div class="text-xs uppercase text-slate-500 font-bold">Projects Snapshot</div>
+<div class="text-sm text-slate-700 mt-1">Track active projects and delivery status.</div>
+</button>
+<button onclick="showPage('voting')" class="dashboard-tile text-left">
+<div class="text-xs uppercase text-slate-500 font-bold">Governance Snapshot</div>
+<div class="text-sm text-slate-700 mt-1">Review proposal outcomes and participation.</div>
+</button>
+<button onclick="showPage('timeline')" class="dashboard-tile text-left">
+<div class="text-xs uppercase text-slate-500 font-bold">Timeline Snapshot</div>
+<div class="text-sm text-slate-700 mt-1">Browse family history and upcoming milestones.</div>
+</button>
+</div>
+
 <div class="bg-white p-6 rounded-3xl shadow border border-slate-100">
 
 <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">
 Financial Distribution
 </h3>
 
+<div class="chart-shell">
 <canvas id="financeChart"></canvas>
+</div>
 
 </div>
 
@@ -126,13 +205,17 @@ Financial Distribution
 <h3 class="text-sm font-bold text-slate-500 uppercase">Investment Allocation</h3>
 <span id="finance-allocation-validation" class="text-xs font-semibold text-slate-500"></span>
 </div>
+<div class="chart-shell chart-shell-sm">
 <canvas id="finance-allocation-chart" height="180"></canvas>
+</div>
 <div id="finance-allocation-breakdown" class="grid grid-cols-2 gap-2 mt-4 text-sm"></div>
 </div>
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Founder Capital Status</h3>
+<div class="chart-shell chart-shell-sm">
 <canvas id="finance-founder-lock-chart" height="180"></canvas>
+</div>
 <div id="finance-founder-lock-summary" class="mt-3 space-y-2 text-sm text-slate-700"></div>
 </div>
 
@@ -342,7 +425,7 @@ Financial Distribution
 <button id="btn-create-vote" onclick="createVote()" class="mt-3 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Create Vote</button>
 </div>
 
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 mb-4"><h3 class="text-sm font-bold text-slate-500 uppercase mb-2">Results Chart</h3><canvas id="vote-results-chart" height="120"></canvas></div>
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 mb-4"><h3 class="text-sm font-bold text-slate-500 uppercase mb-2">Results Chart</h3><div class="chart-shell chart-shell-sm"><canvas id="vote-results-chart" height="120"></canvas></div></div>
 <div id="vote-list" class="space-y-3"></div>
 
 </div>
@@ -360,7 +443,7 @@ Financial Distribution
 
 <div class="grid gap-4 lg:grid-cols-3">
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Calendar View</h3><div id="timeline-calendar" class="grid gap-2 md:grid-cols-4 text-sm"></div></div>
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Calendar View</h3><div id="timeline-calendar" class="text-sm"></div></div>
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Unified Timeline</h3>
 <div id="timeline-list" class="space-y-3"></div>
@@ -402,6 +485,7 @@ Financial Distribution
 </div>
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Family Tree View</h3>
+<div class="text-xs text-slate-500 mb-3">Patriarch/root appears at the top, followed by generation layers.</div>
 <div id="family-tree" class="space-y-2"></div>
 </div>
 </div>
@@ -793,6 +877,8 @@ backgroundColor:[
 }]
 },
 options:{
+maintainAspectRatio:false,
+responsive:true,
 plugins:{
 legend:{position:"bottom"}
 }
@@ -1282,7 +1368,7 @@ data:percents,
 backgroundColor:["#2563eb", "#9333ea", "#f59e0b", "#0f766e"]
 }]
 },
-options:{plugins:{legend:{position:"bottom"}}}
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}}}
 })
 
 document.getElementById("finance-allocation-breakdown").innerHTML = (allocation.breakdown || []).map(item=>`
@@ -1306,7 +1392,7 @@ data:[Number(founderLocks.activeLocked || 0), Number(founderLocks.totalReleased 
 backgroundColor:["#1d4ed8", "#16a34a"]
 }]
 },
-options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
 })
 
 document.getElementById("finance-founder-lock-summary").innerHTML = `
@@ -1432,8 +1518,32 @@ google.script.run.withSuccessHandler(()=>{setAdminStatus("Member deactivated.");
 }
 function renderTimelineCalendar(calendar){
 const el=document.getElementById("timeline-calendar"); if(!el) return
-const keys=Object.keys(calendar||{}).sort(); if(!keys.length){el.innerHTML="<div class='text-sm text-slate-500'>No upcoming events for calendar.</div>";return}
-el.innerHTML=keys.map(k=>`<div class="border rounded-lg p-2"><div class="font-semibold text-xs text-slate-500">${escapeHtml(k)}</div><div class="text-sm">${(calendar[k]||[]).map(e=>escapeHtml(e.Title||'Event')).join('<br/>')}</div></div>`).join('')
+const now=new Date();
+const y=now.getFullYear();
+const m=now.getMonth();
+const first=new Date(y,m,1);
+const startDay=first.getDay();
+const daysInMonth=new Date(y,m+1,0).getDate();
+const monthLabel=first.toLocaleString(undefined,{month:'long',year:'numeric'});
+const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const eventMap={};
+Object.keys(calendar||{}).forEach(key=>{
+const d=new Date(key);
+if(!Number.isNaN(d.getTime()) && d.getFullYear()===y && d.getMonth()===m){
+eventMap[d.getDate()]=(calendar[key]||[]);
+}
+});
+let cells='';
+for(let i=0;i<startDay;i++){cells+=`<div class="calendar-cell faded"></div>`}
+for(let day=1;day<=daysInMonth;day++){
+const today=(now.getDate()===day);
+const events=eventMap[day]||[];
+cells+=`<div class="calendar-cell ${today?'today':''}"><div class="text-xs font-semibold mb-1">${day}</div><div class="space-y-1">${events.slice(0,2).map(e=>`<div class='text-[11px] leading-tight px-1.5 py-1 rounded bg-blue-50 text-blue-700'>${escapeHtml(e.Title||'Event')}</div>`).join('')}${events.length>2?`<div class='text-[11px] text-slate-500'>+${events.length-2} more</div>`:''}</div></div>`
+}
+if(!Object.keys(eventMap).length){
+cells+=`<div class="calendar-cell faded col-span-7"><div class="text-sm text-slate-500">No events mapped this month. Timeline and upcoming sections remain available below.</div></div>`
+}
+el.innerHTML=`<div class="calendar-shell"><div class="px-4 py-3 bg-slate-50 border-b border-slate-200"><div class="font-semibold text-slate-700">${escapeHtml(monthLabel)}</div></div><div class="calendar-grid bg-slate-50">${dayNames.map(d=>`<div class='px-2 py-2 text-xs font-bold uppercase text-slate-500 text-center'>${d}</div>`).join('')}</div><div class="calendar-grid">${cells}</div></div>`
 }
 function renderSOSMap(alert){
 const el=document.getElementById("sos-map"); if(!el) return
@@ -1445,7 +1555,7 @@ function renderVoteChart(votes){
 const totals={yes:0,no:0,abstain:0};(votes||[]).forEach(v=>{totals.yes+=Number(v.yesCount||0);totals.no+=Number(v.noCount||0);totals.abstain+=Number(v.abstainCount||0)})
 const canvas=document.getElementById('vote-results-chart'); if(!canvas) return
 if(voteResultsChartInstance){voteResultsChartInstance.destroy()}
-voteResultsChartInstance=new Chart(canvas,{type:'doughnut',data:{labels:['Yes','No','Abstain'],datasets:[{data:[totals.yes,totals.no,totals.abstain],backgroundColor:['#16a34a','#dc2626','#64748b']}]},options:{plugins:{legend:{position:'bottom'}}}})
+voteResultsChartInstance=new Chart(canvas,{type:'doughnut',data:{labels:['Yes','No','Abstain'],datasets:[{data:[totals.yes,totals.no,totals.abstain],backgroundColor:['#16a34a','#dc2626','#64748b']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}})
 }
 function setFamilyError(message){const el=document.getElementById('family-error'); if(!el) return; if(!message){el.classList.add('hidden'); el.innerText=''; return;} el.classList.remove('hidden'); el.innerText=message}
 function loadFamilyData(){
@@ -1460,7 +1570,13 @@ if(!members.length){
 el.innerHTML="<div class='text-sm text-slate-500'>No family members found.</div>"
 return
 }
-el.innerHTML=members.map(m=>`<div class="border rounded-lg p-2"><div class="font-semibold">${escapeHtml(m.FullName||m.PersonID)}</div><div class="text-xs text-slate-500">${escapeHtml(m.PersonID)} • Gen ${escapeHtml(m.GenerationTier)}</div><div class="text-xs">Parents: ${escapeHtml(m.FatherID||'-')} / ${escapeHtml(m.MotherID||'-')}</div></div>`).join('')
+const sorted=[...members].sort((a,b)=>Number(a.GenerationTier||99)-Number(b.GenerationTier||99))
+const root=sorted.find(m=>String(m.RelationshipToPatriarch||'').toLowerCase().includes('patriarch'))||sorted[0]
+const byGen={}
+sorted.forEach(m=>{const g=String(m.GenerationTier||'Unknown'); if(!byGen[g]) byGen[g]=[]; byGen[g].push(m)})
+const rootCard=root?`<div class="family-root-card rounded-xl p-4 mb-4"><div class="text-xs uppercase text-blue-700 font-bold">Patriarch / Root</div><div class="font-semibold text-slate-800 mt-1">${escapeHtml(root.FullName||root.PersonID)}</div><div class="text-xs text-slate-600 mt-1">${escapeHtml(root.PersonID||'')} • Gen ${escapeHtml(root.GenerationTier||'-')}</div></div>`:''
+const generationBlocks=Object.keys(byGen).sort((a,b)=>Number(a)-Number(b)).map(g=>`<div class="mb-4"><div class="text-xs uppercase font-bold text-slate-500 mb-2">Generation ${escapeHtml(g)}</div><div class="grid gap-2 sm:grid-cols-2">${byGen[g].map(m=>`<div class="border rounded-lg p-2 bg-white"><div class="font-semibold">${escapeHtml(m.FullName||m.PersonID)}</div><div class="text-xs text-slate-500">${escapeHtml(m.PersonID)} • ${escapeHtml(m.RelationshipToPatriarch||'Member')}</div><div class="text-xs mt-1">Parents: ${escapeHtml(m.FatherID||'-')} / ${escapeHtml(m.MotherID||'-')}</div></div>`).join('')}</div></div>`).join('')
+el.innerHTML=`${rootCard}${generationBlocks}`
 })
 .withFailureHandler(err=>{
 if(isSessionExpiredError(err)){
