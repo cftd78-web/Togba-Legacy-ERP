@@ -242,7 +242,11 @@ Financial Distribution
 <input id="channel-join-id" class="p-2 rounded-lg border" placeholder="ChannelID to join" />
 <button onclick="joinChannelUI()" class="bg-slate-900 text-white p-2 rounded-lg text-sm">Join Channel</button>
 </div>
-<div id="channel-list" class="space-y-2 max-h-[52vh] overflow-y-auto"></div>
+<div id="channel-list" class="space-y-2 max-h-[36vh] overflow-y-auto"></div>
+<div class="mt-3 border-t pt-3">
+<div class="text-xs font-bold text-slate-500 uppercase mb-2">Active Channel Directory</div>
+<div id="channel-directory" class="space-y-2 max-h-[16vh] overflow-y-auto"></div>
+</div>
 </div>
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2 flex flex-col min-h-[52vh]">
@@ -529,6 +533,7 @@ let financeAllocationChartInstance = null
 let founderLockChartInstance = null
 let userChannels = []
 let selectedChannelID = ""
+let channelDirectory = []
 let timelineLoaded = false
 let voteDataLoaded = false
 let votePermissions = {canCreateVote:false, canCastBallot:false}
@@ -551,6 +556,7 @@ function resetToLogin(message){
 token = ""
 userChannels = []
 selectedChannelID = ""
+channelDirectory = []
 timelineLoaded = false
 projectsLoaded = false
 projectsCache = []
@@ -946,6 +952,13 @@ return `
 </div>
 <div class="w-full bg-slate-200 rounded-full h-2 mt-2 overflow-hidden"><div class="h-full bg-emerald-600" style="width:${Math.max(0, Math.min(100, Number(task.PercentComplete || 0)))}%"></div></div>
 <div class="grid gap-2 md:grid-cols-4 mt-3">
+<input id="task-title-${taskID}" type="text" value="${escapeHtml(task.TaskTitle || "")}" placeholder="Task title" class="p-2 rounded-lg border border-slate-200 text-sm md:col-span-2" ${canEdit ? "" : "disabled"} />
+<select id="task-assignee-type-${taskID}" class="p-2 rounded-lg border border-slate-200 text-sm" ${canEdit ? "" : "disabled"}>
+<option value="" ${!task.AssigneeType ? "selected" : ""}>Assignee Type</option>
+<option value="internal" ${String(task.AssigneeType||"")==="internal" ? "selected" : ""}>internal</option>
+<option value="external" ${String(task.AssigneeType||"")==="external" ? "selected" : ""}>external</option>
+</select>
+<input id="task-assignee-${taskID}" type="text" value="${escapeHtml(task.Assignee || "")}" placeholder="Assignee" class="p-2 rounded-lg border border-slate-200 text-sm" ${canEdit ? "" : "disabled"} />
 <input id="task-percent-${taskID}" type="number" min="0" max="100" value="${Number(task.PercentComplete || 0)}" class="p-2 rounded-lg border border-slate-200 text-sm" ${canEdit ? "" : "disabled"} />
 <select id="task-status-${taskID}" class="p-2 rounded-lg border border-slate-200 text-sm" ${canEdit ? "" : "disabled"}>
 <option value="Pending" ${String(task.Status||"")==="Pending" ? "selected" : ""}>Pending</option>
@@ -1018,7 +1031,7 @@ document.getElementById("project-create-image").value = ""
 loadProjects()
 })
 .withFailureHandler(err=>{ btn.disabled = false; setProjectError((err && err.message) || "Unable to create project.") })
-.createProject(token, title, goalUSD, status)
+.createProject(token, title, goalUSD, status, document.getElementById("project-create-description").value, document.getElementById("project-create-image").value)
 }
 
 function createTaskRecord(){
@@ -1065,7 +1078,7 @@ return
 }
 setProjectError((err && err.message) || "Unable to update task.")
 })
-.updateProjectTask(token, taskID, percentComplete, status, priority)
+.updateProjectTaskEnhanced(token, {taskID:taskID, percentComplete:percentComplete, status:status, priority:priority, taskTitle:(document.getElementById(`task-title-${taskID}`)||{}).value||"", assigneeType:(document.getElementById(`task-assignee-type-${taskID}`)||{}).value||"", assignee:(document.getElementById(`task-assignee-${taskID}`)||{}).value||""})
 }
 
 function saveProjectUpdate(){
@@ -1422,13 +1435,14 @@ selectedChannelID = ""
 renderMessageHistory([])
 document.getElementById("message-channel-title").innerText = "No channels available"
 setMessageError("You are not a member of any active channel.")
-return
-}
+}else{
 if(!selectedChannelID || !userChannels.some(c=>c.ChannelID===selectedChannelID)){
 selectedChannelID = userChannels[0].ChannelID
 }
 renderChannelList()
 refreshMessages()
+}
+loadChannelDirectory()
 })
 .withFailureHandler(err=>{
 if(isSessionExpiredError(err)){
@@ -1440,14 +1454,31 @@ setMessageError((err && err.message) || "Unable to load channels.")
 .getUserChannels(token)
 }
 
+function loadChannelDirectory(){
+google.script.run
+.withSuccessHandler(res=>{
+channelDirectory = (res && Array.isArray(res.channels)) ? res.channels : []
+renderChannelDirectory()
+})
+.withFailureHandler(err=>{
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setMessageError((err && err.message) || "Unable to load channel directory.")
+renderChannelDirectory()
+})
+.getChannelDirectory(token)
+}
+
 function createChannelUI(){
 const name = document.getElementById("channel-create-name").value
 const type = document.getElementById("channel-create-type").value
-google.script.run.withSuccessHandler(()=>{document.getElementById("channel-create-name").value="";loadUserChannels()}).withFailureHandler(onServerFailure).createChannel(token,name,type)
+google.script.run.withSuccessHandler(()=>{document.getElementById("channel-create-name").value="";setMessageError("");loadUserChannels()}).withFailureHandler(err=>{ if(isSessionExpiredError(err)){ onServerFailure(err); return; } setMessageError((err && err.message) || "Unable to create channel."); }).createChannel(token,name,type)
 }
 function joinChannelUI(){
 const channelID = document.getElementById("channel-join-id").value
-google.script.run.withSuccessHandler(()=>{document.getElementById("channel-join-id").value="";loadUserChannels()}).withFailureHandler(onServerFailure).joinChannel(token,channelID)
+google.script.run.withSuccessHandler(()=>{document.getElementById("channel-join-id").value="";setMessageError("");loadUserChannels()}).withFailureHandler(err=>{ if(isSessionExpiredError(err)){ onServerFailure(err); return; } setMessageError((err && err.message) || "Unable to join channel."); }).joinChannel(token,channelID)
 }
 function renderChannelList(){
 const container = document.getElementById("channel-list")
@@ -1462,6 +1493,29 @@ class="w-full text-left p-3 rounded-xl border ${ch.ChannelID===selectedChannelID
 <div class="text-xs text-slate-500">${escapeHtml(ch.Type || 'channel')}</div>
 </button>
 `).join("")
+}
+
+function renderChannelDirectory(){
+const container = document.getElementById("channel-directory")
+if(!container) return
+if(!channelDirectory.length){
+container.innerHTML = "<div class='text-xs text-slate-500'>No active channels found.</div>"
+return
+}
+container.innerHTML = channelDirectory.map(ch=>`
+<div class="flex items-center justify-between border rounded-lg p-2 bg-slate-50">
+<div>
+<div class="text-sm font-semibold text-slate-700">${escapeHtml(ch.Name || ch.ChannelID)}</div>
+<div class="text-xs text-slate-500">${escapeHtml(ch.ChannelID)} • ${escapeHtml(ch.Type || 'channel')}</div>
+</div>
+${ch.Joined ? '<span class="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">Joined</span>' : `<button onclick="joinChannelById('${escapeHtml(ch.ChannelID)}')" class="text-xs px-2 py-1 rounded bg-slate-900 text-white">Join</button>`}
+</div>
+`).join("")
+}
+
+function joinChannelById(channelID){
+document.getElementById("channel-join-id").value = channelID
+joinChannelUI()
 }
 
 function selectChannel(channelID){

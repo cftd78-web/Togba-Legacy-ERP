@@ -629,3 +629,29 @@ OTP delivery:
 - Intended path is MailApp email delivery to the user email.
 - If email send fails, system returns delivery status and remains safe for fallback flows.
 
+
+------------------------------------------------------------
+23. ENHANCEMENT TASK 1 IMPLEMENTATION NOTES
+------------------------------------------------------------
+
+Projects enhancements implemented backward-compatibly:
+
+- Project creation now supports optional Description and ImageURL aliases.
+- Project board and project list responses now surface description and image metadata when headers are present.
+- Task payloads now support TaskTitle, AssigneeType, and Assignee/AssignedTo aliases for both create and update flows.
+- AssigneeType is normalized and validated to internal or external.
+- No locked baseline header names were changed; optional alias logic is used where available.
+
+Messaging enhancements implemented backward-compatibly:
+
+- Channel creation flow preserved and extended with safer active-channel membership checks.
+- Channel join flow now rejects inactive channels.
+- Message read/send still enforces authorized membership via ChannelMembers.
+- Active channel directory endpoint returns only active channels and a joined flag for safe UI membership controls.
+
+Compatibility and safety:
+
+- Existing authentication/session token checks remain required for all modified backend functions.
+- Existing Messages, Channels, ChannelMembers, Projects, ProjectTasks, and ProjectUpdates baseline behavior is preserved.
+- No sheet/tab/header renames or column reordering introduced.
+
