@@ -118,6 +118,22 @@ background:linear-gradient(180deg,#eff6ff 0%,#ffffff 100%);
 
 .family-placeholder-chip{display:inline-flex;align-items:center;justify-content:center;padding:.18rem .5rem;border-radius:9999px;background:#e2e8f0;color:#64748b;font-size:.68rem;margin:.125rem .125rem 0 0;}
 
+.messages-shell{display:grid;gap:1rem;grid-template-columns:minmax(0,1fr);}
+
+@media (min-width:1024px){
+.messages-shell{grid-template-columns:minmax(260px,.9fr) minmax(0,2.1fr);}
+}
+
+.mail-panel{background:#fff;border:1px solid rgb(226 232 240);border-radius:1rem;box-shadow:0 1px 2px rgba(15,23,42,.05);}
+
+.mail-panel-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:1rem 1rem .65rem 1rem;border-bottom:1px solid rgb(241 245 249);}
+
+.mail-section-title{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#64748b;}
+
+.mail-pane{border:1px solid rgb(226 232 240);border-radius:.8rem;background:#f8fafc;min-height:190px;padding:.75rem;overflow-y:auto;}
+
+.mail-compose-box{min-height:150px;resize:vertical;line-height:1.45;}
+
 </style>
 
 </head>
@@ -353,9 +369,9 @@ Financial Distribution
 
 <h2 class="text-2xl font-bold mb-4">Messaging</h2>
 
-<div class="grid gap-4 lg:grid-cols-3">
+<div class="messages-shell">
 
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+<div class="mail-panel p-4">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Channels</h3>
 <div class="grid gap-2 mb-3">
 <input id="channel-create-name" class="p-2 rounded-lg border" placeholder="New channel name" />
@@ -364,27 +380,47 @@ Financial Distribution
 <input id="channel-join-id" class="p-2 rounded-lg border" placeholder="ChannelID to join" />
 <button onclick="joinChannelUI()" class="bg-slate-900 text-white p-2 rounded-lg text-sm">Join Channel</button>
 </div>
-<div id="channel-list" class="space-y-2 max-h-[36vh] overflow-y-auto"></div>
+<div class="mail-section-title mb-2">Inbox</div>
+<div id="channel-list" class="space-y-2 max-h-[28vh] overflow-y-auto"></div>
 <div class="mt-3 border-t pt-3">
-<div class="text-xs font-bold text-slate-500 uppercase mb-2">Active Channel Directory</div>
-<div id="channel-directory" class="space-y-2 max-h-[16vh] overflow-y-auto"></div>
+<div class="mail-section-title mb-2">Sent / Outbox Directory</div>
+<div id="channel-directory" class="space-y-2 max-h-[18vh] overflow-y-auto"></div>
 </div>
 </div>
 
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2 flex flex-col min-h-[52vh]">
-<div class="flex items-center justify-between mb-3">
+<div class="mail-panel flex flex-col min-h-[64vh]">
+<div class="mail-panel-head">
 <h3 id="message-channel-title" class="text-sm font-bold text-slate-500 uppercase">Select a channel</h3>
 <button onclick="refreshMessages()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
 </div>
+<div class="p-4">
 <div id="message-error" class="hidden text-sm text-red-600 mb-2"></div>
 <div class="mb-3">
 <input id="message-recipient-input" type="text" placeholder="To: search family member by name" class="w-full p-3 rounded-xl border border-slate-200" oninput="handleRecipientSearchInput()" autocomplete="off" />
 <div id="message-recipient-results" class="mt-2 space-y-1"></div>
 </div>
-<div id="message-history" class="flex-1 overflow-y-auto space-y-2 bg-slate-50 rounded-xl p-3"></div>
-<div class="mt-3 flex gap-2">
-<input id="message-input" type="text" placeholder="Type a message..." class="flex-1 p-3 rounded-xl border border-slate-200" />
+<div class="grid gap-3 lg:grid-cols-5">
+<div class="lg:col-span-3">
+<div class="mail-section-title mb-2">Inbox</div>
+<div id="message-history" class="mail-pane space-y-2"></div>
+</div>
+<div class="lg:col-span-2">
+<div class="mail-section-title mb-2">Sent / Outbox</div>
+<div class="mail-pane text-sm text-slate-500">
+<p class="mb-2">Use this pane as your delivery overview while composing.</p>
+<p>Messages you send continue to appear in the conversation stream for the selected channel.</p>
+</div>
+</div>
+</div>
+<div class="mt-3">
+<div class="mail-section-title mb-2">Compose Message</div>
+<div class="flex flex-col gap-2">
+<textarea id="message-input" placeholder="Write your message..." class="w-full p-3 rounded-xl border border-slate-200 mail-compose-box"></textarea>
+<div class="flex justify-end">
 <button id="btn-send-message" onclick="sendCurrentMessage()" class="bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Send</button>
+</div>
+</div>
+</div>
 </div>
 </div>
 
