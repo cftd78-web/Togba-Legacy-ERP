@@ -874,8 +874,8 @@ const total = Number(project.TaskCount || 0)
 detail.innerHTML = `
 <div class="text-xs text-slate-500 uppercase">Project Detail</div>
 <div class="text-2xl font-bold text-slate-800">${escapeHtml(project.Title || "Untitled")}</div>
-${project.ImageURL ? `<img src="${escapeHtml(project.ImageURL)}" class="rounded-xl max-h-44 object-cover w-full mt-2" alt="Project image"/>` : ""}
-<div class="text-sm text-slate-600">${escapeHtml(project.Description || "No description provided.")}</div>
+${project.ImageURL ? `<img src="${escapeHtml(project.ImageURL)}" class="rounded-xl max-h-44 object-cover w-full mt-2"/>` : ""}
+<div class="text-sm text-slate-600">${escapeHtml(project.Description || "")}</div>
 <div class="grid sm:grid-cols-3 gap-3">
 <div class="rounded-xl border border-slate-200 p-3"><div class="text-xs text-slate-500">ProjectID</div><div class="font-semibold text-slate-800">${escapeHtml(project.ProjectID || "")}</div></div>
 <div class="rounded-xl border border-slate-200 p-3"><div class="text-xs text-slate-500">Goal USD</div><div class="font-semibold text-slate-800">${formatCurrency(project.GoalUSD || 0)}</div></div>
@@ -885,18 +885,6 @@ ${project.ImageURL ? `<img src="${escapeHtml(project.ImageURL)}" class="rounded-
 <div class="flex justify-between text-xs text-slate-500 mb-1"><span>Progress</span><span>${formatPercent(project.ProgressPercent || 0)}</span></div>
 <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden"><div class="h-full bg-blue-600" style="width:${Math.max(0, Math.min(100, Number(project.ProgressPercent || 0)))}%"></div></div>
 <div class="text-xs text-slate-500 mt-2">Tasks completed: ${completed} / ${total}</div>
-</div>
-<div class="rounded-xl border border-slate-200 p-3 bg-slate-50">
-<div class="flex items-center justify-between gap-2 mb-2">
-<div class="text-xs font-bold text-slate-500 uppercase">Assigned Tasks</div>
-<div class="text-xs text-slate-500">${Number(project.AssignedTaskCount || 0)} assigned</div>
-</div>
-${(project.AssignedTasks || []).length ? `<div class="space-y-2">${(project.AssignedTasks || []).map(item=>`<div class="rounded-lg border border-slate-200 bg-white p-2">
-<div class="text-xs text-slate-500">${escapeHtml(item.TaskID || "")}</div>
-<div class="text-sm font-semibold text-slate-700">${escapeHtml(item.TaskTitle || "Task")}</div>
-<div class="text-xs text-slate-600">${escapeHtml(item.AssigneeType || "")}: ${escapeHtml(item.Assignee || "")}</div>
-<div class="text-xs text-slate-500">${escapeHtml(item.Status || "Pending")} • ${escapeHtml(item.Priority || "Medium")} • ${formatPercent(item.PercentComplete || 0)}</div>
-</div>`).join("")}</div>` : `<div class="text-sm text-slate-500">No assigned tasks yet.</div>`}
 </div>
 `
 document.getElementById("task-project-id").value = project.ProjectID || ""
@@ -1042,14 +1030,7 @@ document.getElementById("project-create-description").value = ""
 document.getElementById("project-create-image").value = ""
 loadProjects()
 })
-.withFailureHandler(err=>{
-btn.disabled = false
-if(isSessionExpiredError(err)){
-onServerFailure(err)
-return
-}
-setProjectError((err && err.message) || "Unable to create project.")
-})
+.withFailureHandler(err=>{ btn.disabled = false; setProjectError((err && err.message) || "Unable to create project.") })
 .createProject(token, title, goalUSD, status, document.getElementById("project-create-description").value, document.getElementById("project-create-image").value)
 }
 
@@ -1067,14 +1048,7 @@ assignee: document.getElementById("task-create-assignee").value
 btn.disabled = true
 google.script.run
 .withSuccessHandler(()=>{btn.disabled=false; setProjectStatus("Task created."); loadProjects()})
-.withFailureHandler(err=>{
-btn.disabled=false
-if(isSessionExpiredError(err)){
-onServerFailure(err)
-return
-}
-setProjectError((err&&err.message)||"Unable to create task.")
-})
+.withFailureHandler(err=>{btn.disabled=false; setProjectError((err&&err.message)||"Unable to create task.")})
 .createProjectTaskEnhanced(token, payload)
 }
 
