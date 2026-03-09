@@ -805,7 +805,7 @@ function getProjects(token) {
         Status: _normalizeTaskStatus(row[projectsCtx.tasks.idx.Status]),
         Priority: _normalizeTaskPriority(row[projectsCtx.tasks.idx.Priority]),
         TaskTitle: taskTitleIdx === -1 ? '' : String(row[taskTitleIdx] || '').trim(),
-        AssigneeType: assigneeTypeIdx === -1 ? '' : _safeReadAssigneeType(row[assigneeTypeIdx]),
+        AssigneeType: assigneeTypeIdx === -1 ? '' : _normalizeAssigneeType(row[assigneeTypeIdx]),
         Assignee: assigneeValueIdx === -1 ? '' : String(row[assigneeValueIdx] || '').trim(),
         SortOrder: rowIndex,
         Gantt: {
@@ -971,7 +971,7 @@ function getProjectTasks(token, projectID) {
         Status: _normalizeTaskStatus(item.row[projectsCtx.tasks.idx.Status]),
         Priority: _normalizeTaskPriority(item.row[projectsCtx.tasks.idx.Priority]),
         TaskTitle: taskTitleIdx === -1 ? '' : String(item.row[taskTitleIdx] || '').trim(),
-        AssigneeType: assigneeTypeIdx === -1 ? '' : _safeReadAssigneeType(item.row[assigneeTypeIdx]),
+        AssigneeType: assigneeTypeIdx === -1 ? '' : _normalizeAssigneeType(item.row[assigneeTypeIdx]),
         Assignee: assigneeValueIdx === -1 ? '' : String(item.row[assigneeValueIdx] || '').trim(),
         Gantt: {
           id: _deriveProjectTaskID(projectsCtx.tasks, item.row, item.rowIndex),
@@ -2055,16 +2055,6 @@ function _normalizeAssigneeType(value) {
   throw new Error('AssigneeType must be internal or external.');
 }
 
-function _safeReadAssigneeType(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return '';
-  try {
-    return _normalizeAssigneeType(raw);
-  } catch (e) {
-    return raw;
-  }
-}
-
 function _clampPercent(value) {
   const parsed = Number(value);
   if (isNaN(parsed)) {
@@ -2607,7 +2597,7 @@ function getProjectBoard(token) {
         PercentComplete: _clampPercent(row[ctx.tasks.idx.PercentComplete]),
         Status: _normalizeTaskStatus(row[ctx.tasks.idx.Status]),
         Priority: _normalizeTaskPriority(row[ctx.tasks.idx.Priority]),
-        AssigneeType: assigneeTypeIdx === -1 ? '' : _safeReadAssigneeType(row[assigneeTypeIdx]),
+        AssigneeType: assigneeTypeIdx === -1 ? '' : _normalizeAssigneeType(row[assigneeTypeIdx]),
         Assignee: assigneeValueIdx === -1 ? '' : String(row[assigneeValueIdx] || '').trim()
       });
     });
