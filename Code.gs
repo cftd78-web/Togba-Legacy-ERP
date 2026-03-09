@@ -55,8 +55,7 @@ function loginStepOne(email) {
 
     const access = _readSheet('Access', {
       EmailOptional: ['EmailOptional', 'Email'],
-      OneTimeCode: ['OneTimeCode', 'OTP', 'OneTimePasscode'],
-      FullName: ['FullName', 'Name']
+      OneTimeCode: ['OneTimeCode', 'OTP', 'OneTimePasscode']
     });
 
     const rowIndex = access.rows.findIndex(r => _norm(r[access.idx.EmailOptional]) === normalizedEmail);
@@ -70,24 +69,9 @@ function loginStepOne(email) {
 
     SpreadsheetApp.flush();
 
-    let deliveredByEmail = false;
-    let deliveryError = '';
-    try {
-      const fullName = String(access.rows[rowIndex][access.idx.FullName] || '').trim() || 'Member';
-      MailApp.sendEmail({
-        to: normalizedEmail,
-        subject: 'Your Togba Legacy ERP login code',
-        htmlBody: '<p>Hello ' + fullName + ',</p><p>Your one-time login code is:</p><h2 style="letter-spacing:2px">' + otp + '</h2><p>This code expires with your active login window.</p>'
-      });
-      deliveredByEmail = true;
-    } catch (mailErr) {
-      deliveryError = mailErr && mailErr.message ? String(mailErr.message) : 'Email delivery failed.';
-    }
-
     return {
       success: true,
-      deliveredByEmail: deliveredByEmail,
-      deliveryError: deliveryError
+      deliveredByEmail: false
     };
   } catch (e) {
     throw new Error(_errMsg('loginStepOne', e));
@@ -1457,7 +1441,6 @@ function getSOSAlerts(token) {
         return {
           SOSID: _deriveSOSID(sos.alerts, row, rowIndex),
           ReporterEmail: _norm(row[sos.alerts.idx.ReporterEmail]),
-          ReporterName: _resolveFullNameByEmail(_norm(row[sos.alerts.idx.ReporterEmail])),
           Lat: Number(row[sos.alerts.idx.Lat]) || 0,
           Lng: Number(row[sos.alerts.idx.Lng]) || 0,
           Status: String(row[sos.alerts.idx.Status] || '').trim() || 'Open',
@@ -2248,7 +2231,7 @@ function _buildSOSWhatsAppLink(settingsCtx, reporterEmail, lat, lng) {
     'soswhatsappmessage',
     'sosmessage',
     'emergencymessage'
-  ]) || 'Emergency SOS from {name} ({email}). Location: {lat}, {lng}. Map: {map}';
+  ]) || 'Emergency SOS from {email}. Location: {lat}, {lng}';
 
   const message = template
     .replace(/\{email\}/gi, reporterEmail)
@@ -2317,7 +2300,6 @@ function _findSOSAlertByID(sos, sosID) {
     return {
       SOSID: _deriveSOSID(sos.alerts, row, rowIndex),
       ReporterEmail: _norm(row[sos.alerts.idx.ReporterEmail]),
-          ReporterName: _resolveFullNameByEmail(_norm(row[sos.alerts.idx.ReporterEmail])),
       Lat: Number(row[sos.alerts.idx.Lat]) || 0,
       Lng: Number(row[sos.alerts.idx.Lng]) || 0,
       Status: String(row[sos.alerts.idx.Status] || '').trim() || 'Open',
@@ -2326,18 +2308,6 @@ function _findSOSAlertByID(sos, sosID) {
   });
 
   return mapped.find(item => item.SOSID === normalizedSOSID) || null;
-}
-
-
-function _resolveFullNameByEmail(email) {
-  try {
-    if (!email) return '';
-    const access = _readSheet('Access', { EmailOptional: ['EmailOptional', 'Email'], FullName: ['FullName', 'Name'] });
-    const row = access.rows.find(r => _norm(r[access.idx.EmailOptional]) === _norm(email));
-    return row ? String(row[access.idx.FullName] || '').trim() : '';
-  } catch (e) {
-    return '';
-  }
 }
 
 function _normalizeSOSMediaType(value) {
@@ -2534,315 +2504,6 @@ function _resolveAuthorizedChannel(messageCtx, email, channelID) {
   }
 
   return channel;
-}
-
-
-
-function getProjectBoard(token) {
-  try {
-    const session = _auth(token);
-    const ctx = _getProjectSheets();
-    const projectDescriptionIdx = _optionalHeaderIndex(ctx.projects, ['Description', 'ProjectDescription']);
-    const projectImageIdx = _optionalHeaderIndex(ctx.projects, ['ImageURL', 'ThumbnailURL', 'ProjectImageURL']);
-    const taskTitleIdx = _optionalHeaderIndex(ctx.tasks, ['TaskTitle', 'Title']);
-    const assigneeTypeIdx = _optionalHeaderIndex(ctx.tasks, ['AssigneeType', 'AssignedType']);
-    const assigneeValueIdx = _optionalHeaderIndex(ctx.tasks, ['Assignee', 'AssignedTo', 'AssigneeValue']);
-
-    const tasksByProject = {};
-    ctx.tasks.rows.forEach((row, i) => {
-      const projectID = String(row[ctx.tasks.idx.ProjectID] || '').trim();
-      if (!projectID) return;
-      if (!tasksByProject[projectID]) tasksByProject[projectID] = [];
-      tasksByProject[projectID].push({
-        TaskID: _deriveProjectTaskID(ctx.tasks, row, i + 2),
-        ProjectID: projectID,
-        TaskTitle: taskTitleIdx === -1 ? '' : String(row[taskTitleIdx] || '').trim(),
-        PercentComplete: _clampPercent(row[ctx.tasks.idx.PercentComplete]),
-        Status: _normalizeTaskStatus(row[ctx.tasks.idx.Status]),
-        Priority: _normalizeTaskPriority(row[ctx.tasks.idx.Priority]),
-        AssigneeType: assigneeTypeIdx === -1 ? '' : String(row[assigneeTypeIdx] || '').trim(),
-        Assignee: assigneeValueIdx === -1 ? '' : String(row[assigneeValueIdx] || '').trim()
-      });
-    });
-
-    return {
-      success: true,
-      permissions: _getProjectPermissions(session, ctx),
-      projects: ctx.projects.rows.map(row => {
-        const projectID = String(row[ctx.projects.idx.ProjectID] || '').trim();
-        const tasks = tasksByProject[projectID] || [];
-        const progress = tasks.length ? tasks.reduce((s,t)=>s+t.PercentComplete,0)/tasks.length : 0;
-        return {
-          ProjectID: projectID,
-          Title: String(row[ctx.projects.idx.Title] || '').trim(),
-          Description: projectDescriptionIdx === -1 ? '' : String(row[projectDescriptionIdx] || '').trim(),
-          ImageURL: projectImageIdx === -1 ? '' : String(row[projectImageIdx] || '').trim(),
-          GoalUSD: Number(row[ctx.projects.idx.GoalUSD]) || 0,
-          Status: _normalizeProjectStatus(row[ctx.projects.idx.Status]),
-          ProgressPercent: Number(progress.toFixed(2)),
-          tasks: tasks
-        };
-      })
-    };
-  } catch (e) {
-    throw new Error(_errMsg('getProjectBoard', e));
-  }
-}
-
-function createProjectTaskEnhanced(token, payload) {
-  try {
-    const session = _auth(token);
-    const ctx = _getProjectSheets();
-    _assertProjectEditor(session, ctx);
-    payload = payload || {};
-    const projectID = String(payload.projectID || '').trim();
-    if (!projectID) throw new Error('projectID is required.');
-    const status = _normalizeTaskStatus(payload.status);
-    const priority = _normalizeTaskPriority(payload.priority);
-    const percentComplete = _clampPercent(payload.percentComplete);
-    const title = String(payload.taskTitle || '').trim();
-    const assigneeType = String(payload.assigneeType || '').trim();
-    const assignee = String(payload.assignee || '').trim();
-    const created = createProjectTask(token, projectID, status, priority, percentComplete);
-    const rowIndex = ctx.tasks.rows.length + 1;
-    const taskTitleIdx = _optionalHeaderIndex(ctx.tasks, ['TaskTitle', 'Title']);
-    const assigneeTypeIdx = _optionalHeaderIndex(ctx.tasks, ['AssigneeType', 'AssignedType']);
-    const assigneeValueIdx = _optionalHeaderIndex(ctx.tasks, ['Assignee', 'AssignedTo', 'AssigneeValue']);
-    if (taskTitleIdx !== -1) ctx.tasks.sheet.getRange(rowIndex + 1, taskTitleIdx + 1).setValue(title);
-    if (assigneeTypeIdx !== -1) ctx.tasks.sheet.getRange(rowIndex + 1, assigneeTypeIdx + 1).setValue(assigneeType);
-    if (assigneeValueIdx !== -1) ctx.tasks.sheet.getRange(rowIndex + 1, assigneeValueIdx + 1).setValue(assignee);
-    return created;
-  } catch (e) {
-    throw new Error(_errMsg('createProjectTaskEnhanced', e));
-  }
-}
-
-function createChannel(token, name, type) {
-  try {
-    const session = _auth(token);
-    const ctx = _getMessagingSheets();
-    const normalizedName = String(name || '').trim();
-    const normalizedType = String(type || 'private').trim().toLowerCase();
-    if (!normalizedName) throw new Error('Channel name is required.');
-    if (CHANNEL_TYPES.indexOf(normalizedType) === -1) throw new Error('Unsupported channel type.');
-    const channelID = 'CH-' + Utilities.getUuid().split('-')[0].toUpperCase();
-    const row = new Array(ctx.channels.headers.length).fill('');
-    row[ctx.channels.idx.ChannelID] = channelID;
-    row[ctx.channels.idx.Name] = normalizedName;
-    row[ctx.channels.idx.Type] = normalizedType;
-    row[ctx.channels.idx.IsActive] = true;
-    ctx.channels.sheet.appendRow(row);
-
-    const memberRow = new Array(ctx.channelMembers.headers.length).fill('');
-    memberRow[ctx.channelMembers.idx.ChannelID] = channelID;
-    memberRow[ctx.channelMembers.idx.Email] = _norm(session.email);
-    memberRow[ctx.channelMembers.idx.MemberRole] = 'Owner';
-    ctx.channelMembers.sheet.appendRow(memberRow);
-    return { success: true, channel: { ChannelID: channelID, Name: normalizedName, Type: normalizedType, IsActive: true } };
-  } catch (e) { throw new Error(_errMsg('createChannel', e)); }
-}
-
-function joinChannel(token, channelID) {
-  try {
-    const session = _auth(token);
-    const ctx = _getMessagingSheets();
-    const cid = String(channelID || '').trim();
-    if (!cid) throw new Error('ChannelID is required.');
-    const channelExists = ctx.channels.rows.some(r => String(r[ctx.channels.idx.ChannelID] || '').trim() === cid);
-    if (!channelExists) throw new Error('Channel not found.');
-    const exists = ctx.channelMembers.rows.some(r => String(r[ctx.channelMembers.idx.ChannelID] || '').trim() === cid && _norm(r[ctx.channelMembers.idx.Email]) === _norm(session.email));
-    if (!exists) {
-      const row = new Array(ctx.channelMembers.headers.length).fill('');
-      row[ctx.channelMembers.idx.ChannelID] = cid;
-      row[ctx.channelMembers.idx.Email] = _norm(session.email);
-      row[ctx.channelMembers.idx.MemberRole] = 'Member';
-      ctx.channelMembers.sheet.appendRow(row);
-    }
-    return { success: true };
-  } catch (e) { throw new Error(_errMsg('joinChannel', e)); }
-}
-
-function getChannelDirectory(token) {
-  try {
-    _auth(token);
-    const ctx = _getMessagingSheets();
-    return {
-      success: true,
-      channels: ctx.channels.rows.map(r => ({
-        ChannelID: String(r[ctx.channels.idx.ChannelID] || '').trim(),
-        Name: String(r[ctx.channels.idx.Name] || '').trim(),
-        Type: String(r[ctx.channels.idx.Type] || '').trim(),
-        IsActive: r[ctx.channels.idx.IsActive]
-      }))
-    };
-  } catch (e) { throw new Error(_errMsg('getChannelDirectory', e)); }
-}
-
-function getMemberDirectory(token) {
-  try {
-    _auth(token);
-    const access = _readSheet('Access', { EmailOptional: ['EmailOptional', 'Email'], FullName: ['FullName', 'Name'], Role: ['Role', 'RoleName'] });
-    return { success: true, members: access.rows.map((r,i)=>({ rowIndex:i+2,email:String(r[access.idx.EmailOptional]||'').trim(), fullName:String(r[access.idx.FullName]||'').trim(), role:String(r[access.idx.Role]||'').trim() })) };
-  } catch (e) { throw new Error(_errMsg('getMemberDirectory', e)); }
-}
-
-function addMember(token, payload) {
-  try {
-    const session = _auth(token); _assertAdminSession(session); payload = payload || {};
-    const access = _readSheet('Access', { PersonID:['PersonID'], EmailOptional:['EmailOptional','Email'], FullName:['FullName','Name'], OneTimeCode:['OneTimeCode','OTP','OneTimePasscode'], PublicKey:['PublicKey'], Role:['Role','RoleName'] });
-    const row = new Array(access.headers.length).fill('');
-    row[access.idx.PersonID] = String(payload.personID || ('P-' + Utilities.getUuid().split('-')[0].toUpperCase())).trim();
-    row[access.idx.EmailOptional] = _norm(payload.email);
-    row[access.idx.FullName] = String(payload.fullName || '').trim();
-    row[access.idx.OneTimeCode] = '';
-    row[access.idx.PublicKey] = String(payload.publicKey || '').trim();
-    row[access.idx.Role] = String(payload.role || 'Member').trim();
-    access.sheet.appendRow(row);
-    return { success: true };
-  } catch (e) { throw new Error(_errMsg('addMember', e)); }
-}
-
-function updateMember(token, payload) {
-  try {
-    const session = _auth(token); _assertAdminSession(session); payload = payload || {};
-    const access = _readSheet('Access', { EmailOptional:['EmailOptional','Email'], FullName:['FullName','Name'], Role:['Role','RoleName'] });
-    const email = _norm(payload.email);
-    const idx = access.rows.findIndex(r => _norm(r[access.idx.EmailOptional]) === email);
-    if (idx === -1) throw new Error('Member not found.');
-    const rowIndex = idx + 2;
-    if (payload.fullName !== undefined) access.sheet.getRange(rowIndex, access.idx.FullName + 1).setValue(String(payload.fullName || '').trim());
-    if (payload.role !== undefined) access.sheet.getRange(rowIndex, access.idx.Role + 1).setValue(String(payload.role || '').trim());
-    return { success: true };
-  } catch (e) { throw new Error(_errMsg('updateMember', e)); }
-}
-
-function deactivateMember(token, email) {
-  try {
-    const session = _auth(token); _assertAdminSession(session);
-    const normalized = _norm(email);
-    const access = _readSheet('Access', { EmailOptional:['EmailOptional','Email'], Role:['Role','RoleName'] });
-    const idx = access.rows.findIndex(r => _norm(r[access.idx.EmailOptional]) === normalized);
-    if (idx === -1) throw new Error('Member not found.');
-    access.sheet.getRange(idx + 2, access.idx.Role + 1).setValue('Inactive');
-    return { success: true };
-  } catch (e) { throw new Error(_errMsg('deactivateMember', e)); }
-}
-
-function getFamilyData(token) {
-  try {
-    _auth(token);
-    const people = _readSheet('People', { PersonID:['PersonID'], RelationshipToPatriarch:['RelationshipToPatriarch'], GenerationTier:['GenerationTier'], FatherID:['FatherID'], MotherID:['MotherID'], SpouseFullNameOptional:['SpouseFullNameOptional'] });
-    const nameIdx = _optionalHeaderIndex(people, ['FullName', 'Name']);
-    return { success: true, members: people.rows.map(r => ({ PersonID:String(r[people.idx.PersonID]||'').trim(), FullName:nameIdx===-1?'':String(r[nameIdx]||'').trim(), RelationshipToPatriarch:String(r[people.idx.RelationshipToPatriarch]||'').trim(), GenerationTier:String(r[people.idx.GenerationTier]||'').trim(), FatherID:String(r[people.idx.FatherID]||'').trim(), MotherID:String(r[people.idx.MotherID]||'').trim(), SpouseFullNameOptional:String(r[people.idx.SpouseFullNameOptional]||'').trim() })) };
-  } catch (e) { throw new Error(_errMsg('getFamilyData', e)); }
-}
-
-function upsertFamilyMember(token, payload) {
-  try {
-    const session = _auth(token);
-    payload = payload || {};
-    const people = _readSheet('People', { PersonID:['PersonID'], RelationshipToPatriarch:['RelationshipToPatriarch'], GenerationTier:['GenerationTier'], FatherID:['FatherID'], MotherID:['MotherID'], SpouseFullNameOptional:['SpouseFullNameOptional'] });
-    const pid = String(payload.PersonID || '').trim() || ('P-' + Utilities.getUuid().split('-')[0].toUpperCase());
-    let idx = people.rows.findIndex(r => String(r[people.idx.PersonID] || '').trim() === pid);
-    const row = new Array(people.headers.length).fill('');
-    if (idx !== -1) {
-      for (let i=0;i<people.headers.length;i+=1) row[i] = people.rows[idx][i];
-    }
-    row[people.idx.PersonID] = pid;
-    row[people.idx.RelationshipToPatriarch] = String(payload.RelationshipToPatriarch || '').trim();
-    row[people.idx.GenerationTier] = String(payload.GenerationTier || '').trim();
-    row[people.idx.FatherID] = String(payload.FatherID || '').trim();
-    row[people.idx.MotherID] = String(payload.MotherID || '').trim();
-    row[people.idx.SpouseFullNameOptional] = String(payload.SpouseFullNameOptional || '').trim();
-    const nameIdx = _optionalHeaderIndex(people, ['FullName', 'Name']);
-    if (nameIdx !== -1) row[nameIdx] = String(payload.FullName || '').trim();
-    if (idx === -1) people.sheet.appendRow(row); else people.sheet.getRange(idx + 2, 1, 1, row.length).setValues([row]);
-    return { success: true, PersonID: pid };
-  } catch (e) { throw new Error(_errMsg('upsertFamilyMember', e)); }
-}
-
-function getFamilyTree(token) {
-  const data = getFamilyData(token);
-  const map = {};
-  (data.members || []).forEach(m => { map[m.PersonID] = Object.assign({ children: [] }, m); });
-  Object.keys(map).forEach(pid => {
-    const m = map[pid];
-    [m.FatherID, m.MotherID].forEach(parentID => { if (parentID && map[parentID]) map[parentID].children.push(pid); });
-  });
-  return { success: true, nodes: Object.keys(map).map(k => map[k]) };
-}
-
-function getVotingDashboard(token) {
-  try {
-    _auth(token);
-    const votes = getVotes(token);
-    const ctx = _getGovernanceSheets();
-    const imageIdx = _optionalHeaderIndex(ctx.votes, ['ImageURL', 'ProposalImageURL', 'ThumbnailURL']);
-    const rows = (votes.votes || []).map(v => {
-      const source = ctx.votes.rows.find(r => String(r[ctx.votes.idx.VoteID] || '').trim() === v.VoteID) || [];
-      return Object.assign({}, v, { ImageURL: imageIdx === -1 ? '' : String(source[imageIdx] || '').trim() });
-    });
-    return { success: true, canCreateVote: votes.canCreateVote, canCastBallot: votes.canCastBallot, votes: rows };
-  } catch (e) { throw new Error(_errMsg('getVotingDashboard', e)); }
-}
-
-function createVoteEnhanced(token, payload) {
-  try {
-    payload = payload || {};
-    const res = createVote(token, payload.title, payload.thresholdType, payload.status);
-    const ctx = _getGovernanceSheets();
-    const imageIdx = _optionalHeaderIndex(ctx.votes, ['ImageURL', 'ProposalImageURL', 'ThumbnailURL']);
-    if (imageIdx !== -1) {
-      const idx = ctx.votes.rows.findIndex(r => String(r[ctx.votes.idx.VoteID] || '').trim() === res.vote.VoteID);
-      if (idx !== -1) ctx.votes.sheet.getRange(idx + 2, imageIdx + 1).setValue(String(payload.imageURL || '').trim());
-    }
-    return res;
-  } catch (e) { throw new Error(_errMsg('createVoteEnhanced', e)); }
-}
-
-function getTimelineCalendarData(token) {
-  try {
-    _auth(token);
-    const data = getTimelineData(token);
-    const buckets = {};
-    (data.upcoming || []).forEach(item => {
-      const d = item.NextOccurrence || item.EventDate;
-      const k = d ? String(d).slice(0, 10) : '';
-      if (!k) return;
-      if (!buckets[k]) buckets[k] = [];
-      buckets[k].push(item);
-    });
-    return Object.assign({}, data, { calendar: buckets });
-  } catch (e) { throw new Error(_errMsg('getTimelineCalendarData', e)); }
-}
-
-function getSOSAdminGuide(token) {
-  try {
-    const session = _auth(token); _assertAdminSession(session);
-    return {
-      success: true,
-      whatsappConfigInstructions: [
-        'In Settings sheet add key WhatsAppNumber with an international number (example: 15551234567).',
-        'Optional key WhatsAppMessageTemplate can include {email}, {name}, {lat}, {lng}, {map}.',
-        'Optional key SOSEmergencyAction can be set to whatsapp to surface one-click action.'
-      ],
-      otpEmailInstructions: [
-        'Authorize MailApp for the Apps Script deployment owner.',
-        'Deploy as web app with the owner account that can send email.',
-        'Ensure Access.EmailOptional has valid addresses for recipients.'
-      ]
-    };
-  } catch (e) { throw new Error(_errMsg('getSOSAdminGuide', e)); }
-}
-
-function _optionalHeaderIndex(ctx, aliases) {
-  for (let i = 0; i < (aliases || []).length; i += 1) {
-    const alias = aliases[i];
-    if (Object.prototype.hasOwnProperty.call(ctx.headerMap, alias)) {
-      return ctx.headerMap[alias];
-    }
-  }
-  return -1;
 }
 
 function _norm(value) {
