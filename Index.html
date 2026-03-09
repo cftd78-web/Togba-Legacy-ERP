@@ -86,13 +86,37 @@ border:1px solid rgb(191 219 254);
 background:linear-gradient(180deg,#eff6ff 0%,#ffffff 100%);
 }
 
+.family-tree-shell{position:relative;padding:1rem;border:1px solid rgb(226 232 240);border-radius:1rem;background:linear-gradient(180deg,#f8fbff 0%,#ffffff 50%);}
+
+.family-tree-shell::before{content:'';position:absolute;left:50%;top:6.1rem;transform:translateX(-50%);width:2px;height:calc(100% - 8.2rem);background:linear-gradient(180deg,rgba(148,163,184,.45),rgba(148,163,184,.08));pointer-events:none;}
+
+.family-root-card{position:relative;max-width:520px;margin:0 auto 1rem auto;box-shadow:0 10px 30px rgba(59,130,246,.08);}
+
+.family-root-card::after{content:'';position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);width:2px;height:14px;background:rgb(148 163 184 / .5);}
+
+.family-generation-block{position:relative;padding-top:.35rem;}
+
+.family-generation-block::before{content:'';position:absolute;left:50%;top:-.2rem;transform:translateX(-50%);width:60%;max-width:520px;height:2px;background:rgb(203 213 225 / .9);}
+
 .family-tree-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.75rem;}
 
-.family-member-card{border:1px solid rgb(226 232 240);border-radius:.75rem;padding:.75rem;background:#fff;}
+.family-member-card{border:1px solid rgb(226 232 240);border-radius:.95rem;padding:.9rem;background:#fff;box-shadow:0 8px 18px rgba(15,23,42,.06);}
 
-.family-avatar{width:52px;height:52px;border-radius:9999px;object-fit:cover;border:2px solid rgb(226 232 240);background:rgb(248 250 252);}
+.family-member-head{display:flex;gap:.75rem;align-items:center;}
+
+.family-avatar{width:60px;height:60px;border-radius:9999px;object-fit:cover;border:2px solid rgb(191 219 254);background:radial-gradient(circle at 30% 30%,#e2e8f0,#cbd5e1);}
+
+.family-avatar-placeholder{display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#64748b;letter-spacing:.04em;text-transform:uppercase;}
+
+.family-branch-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.65rem;}
+
+.family-branch-box{border:1px dashed rgb(203 213 225);border-radius:.65rem;padding:.5rem;background:#f8fafc;min-height:74px;}
+
+.family-branch-title{font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#64748b;margin-bottom:.3rem;}
 
 .family-link-chip{display:inline-block;padding:.125rem .45rem;border-radius:9999px;background:#f1f5f9;color:#334155;font-size:.7rem;margin:.125rem .125rem 0 0;}
+
+.family-placeholder-chip{display:inline-flex;align-items:center;justify-content:center;padding:.18rem .5rem;border-radius:9999px;background:#e2e8f0;color:#64748b;font-size:.68rem;margin:.125rem .125rem 0 0;}
 
 </style>
 
@@ -518,7 +542,7 @@ Financial Distribution
 </div>
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Family Tree View</h3>
-<div class="text-xs text-slate-500 mb-3">Root/patriarch is pinned at top. Each card shows member photo plus ancestor/descendant links from current FatherID/MotherID data.</div>
+<div class="text-xs text-slate-500 mb-3">Patriarch/root is highlighted at the top. Ancestor and descendant placeholders keep lineage lanes visually clear even when links are missing.</div>
 <div id="family-tree" class="space-y-2"></div>
 </div>
 </div>
@@ -1619,11 +1643,11 @@ childMap[parent].push(pid)
 })
 const withGen=members.map(m=>Object.assign({},m,{_gen:Number(m.GenerationTier||99)})).sort((a,b)=>a._gen-b._gen)
 const root=withGen.find(m=>String(m.RelationshipToPatriarch||'').toLowerCase().includes('patriarch'))||withGen.find(m=>!String(m.FatherID||'').trim()&&!String(m.MotherID||'').trim())||withGen[0]
-const rootCard=root?`<div class="family-root-card rounded-xl p-4 mb-4"><div class="text-xs uppercase text-blue-700 font-bold">Patriarch / Root</div><div class="flex items-center gap-3 mt-2"><img src="${escapeHtml(root.PhotoFileURL||'https://via.placeholder.com/96?text=Photo')}" class="family-avatar" alt="root photo" onerror="this.src='https://via.placeholder.com/96?text=Photo'" /><div><div class="font-semibold text-slate-800">${escapeHtml(root.FullName||root.PersonID)}</div><div class="text-xs text-slate-600 mt-1">${escapeHtml(root.PersonID||'')} • Gen ${escapeHtml(root.GenerationTier||'-')}</div></div></div></div>`:''
+const rootCard=root?`<div class="family-root-card rounded-xl p-4 mb-4"><div class="text-xs uppercase text-blue-700 font-bold tracking-wide">Patriarch / Root</div><div class="family-member-head mt-2"><img src="${escapeHtml(root.PhotoFileURL||'https://via.placeholder.com/96?text=Photo')}" class="family-avatar" alt="root photo" onerror="this.src='https://via.placeholder.com/96?text=Photo'" /><div><div class="font-semibold text-slate-800">${escapeHtml(root.FullName||root.PersonID)}</div><div class="text-xs text-slate-600 mt-1">${escapeHtml(root.PersonID||'')} • Gen ${escapeHtml(root.GenerationTier||'-')}</div><div class="text-xs text-slate-500 mt-1">${escapeHtml(root.RelationshipToPatriarch||'Patriarch')}</div></div></div></div>`:''
 const byGen={}
 withGen.forEach(m=>{const g=String(m.GenerationTier||'Unknown'); if(!byGen[g]) byGen[g]=[]; byGen[g].push(m)})
-const generationBlocks=Object.keys(byGen).sort((a,b)=>Number(a)-Number(b)).map(g=>`<div class="mb-4"><div class="text-xs uppercase font-bold text-slate-500 mb-2">Generation ${escapeHtml(g)}</div><div class="family-tree-grid">${byGen[g].map(m=>renderFamilyMemberCard(m, memberMap, childMap)).join('')}</div></div>`).join('')
-el.innerHTML=`${rootCard}${generationBlocks}`
+const generationBlocks=Object.keys(byGen).sort((a,b)=>Number(a)-Number(b)).map(g=>`<div class="family-generation-block mb-4"><div class="text-xs uppercase font-bold text-slate-500 mb-2 text-center">Generation ${escapeHtml(g)}</div><div class="family-tree-grid">${byGen[g].map(m=>renderFamilyMemberCard(m, memberMap, childMap)).join('')}</div></div>`).join('')
+el.innerHTML=`<div class="family-tree-shell">${rootCard}${generationBlocks}</div>`
 })
 .withFailureHandler(err=>{
 if(isSessionExpiredError(err)){
@@ -1642,7 +1666,11 @@ const mother=String(member.MotherID||'').trim()
 const children=(childMap[String(member.PersonID||'').trim()]||[])
 const parentLinks=[father,mother].filter(Boolean).map(pid=>formatRelativeChip('Ancestor', pid, memberMap[pid]))
 const childLinks=children.map(pid=>formatRelativeChip('Descendant', pid, memberMap[pid]))
-return `<div class="family-member-card"><div class="flex gap-3"><img src="${escapeHtml(member.PhotoFileURL||'https://via.placeholder.com/96?text=Photo')}" class="family-avatar" alt="member photo" onerror="this.src='https://via.placeholder.com/96?text=Photo'" /><div class="min-w-0"><div class="font-semibold truncate">${escapeHtml(member.FullName||member.PersonID)}</div><div class="text-xs text-slate-500">${escapeHtml(member.PersonID||'')} • ${escapeHtml(member.RelationshipToPatriarch||'Member')}</div><div class="text-xs text-slate-500 mt-1">Spouse: ${escapeHtml(member.SpouseFullNameOptional||'-')}</div></div></div><div class="mt-2 text-xs"><div class="text-slate-600">Ancestors</div><div>${parentLinks.length?parentLinks.join(''):'<span class="text-slate-400">No linked parents</span>'}</div></div><div class="mt-2 text-xs"><div class="text-slate-600">Descendants</div><div>${childLinks.length?childLinks.join(''):'<span class="text-slate-400">No linked children</span>'}</div></div></div>`
+const avatarSource=escapeHtml(member.PhotoFileURL||'https://via.placeholder.com/96?text=Photo')
+const avatar=`<img src="${avatarSource}" class="family-avatar" alt="member photo" onerror="this.onerror=null;this.outerHTML='<div class=&quot;family-avatar family-avatar-placeholder&quot;>No Photo</div>'" />`
+const ancestorDisplay=parentLinks.length?parentLinks.join(''):'<span class="family-placeholder-chip">No ancestors linked</span><span class="family-placeholder-chip">Lineage pending</span>'
+const descendantDisplay=childLinks.length?childLinks.join(''):'<span class="family-placeholder-chip">No descendants linked</span><span class="family-placeholder-chip">Future branch</span>'
+return `<div class="family-member-card"><div class="family-member-head">${avatar}<div class="min-w-0"><div class="font-semibold truncate">${escapeHtml(member.FullName||member.PersonID)}</div><div class="text-xs text-slate-500">${escapeHtml(member.PersonID||'')} • ${escapeHtml(member.RelationshipToPatriarch||'Member')}</div><div class="text-xs text-slate-500 mt-1">Spouse: ${escapeHtml(member.SpouseFullNameOptional||'-')}</div></div></div><div class="family-branch-row text-xs"><div class="family-branch-box"><div class="family-branch-title">Ancestors</div><div>${ancestorDisplay}</div></div><div class="family-branch-box"><div class="family-branch-title">Descendants</div><div>${descendantDisplay}</div></div></div></div>`
 }
 
 function formatRelativeChip(label,pid,member){
