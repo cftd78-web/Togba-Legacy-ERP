@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Togba Legacy | Document Vault</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#adc6ff",
+              "on-secondary-fixed-variant": "#005236",
+              "on-primary-container": "#00285d",
+              "on-tertiary-fixed": "#2a1700",
+              "inverse-surface": "#dae2fd",
+              "on-error-container": "#ffdad6",
+              "surface-container-high": "#222a3d",
+              "secondary-container": "#00a572",
+              "on-secondary-fixed": "#002113",
+              "on-background": "#dae2fd",
+              "primary-fixed-dim": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "inverse-on-surface": "#283044",
+              "surface-dim": "#0b1326",
+              "surface-variant": "#2d3449",
+              "error": "#ffb4ab",
+              "surface-container": "#171f33",
+              "primary-container": "#4d8eff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "outline-variant": "#424754",
+              "secondary-fixed-dim": "#4edea3",
+              "primary-fixed": "#d8e2ff",
+              "on-primary": "#002e6a",
+              "surface-bright": "#31394d",
+              "on-secondary": "#003824",
+              "surface": "#0b1326",
+              "on-tertiary-container": "#3e2400",
+              "tertiary-fixed-dim": "#ffb95f",
+              "surface-container-lowest": "#060e20",
+              "tertiary": "#ffb95f",
+              "on-tertiary": "#472a00",
+              "outline": "#8c909f",
+              "on-error": "#690005",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#004395",
+              "surface-container-low": "#131b2e",
+              "surface-container-highest": "#2d3449",
+              "on-secondary-container": "#00311f",
+              "secondary": "#4edea3",
+              "tertiary-container": "#ca8100",
+              "surface-tint": "#adc6ff",
+              "inverse-primary": "#005ac2",
+              "on-surface-variant": "#c2c6d6",
+              "tertiary-fixed": "#ffddb8",
+              "background": "#0b1326",
+              "secondary-fixed": "#6ffbbe",
+              "on-primary-fixed": "#001a42"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .vault-gradient { background: linear-gradient(135deg, #adc6ff 0%, #4d8eff 100%); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface selection:bg-primary/30 min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#0b1326] dark:bg-[#0b1326] shadow-[0_32px_64px_rgba(6,14,32,0.06)]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img alt="Family Crest" class="w-full h-full object-cover" data-alt="Close up of a metallic silver family crest emblem with intricate heraldic details set against a dark velvet background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIgb_zu4hsteY3-vOW2SlNkPLtQw89ckV1pGyGJ5SIRMQG3qbaMpOj_z50veg5omUbrv7jr8qUYzxDw08Bam0qGXDTvhV-Nrxey0XCkHwB19Y1E-XcBHMQSRwDPNDBMmTDkYPEOE8u76_lGGoDpIvYPXMAu3GAnq7WZRl4C7U2AJGGQouIX753jaEjPfclvPeXR9jhAo2IJD1tX5QzaCJLJNibmOWPxnsohgigYak564PN4A6ejZrJYlABLQzFdkcJzA-a_bfU1h4z"/>
+</div>
+<span class="text-lg font-bold text-[#dae2fd] tracking-[0.05em] uppercase">Togba Legacy</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#1a2337] transition-colors duration-300 scale-95 active:opacity-80">
+<span class="material-symbols-outlined text-[#adc6ff]">notifications</span>
+</button>
+</header>
+<main class="pt-24 px-6 space-y-8">
+<!-- Search & Filter Area -->
+<section class="space-y-4">
+<div class="relative">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</div>
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search Vault..." type="text"/>
+</div>
+<!-- Asset Ribbon (Tags/Categories) -->
+<div class="flex gap-3 overflow-x-auto hide-scrollbar -mx-6 px-6">
+<button class="whitespace-nowrap px-6 py-2 rounded-full bg-primary text-on-primary-container font-medium text-sm">All Files</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-medium text-sm hover:bg-surface-container-high transition-colors">Trusts</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-medium text-sm hover:bg-surface-container-high transition-colors">Real Estate</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-medium text-sm hover:bg-surface-container-high transition-colors">Tax Records</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-medium text-sm hover:bg-surface-container-high transition-colors">Identity</button>
+</div>
+</section>
+<!-- Pinned / Recent Section (Editorial Bento Style) -->
+<section class="space-y-4">
+<div class="flex justify-between items-end">
+<h2 class="text-2xl font-bold tracking-tight text-on-surface">Priority Access</h2>
+<span class="text-xs uppercase tracking-widest text-primary font-bold">See All</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Large Featured Card -->
+<div class="col-span-2 bg-surface-container-low rounded-xl p-5 flex flex-col justify-between h-48 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-40 transition-opacity">
+<span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<div class="z-10">
+<span class="text-[10px] uppercase tracking-[0.1em] text-secondary font-bold mb-1 block">Active Protection</span>
+<h3 class="text-xl font-bold text-on-surface leading-tight">Family Trust<br/>Bylaws 2024</h3>
+</div>
+<div class="z-10 flex justify-between items-center">
+<span class="text-xs text-on-surface-variant">Modified 2d ago</span>
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">verified_user</span>
+</div>
+</div>
+</div>
+<!-- Secondary Cards -->
+<div class="bg-surface-container-lowest rounded-xl p-4 flex flex-col gap-4 border border-outline-variant/10">
+<div class="w-10 h-10 rounded-lg bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">folder_shared</span>
+</div>
+<div>
+<h4 class="font-bold text-sm text-on-surface">Legal Deeds</h4>
+<p class="text-[10px] text-on-surface-variant">12 Documents</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 flex flex-col gap-4 border border-outline-variant/10">
+<div class="w-10 h-10 rounded-lg bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">account_balance</span>
+</div>
+<div>
+<h4 class="font-bold text-sm text-on-surface">Banking Docs</h4>
+<p class="text-[10px] text-on-surface-variant">8 Documents</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Vertical File List -->
+<section class="space-y-6">
+<h2 class="text-2xl font-bold tracking-tight text-on-surface">Recent Deposits</h2>
+<div class="space-y-3">
+<!-- File Item -->
+<div class="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-container-low transition-colors group">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant">description</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-semibold text-on-surface truncate">Tax_Return_Q3_2024.pdf</h4>
+<p class="text-xs text-on-surface-variant">2.4 MB • Oct 12, 2024</p>
+</div>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- File Item -->
+<div class="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-container-low transition-colors group">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary">verified</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-semibold text-on-surface truncate">Passport_Scan_E_Togba.jpg</h4>
+<p class="text-xs text-on-surface-variant">4.1 MB • Oct 08, 2024</p>
+</div>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- File Item -->
+<div class="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-container-low transition-colors group">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-tertiary">draw</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-semibold text-on-surface truncate">Estate_Plan_Revision_V2.pdf</h4>
+<p class="text-xs text-on-surface-variant">1.8 MB • Oct 01, 2024</p>
+</div>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB for adding documents (Contextual for Home/Vault) -->
+<button class="fixed right-6 bottom-32 w-14 h-14 vault-gradient rounded-2xl shadow-2xl flex items-center justify-center text-on-primary-container z-40 active:scale-90 transition-transform">
+<span class="material-symbols-outlined font-bold text-3xl">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#0b1326]/80 backdrop-blur-xl dark:bg-[#0b1326]/80 rounded-t-[16px] shadow-[0_-10px_40px_rgba(6,14,32,0.1)]">
+<a class="flex flex-col items-center justify-center bg-[#1a2337] text-[#adc6ff] rounded-2xl px-4 py-2 transition-transform duration-200 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+<span class="font-sans text-[10px] uppercase tracking-[0.05em] font-bold">Vault</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">trending_up</span>
+<span class="font-sans text-[10px] uppercase tracking-[0.05em]">Growth</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">history_edu</span>
+<span class="font-sans text-[10px] uppercase tracking-[0.05em]">Activity</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">insights</span>
+<span class="font-sans text-[10px] uppercase tracking-[0.05em]">Strategy</span>
+</a>
+</nav>
+</body></html>

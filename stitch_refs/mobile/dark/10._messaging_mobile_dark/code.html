@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Togba Legacy | Communications Vault</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#adc6ff",
+              "on-secondary-fixed-variant": "#005236",
+              "on-primary-container": "#00285d",
+              "on-tertiary-fixed": "#2a1700",
+              "inverse-surface": "#dae2fd",
+              "on-error-container": "#ffdad6",
+              "surface-container-high": "#222a3d",
+              "secondary-container": "#00a572",
+              "on-secondary-fixed": "#002113",
+              "on-background": "#dae2fd",
+              "primary-fixed-dim": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "inverse-on-surface": "#283044",
+              "surface-dim": "#0b1326",
+              "surface-variant": "#2d3449",
+              "error": "#ffb4ab",
+              "surface-container": "#171f33",
+              "primary-container": "#4d8eff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "outline-variant": "#424754",
+              "secondary-fixed-dim": "#4edea3",
+              "primary-fixed": "#d8e2ff",
+              "on-primary": "#002e6a",
+              "surface-bright": "#31394d",
+              "on-secondary": "#003824",
+              "surface": "#0b1326",
+              "on-tertiary-container": "#3e2400",
+              "tertiary-fixed-dim": "#ffb95f",
+              "surface-container-lowest": "#060e20",
+              "tertiary": "#ffb95f",
+              "on-tertiary": "#472a00",
+              "outline": "#8c909f",
+              "on-error": "#690005",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#004395",
+              "surface-container-low": "#131b2e",
+              "surface-container-highest": "#2d3449",
+              "on-secondary-container": "#00311f",
+              "secondary": "#4edea3",
+              "tertiary-container": "#ca8100",
+              "surface-tint": "#adc6ff",
+              "inverse-primary": "#005ac2",
+              "on-surface-variant": "#c2c6d6",
+              "tertiary-fixed": "#ffddb8",
+              "background": "#0b1326",
+              "secondary-fixed": "#6ffbbe",
+              "on-primary-fixed": "#001a42"
+            },
+            fontFamily: {
+              "headline": ["Inter", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#0b1326] shadow-[0_32px_64px_rgba(6,14,32,0.06)]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden border-2 border-primary/20">
+<img alt="Family Crest" class="w-full h-full object-cover" data-alt="Close up of a metallic family crest embossed on dark textured leather with soft blue rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrrbKAH2G7IKJq4-Tg6V8UXviORUNxJFGByo6KbULiY5vpuU3O3-GgIQuftFoDbFFDQYjRMkBPQJMJqruY7fh_Tf7yw_XCUv_S5o4_2JyBgrM-Rtaku0zRiO-Ib_WMM0NkrdTX7Oxr-Y8nnBpTwjYnn1zxmgn9rxYtURVLq5La_MDo1vEdS53yyTTTlw2mY-q60Qm9lAGx_6ESqnSUBtSUxi2qvBMR9NtqYgRPlrR5Xa-66-Knkbe8oGgHYc62QUvGZFnziZVqb8Aw"/>
+</div>
+<span class="text-lg font-bold text-[#dae2fd] tracking-[0.05em] uppercase">Togba Legacy</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#adc6ff] hover:bg-[#1a2337] transition-colors duration-300 p-2 rounded-full">notifications</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="pt-24 pb-32 px-6 max-w-2xl mx-auto space-y-8">
+<!-- Search & Filter Area -->
+<section class="space-y-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search Vault communications..." type="text"/>
+</div>
+<!-- Category Chips -->
+<div class="flex gap-2 overflow-x-auto hide-scrollbar">
+<button class="bg-primary text-on-primary-container px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap">All Channels</button>
+<button class="bg-surface-container-high text-on-surface-variant px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-surface-container-highest transition-colors">Direct Messages</button>
+<button class="bg-surface-container-high text-on-surface-variant px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-surface-container-highest transition-colors">Archive</button>
+<button class="bg-surface-container-high text-on-surface-variant px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-surface-container-highest transition-colors">Urgent</button>
+</div>
+</section>
+<!-- Channels Section: The Sovereign Vault Style -->
+<section class="space-y-4">
+<div class="flex justify-between items-center">
+<h2 class="font-sans text-[#dae2fd] tracking-tight headline-lg font-bold text-xl uppercase tracking-widest opacity-80">Priority Channels</h2>
+<span class="material-symbols-outlined text-primary cursor-pointer">add_circle</span>
+</div>
+<div class="grid gap-3">
+<!-- Channel Card 1 -->
+<div class="group bg-surface-container-low p-5 rounded-xl hover:bg-surface-container transition-all duration-300 cursor-pointer flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-highest rounded-xl flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<h3 class="text-on-surface font-semibold text-lg">Strategy-Vault</h3>
+<p class="text-on-surface-variant text-sm flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                                Institutional asset discussion
+                            </p>
+</div>
+</div>
+<div class="bg-primary-container/20 text-primary px-3 py-1 rounded-lg text-xs font-bold tracking-tighter">12 NEW</div>
+</div>
+<!-- Channel Card 2 -->
+<div class="group bg-surface-container-low p-5 rounded-xl hover:bg-surface-container transition-all duration-300 cursor-pointer flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-highest rounded-xl flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+</div>
+<div>
+<h3 class="text-on-surface font-semibold text-lg">Growth-Equity</h3>
+<p class="text-on-surface-variant text-sm">Portfolio rebalancing Q4</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Direct Messages Section -->
+<section class="space-y-4">
+<div class="flex justify-between items-center">
+<h2 class="font-sans text-[#dae2fd] tracking-tight headline-lg font-bold text-xl uppercase tracking-widest opacity-80">Advisors &amp; Family</h2>
+</div>
+<div class="space-y-1">
+<!-- DM Item 1 -->
+<div class="flex items-center gap-4 p-4 rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer relative overflow-hidden group">
+<div class="relative">
+<div class="w-14 h-14 rounded-full overflow-hidden border-2 border-secondary/40 p-0.5">
+<img alt="Marcus Togba" class="w-full h-full object-cover rounded-full" data-alt="Portrait of a distinguished man in a dark tailored suit with a deep navy background and sophisticated lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzyr44eimnygF3XssLhTRqp_v58A5QxXqfRGRjIGKPhvANqVVvSWTdbVZPzG-uysZ47GuGGfGAirOV2CWWTslL3cnXEizxKxMh_1nFFodRkuBFGMdM9fbb_9gmUUZg18RG1C_eDtDHGyhNjjWZKXjrDWwD-cyMFzQkfwPRD_PThknYAohwoBfW1UqHNXLNRX9iyWrW-Tdoxaxw0Qpeo_EvmTFWXxIXDzbmBa97NzkqcXW1YgU-mU_9gxBxs4EHgFSGewW2FAeMOz_e"/>
+</div>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-secondary border-4 border-surface rounded-full"></div>
+</div>
+<div class="flex-1 border-b border-outline-variant/10 pb-4 group-last:border-none">
+<div class="flex justify-between mb-1">
+<span class="font-bold text-on-surface">Marcus Togba</span>
+<span class="text-xs text-on-surface-variant">14:02</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-1">The offshore diversification proposal is ready for your digital signature...</p>
+</div>
+</div>
+<!-- DM Item 2 -->
+<div class="flex items-center gap-4 p-4 rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer relative overflow-hidden group">
+<div class="relative">
+<div class="w-14 h-14 rounded-full overflow-hidden border-2 border-transparent p-0.5">
+<img alt="Elena Vance" class="w-full h-full object-cover rounded-full" data-alt="Close up portrait of a professional woman with a calm expression in a minimalist office setting with soft shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAglh77MxkAj9CsEK2MwBFlDGHANsIpMUyACBhY03aT23zuoouPWN77U0gGAM4t258ZmGZ0tc020RJUOna2X60StZUQt47q6hxuMbRy3gFu0n_vFfLA-X26aTvZqPHZZFcVAjdw6Mmp9qOW9sghYU6L1WwIrBQM6l5fTm1NoUD1XozMhGdVlE4BBqqpW4S4xmUQ-EZ0LTcs_El_f8tpsuSlLyM_T00xPifm6efdDVIimU4XIIykIEukWsQyUjiVafjUYXoz-ztWGixD"/>
+</div>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-surface-container-highest border-4 border-surface rounded-full"></div>
+</div>
+<div class="flex-1 border-b border-outline-variant/10 pb-4 group-last:border-none">
+<div class="flex justify-between mb-1">
+<span class="font-bold text-on-surface">Elena Vance</span>
+<span class="text-xs text-on-surface-variant">Yesterday</span>
+</div>
+<p class="text-sm font-semibold text-primary line-clamp-1">Sent a file: Q3_Performance_Audit.pdf</p>
+</div>
+</div>
+<!-- DM Item 3 -->
+<div class="flex items-center gap-4 p-4 rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer relative overflow-hidden group">
+<div class="relative">
+<div class="w-14 h-14 rounded-full overflow-hidden border-2 border-transparent p-0.5">
+<img alt="Legal Counsel" class="w-full h-full object-cover rounded-full" data-alt="Headshot of a man in professional attire against a blurred architectural background with cool blue tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8jl5ImjQuCc-rhMsUQn9XeAacI5mB7_VFQ8x-n7UBBHVWq5BJ83rk8YwKRZtmAiCI7m0mL4_hxml2dtu3bsWBHmxhkDWYmnJrukrsoZLnKpzMSRRbT6YaYCCb5zBXo03yG9Y8n41QY3BwJHoqFL2m2dEe-t_XKdv9zsb57yORaayFdMrtv9GJo0jXXdn0RzOFm0wb2MK7LviePERkA7a0ouWpDv8-pMfVGB6wiuwY--FweBkSu_gbLRNVbjmJlHTv_k9JLPFegaOY"/>
+</div>
+</div>
+<div class="flex-1 border-b border-outline-variant/10 pb-4 group-last:border-none">
+<div class="flex justify-between mb-1">
+<span class="font-bold text-on-surface">Legal Counsel</span>
+<span class="text-xs text-on-surface-variant">Tuesday</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-1">Review of the trust modification document is complete.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#0b1326]/80 backdrop-blur-xl shadow-[0_-10px_40px_rgba(6,14,32,0.1)] rounded-t-[16px]">
+<div class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-all cursor-pointer">
+<span class="material-symbols-outlined mb-1">account_balance</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px]">Vault</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-all cursor-pointer">
+<span class="material-symbols-outlined mb-1">trending_up</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px]">Growth</span>
+</div>
+<!-- ACTIVE: Activity (Closest match to communications/messaging) -->
+<div class="flex flex-col items-center justify-center bg-[#1a2337] text-[#adc6ff] rounded-2xl px-4 py-2 transition-transform duration-200 ease-out cursor-pointer">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">history_edu</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px] font-bold">Activity</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-all cursor-pointer">
+<span class="material-symbols-outlined mb-1">insights</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px]">Strategy</span>
+</div>
+</nav>
+<!-- Contextual FAB (Restricted to Communication context) -->
+<button class="fixed right-6 bottom-28 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-container text-on-primary-container shadow-2xl flex items-center justify-center active:scale-95 transition-all">
+<span class="material-symbols-outlined text-3xl">edit_square</span>
+</button>
+</body></html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Togba Legacy - Family Tree</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#adc6ff",
+              "on-secondary-fixed-variant": "#005236",
+              "on-primary-container": "#00285d",
+              "on-tertiary-fixed": "#2a1700",
+              "inverse-surface": "#dae2fd",
+              "on-error-container": "#ffdad6",
+              "surface-container-high": "#222a3d",
+              "secondary-container": "#00a572",
+              "on-secondary-fixed": "#002113",
+              "on-background": "#dae2fd",
+              "primary-fixed-dim": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "inverse-on-surface": "#283044",
+              "surface-dim": "#0b1326",
+              "surface-variant": "#2d3449",
+              "error": "#ffb4ab",
+              "surface-container": "#171f33",
+              "primary-container": "#4d8eff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "outline-variant": "#424754",
+              "secondary-fixed-dim": "#4edea3",
+              "primary-fixed": "#d8e2ff",
+              "on-primary": "#002e6a",
+              "surface-bright": "#31394d",
+              "on-secondary": "#003824",
+              "surface": "#0b1326",
+              "on-tertiary-container": "#3e2400",
+              "tertiary-fixed-dim": "#ffb95f",
+              "surface-container-lowest": "#060e20",
+              "tertiary": "#ffb95f",
+              "on-tertiary": "#472a00",
+              "outline": "#8c909f",
+              "on-error": "#690005",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#004395",
+              "surface-container-low": "#131b2e",
+              "surface-container-highest": "#2d3449",
+              "on-secondary-container": "#00311f",
+              "secondary": "#4edea3",
+              "tertiary-container": "#ca8100",
+              "surface-tint": "#adc6ff",
+              "inverse-primary": "#005ac2",
+              "on-surface-variant": "#c2c6d6",
+              "tertiary-fixed": "#ffddb8",
+              "background": "#0b1326",
+              "secondary-fixed": "#6ffbbe",
+              "on-primary-fixed": "#001a42"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .canvas-grid {
+            background-image: radial-gradient(circle, #424754 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .connection-line {
+            background: linear-gradient(to bottom, #4d8eff 0%, transparent 100%);
+            width: 2px;
+        }
+        .connection-line-horizontal {
+            background: #4d8eff;
+            height: 2px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#0b1326] dark:bg-[#0b1326] shadow-[0_32px_64px_rgba(6,14,32,0.06)]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img alt="Family Crest" class="w-full h-full object-cover" data-alt="Intricate silver and navy family crest emblem with classic heraldic symbols on a textured dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8F0-lWDEZsQ_rVFREpW3kgRZdWDNDRORBV5gZT0fhkdFGdCxftmhlnMNjA_vBrJn3zl60fl5RzjSKYM3NG5q44FAfuePvZy_cBzp6ZFfltA3muVimgv0TGCBzuWTgB77h4fQK8jCa3yeQJ7yjj4fg0Df60n_PJUTgkvY5F1ORtS3uXH7hKsd8v2FFiibw8v1glyD7Vf4uYqzRfFyvGBzOQ3kKV_GnM-OhY51rL-8r14xz9nxvgPwD6u2uffFg5OMsLZdY3qLRZNzn"/>
+</div>
+<span class="text-lg font-bold text-[#dae2fd] tracking-[0.05em] uppercase font-sans">Togba Legacy</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#1a2337] transition-colors duration-300 active:opacity-80 scale-95 transition-all text-[#adc6ff]">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</nav>
+<!-- Main Canvas -->
+<main class="min-h-screen pt-20 pb-28 relative overflow-hidden canvas-grid">
+<!-- UI Overlay Controls -->
+<div class="absolute top-24 right-6 z-20 flex flex-col gap-3">
+<button class="w-12 h-12 rounded-xl bg-surface-container-high/80 backdrop-blur-md flex items-center justify-center text-primary shadow-xl border border-outline-variant/10">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="w-12 h-12 rounded-xl bg-surface-container-high/80 backdrop-blur-md flex items-center justify-center text-primary shadow-xl border border-outline-variant/10">
+<span class="material-symbols-outlined">zoom_out</span>
+</button>
+<button class="w-12 h-12 rounded-xl bg-surface-container-high/80 backdrop-blur-md flex items-center justify-center text-primary shadow-xl border border-outline-variant/10">
+<span class="material-symbols-outlined">filter_center_focus</span>
+</button>
+</div>
+<!-- Horizontal Asset Ribbon / Breadcrumb -->
+<div class="px-6 mb-8 relative z-10">
+<div class="bg-surface-container-lowest/60 backdrop-blur-sm rounded-xl p-3 flex items-center gap-4 overflow-x-auto no-scrollbar">
+<div class="flex items-center gap-2 flex-shrink-0">
+<span class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Focus</span>
+<span class="text-sm font-bold text-primary">Matriarch Line</span>
+</div>
+<div class="w-px h-4 bg-outline-variant/30 flex-shrink-0"></div>
+<div class="flex gap-2 overflow-x-auto no-scrollbar whitespace-nowrap">
+<span class="px-3 py-1 bg-surface-container rounded-full text-[10px] uppercase tracking-tighter text-on-surface-variant border border-outline-variant/5">18th Century</span>
+<span class="px-3 py-1 bg-surface-container rounded-full text-[10px] uppercase tracking-tighter text-on-surface-variant border border-outline-variant/5">West African Origins</span>
+<span class="px-3 py-1 bg-surface-container rounded-full text-[10px] uppercase tracking-tighter text-on-surface-variant border border-outline-variant/5">Migration Records</span>
+</div>
+</div>
+</div>
+<!-- Node Graph Container -->
+<div class="px-6 space-y-12 relative flex flex-col items-center">
+<!-- Tier 1: Patriarch/Matriarch -->
+<div class="relative flex flex-col items-center">
+<div class="relative z-10 p-[2px] rounded-2xl bg-gradient-to-br from-primary to-primary-container shadow-[0_0_30px_rgba(77,142,255,0.2)]">
+<div class="bg-surface-container-highest rounded-[14px] p-4 flex flex-col items-center w-40 text-center">
+<div class="w-16 h-16 rounded-xl mb-3 overflow-hidden border-2 border-primary/20">
+<img alt="Elias Akpan" class="w-full h-full object-cover" data-alt="Regal portrait of an elderly African man in traditional formal attire, dignified expression, soft dramatic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzeAb1sLto4p9bmcpG4GmbEjvP45pO9DSRie5slJ-oj7By-gIGMsNtK1ncHSQqJPxyUGEoHpztNOSwdQOi-X7a-d0WMuwTEe94hLBUavI0a6sAKaaIjQnJht5oQKXsQ1LYWGxPmic4YpnyqsbRnr3lwgwhlxnEFUATDreaoVYH559HNRids0oPAv2x5PASeoWejCRO6CDEy9e7SgVKmJF0cPtx5Xuon_3IH9Sk_ZK7DxTl207IPG2u-I51GJ2D7rTMTMvw0awjOABS"/>
+</div>
+<h3 class="text-sm font-bold text-on-surface leading-tight">Elias Akpan</h3>
+<p class="text-[10px] font-label text-on-surface-variant uppercase tracking-widest mt-1">1892 — 1974</p>
+</div>
+</div>
+<!-- Vertical Stem -->
+<div class="connection-line h-12"></div>
+</div>
+<!-- Tier 2: Children -->
+<div class="relative w-full flex justify-center">
+<!-- Horizontal bar -->
+<div class="absolute top-0 left-1/4 right-1/4 connection-line-horizontal"></div>
+<div class="flex justify-between w-full max-w-sm relative">
+<!-- Child 1 -->
+<div class="flex flex-col items-center w-1/2">
+<div class="connection-line h-8 mb-0"></div>
+<div class="bg-surface-container-low rounded-xl p-3 flex flex-col items-center w-36 text-center border border-outline-variant/10 shadow-lg">
+<div class="w-12 h-12 rounded-lg mb-2 overflow-hidden bg-surface-container">
+<img alt="Samuel Akpan" class="w-full h-full object-cover" data-alt="Professional middle-aged man with sharp features and a kind smile, clean lighting, blurred architectural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1oFfSWDP_4Lft4MbKpX23JUdd0E7P1gu1OD33TFA9yDt4Lixp0pfeCBJqSmI8Wj1UwhjyGO2Eco9wGbHbAJUIEuz8scRTQDfOoVfHzNY37q9Z3zgPt8sHbVIQpWe8rSFEICMCMVyrIkj7k1syBJjCFF87QktDCI15Mn5wtwJMCgRkJHXbL2hqer_PpG7LEFGnnoKscqXMoE24whNPJyVQUatham4avou5KddGOuXzlo9emeCW3T7spMUYJKBLuizc4PEGrOAdn7vK"/>
+</div>
+<h3 class="text-xs font-bold text-on-surface">Samuel Akpan</h3>
+<p class="text-[9px] font-label text-secondary uppercase tracking-widest mt-1">Active Head</p>
+</div>
+<div class="connection-line h-12"></div>
+</div>
+<!-- Child 2 -->
+<div class="flex flex-col items-center w-1/2">
+<div class="connection-line h-8 mb-0"></div>
+<div class="bg-surface-container-low rounded-xl p-3 flex flex-col items-center w-36 text-center border border-outline-variant/10 shadow-lg">
+<div class="w-12 h-12 rounded-lg mb-2 overflow-hidden bg-surface-container">
+<img alt="Lydia Akpan" class="w-full h-full object-cover" data-alt="Elegant woman in her 50s, graceful posture, soft ambient studio lighting, sophisticated professional style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDc2WGbPqLmCzYP5MBV7s_Xto8ZVfzmutaA_I7c-SXfSfcijaJ8tydcISi0qw7YZrVALmv7RSCXMxJcpU1YgkZopWn__urqPbO29AWdNb_Qt06dnOCjVvvmXR26Zlrd1dfON9AJYr384VA_yL59djIRWIR9hSgf0RV7J1Rzn5FwFa6dYg7KZHYC00hIY47isbH_k1CrCM4-Md6KaJjVwpYyk10hey6--Yyg4vb_Rnkyc2dbV5cuG46KvS0dUdoeWqXo3zZ6AE5QN77p"/>
+</div>
+<h3 class="text-xs font-bold text-on-surface">Lydia Akpan</h3>
+<p class="text-[9px] font-label text-on-surface-variant uppercase tracking-widest mt-1">1924 — 2001</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Tier 3: Grandchildren (Focused Branch) -->
+<div class="relative w-full flex flex-col items-center">
+<div class="absolute top-0 left-1/4 right-1/4"></div> <!-- Connects from Samuel above -->
+<!-- Active Path Card -->
+<div class="bg-surface-container-high/40 backdrop-blur-md rounded-3xl p-6 w-full max-w-sm border border-primary/10 shadow-2xl relative overflow-hidden">
+<!-- Glass shine -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+<div class="flex justify-between items-start mb-6">
+<div>
+<span class="text-[10px] font-label uppercase tracking-[0.2em] text-primary block mb-1">Direct Lineage</span>
+<h2 class="text-xl font-bold tracking-tight">The Modern Era</h2>
+</div>
+<button class="p-2 rounded-full bg-surface-container-highest text-primary">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+<div class="space-y-4">
+<!-- Person 1 -->
+<div class="flex items-center gap-4 bg-surface-container-low/50 p-3 rounded-2xl hover:bg-surface-container-high transition-colors">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-secondary">
+<img alt="Kofi" class="w-full h-full object-cover" data-alt="Young energetic man in a modern casual shirt, optimistic expression, warm sunlight through a window" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAejDSZISsyqkL_RYDUL2ZOrguwsbPqTY3ruhGY76cJaFOZOb-Ni5SUiOc5ZcqObxqMHgn7SbaA_sfZnmCpG6Dte7kktyfruxuRZsXbBHq0-6YdRPDfF6u2_IDwTzjAI41_TBFxW6jesp43AYOTScrg26Dh2MoAnuc7LoVZxQa-P_1xc7riqcuz9ErPUw3l0x-RQyGm2x1MImfBbDfxG9UxBoBO2fqMv9mGrj6obcRS8YRExqdfCXGSSrAOszgxiIEQ8ZlP3JFSICR6"/>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold">Kofi Akpan</h4>
+<p class="text-[10px] text-on-surface-variant">Chief Strategist</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+<!-- Person 2 -->
+<div class="flex items-center gap-4 bg-surface-container-low/50 p-3 rounded-2xl border-2 border-primary/40 shadow-[0_0_15px_rgba(173,198,255,0.1)]">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary">
+<img alt="You" class="w-full h-full object-cover" data-alt="Confident young professional woman looking at camera, neutral grey background, high-end fashion lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC08spLzajhkkmgey4LftSlmkKwJfEFxnwKcZntayp9mdUYnjg_jbwyTRwFCm_YnLRzuIeRwsdUaU1XmAEcV46bejf2aZ4qKHew7hfB2TjvNTk6gjXOfj0ZUfWHN83GBJnzePAHVzI0XbPZ1VnrI7fi3CWdfrJ9ADOLdMDaKWImeGswQ33vZDZWRO7yaAZwYe3ows0HrODw6VoevRxMLKu_zXUWqlJ28yrSXZODd00onPeoRYU5-D5bgAM8KHoKFKBHkruztVbjWoaB"/>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold text-primary">Nia Akpan (You)</h4>
+<p class="text-[10px] text-on-surface-variant">Archivist</p>
+</div>
+<div class="bg-primary/10 px-2 py-1 rounded text-[8px] font-bold text-primary uppercase">Focused</div>
+</div>
+<!-- Person 3 -->
+<div class="flex items-center gap-4 bg-surface-container-low/50 p-3 rounded-2xl opacity-60">
+<div class="w-12 h-12 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Amara" class="w-full h-full object-cover" data-alt="Teenage girl with braided hair, bright smile, natural outdoor park setting, soft focus foliage" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2i0SRtTcuotX8lcBbxaURPb9D4ZMp8P6AGBd7W4jivIUkFpph354tJmoqPw8EGzyaiicmBoJtUi_Kw4m0C6fgL81kgg025Mqt_vHh5roZSEGwJQ-xKT-WgAR9DHxDX4OVf3xUKfmnriIElJNtzyjE_7tbqw4zesEZ5XCYTykbADLY1dzEmj255u08CAvuyI8Wmkbpl3hMnhyISvpfWveExSlYk2MpFEXhtuLk_vKBz3O_CX1CfAtiOg29BVJJfq5ANJqbLu79EaNt"/>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold">Amara Akpan</h4>
+<p class="text-[10px] text-on-surface-variant">Education Fund</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">lock</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB Suppression: Contextual Action -->
+<!-- Not needed for a pure "View" tree unless adding, but we'll include a Search/Add FAB here -->
+<button class="fixed bottom-28 right-6 w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary-container rounded-2xl shadow-2xl flex items-center justify-center z-40 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#0b1326]/80 backdrop-blur-xl dark:bg-[#0b1326]/80 shadow-[0_-10px_40px_rgba(6,14,32,0.1)] rounded-t-[16px]">
+<!-- Vault -->
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-transform duration-200 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] mt-1 text-[10px]">Vault</span>
+</a>
+<!-- Growth -->
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-transform duration-200 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] mt-1 text-[10px]">Growth</span>
+</a>
+<!-- Activity (ACTIVE: Mapping Tree to Activity/History lineage) -->
+<a class="flex flex-col items-center justify-center bg-[#1a2337] text-[#adc6ff] rounded-2xl px-4 py-2 transition-transform duration-200 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu" style="font-variation-settings: 'FILL' 1;">history_edu</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] mt-1 text-[10px] font-bold">Activity</span>
+</a>
+<!-- Strategy -->
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-transform duration-200 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] mt-1 text-[10px]">Strategy</span>
+</a>
+</nav>
+</body></html>

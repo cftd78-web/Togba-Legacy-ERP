@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Togba Legacy - SOS Emergency</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#adc6ff",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-primary-container": "#00285d",
+                        "on-tertiary-fixed": "#2a1700",
+                        "inverse-surface": "#dae2fd",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-high": "#222a3d",
+                        "secondary-container": "#00a572",
+                        "on-secondary-fixed": "#002113",
+                        "on-background": "#dae2fd",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-surface": "#dae2fd",
+                        "inverse-on-surface": "#283044",
+                        "surface-dim": "#0b1326",
+                        "surface-variant": "#2d3449",
+                        "error": "#ffb4ab",
+                        "surface-container": "#171f33",
+                        "primary-container": "#4d8eff",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "outline-variant": "#424754",
+                        "secondary-fixed-dim": "#4edea3",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary": "#002e6a",
+                        "surface-bright": "#31394d",
+                        "on-secondary": "#003824",
+                        "surface": "#0b1326",
+                        "on-tertiary-container": "#3e2400",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "surface-container-lowest": "#060e20",
+                        "tertiary": "#ffb95f",
+                        "on-tertiary": "#472a00",
+                        "outline": "#8c909f",
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "on-primary-fixed-variant": "#004395",
+                        "surface-container-low": "#131b2e",
+                        "surface-container-highest": "#2d3449",
+                        "on-secondary-container": "#00311f",
+                        "secondary": "#4edea3",
+                        "tertiary-container": "#ca8100",
+                        "surface-tint": "#adc6ff",
+                        "inverse-primary": "#005ac2",
+                        "on-surface-variant": "#c2c6d6",
+                        "tertiary-fixed": "#ffddb8",
+                        "background": "#0b1326",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-primary-fixed": "#001a42"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .emergency-glow {
+            box-shadow: 0 0 50px rgba(147, 0, 10, 0.4);
+        }
+        .map-mask {
+            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body select-none">
+<!-- TopAppBar (Transactional Suppression applies, but for SOS we keep a custom "Close" version) -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#0b1326] shadow-[0_32px_64px_rgba(6,14,32,0.06)]">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">close</span>
+<h1 class="text-lg font-bold text-[#dae2fd] tracking-[0.05em] uppercase">Emergency Protocol</h1>
+</div>
+<div class="h-10 w-10 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">shield_with_heart</span>
+</div>
+</header>
+<main class="pt-20 pb-12 px-6 flex flex-col min-h-screen">
+<!-- Live Map Background Section -->
+<section class="relative w-full h-64 rounded-xl overflow-hidden bg-surface-container-low mb-8 shadow-2xl">
+<div class="absolute inset-0 map-mask">
+<img class="w-full h-full object-cover opacity-50 grayscale contrast-125" data-alt="Dark stylized satellite map view of a city center at night with glowing blue and gold data markers" data-location="Geneva, Switzerland" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDaLSPeHrOI6XUmAHrEt24ZK_IZOOiOYhOzLhrphhyQKUsV6eKGzrqTAkeDev9gFp6Rne6u1uy3w9Vd-7WZ4FInuD3GBRNKTpc9pElNB9WvpR6o3uZp2GISrbT3PXKHtSUbqEl-OYh1RPhs2lyisPYofqW5K6c-slDtNP-f5IpUZOmEIm9visce__kYoo3tHORnCIZmO_lApkdP9KiCSdpWpXPEGTyYPGHBJ8RjrXfLuj9M67wtSRDZechTSVwYxjFssB4A06nu6-F"/>
+</div>
+<div class="absolute inset-0 flex flex-col justify-end p-4">
+<div class="bg-surface-container/90 backdrop-blur-md p-4 rounded-xl border-l-4 border-primary">
+<p class="text-on-surface-variant font-label label-md uppercase tracking-widest mb-1">Current Coordinates</p>
+<p class="font-headline font-bold text-lg text-primary tracking-tight">46.2044° N, 6.1432° E</p>
+<p class="text-on-surface-variant text-sm">Quai du Mont-Blanc, Geneva</p>
+</div>
+</div>
+<!-- Signal Pulse Animation (Decorative Static) -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+<div class="w-4 h-4 bg-primary rounded-full ring-4 ring-primary/20"></div>
+</div>
+</section>
+<!-- SOS Activation Center -->
+<section class="flex-grow flex flex-col items-center justify-center text-center space-y-8">
+<div class="relative">
+<!-- Outer Pulsing Circles -->
+<div class="absolute inset-0 rounded-full bg-error/10 animate-ping opacity-25"></div>
+<!-- Main SOS Trigger -->
+<button class="relative w-52 h-52 rounded-full bg-gradient-to-tr from-error-container to-error flex flex-col items-center justify-center emergency-glow active:scale-95 transition-all group">
+<span class="material-symbols-outlined text-on-error text-6xl mb-2" style="font-variation-settings: 'FILL' 1;">emergency_home</span>
+<span class="font-headline font-black text-4xl text-on-error tracking-tighter">SOS</span>
+<div class="absolute -bottom-4 bg-surface-container-highest px-4 py-1 rounded-full border border-outline-variant/30">
+<span class="text-on-surface text-xs font-bold uppercase tracking-widest">Hold to Activate</span>
+</div>
+</button>
+</div>
+<div class="space-y-2">
+<h2 class="text-headline-lg font-bold text-on-surface">Immediate Assistance</h2>
+<p class="text-on-surface-variant max-w-[280px] mx-auto text-body-md">Activating SOS will alert the Family Office security desk and local emergency services.</p>
+</div>
+</section>
+<!-- Quick Action Grid (Bento Style) -->
+<section class="mt-12 grid grid-cols-2 gap-4">
+<div class="col-span-2 bg-surface-container-low p-5 rounded-xl flex items-center justify-between group active:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">medical_services</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Medical Emergency</p>
+<p class="text-xs text-on-surface-variant">Priority ambulance dispatch</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+<div class="bg-surface-container-low p-5 rounded-xl space-y-3 active:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-tertiary">local_police</span>
+<div>
+<p class="font-bold text-on-surface">Security</p>
+<p class="text-xs text-on-surface-variant">Report threat</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-xl space-y-3 active:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-secondary">support_agent</span>
+<div>
+<p class="font-bold text-on-surface">Concierge</p>
+<p class="text-xs text-on-surface-variant">Direct line</p>
+</div>
+</div>
+</section>
+<!-- Status Indicator -->
+<footer class="mt-8 flex items-center justify-center gap-2 py-4">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<p class="text-xs font-label uppercase tracking-[0.1em] text-on-surface-variant">Secure Uplink Established</p>
+</footer>
+</main>
+<!-- Suppressed BottomNavBar (Task-Focused suppression per rules) -->
+<!-- Instead, we provide a focused Emergency Footer -->
+<div class="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-background via-background to-transparent pointer-events-none">
+<div class="bg-surface-container-highest/80 backdrop-blur-xl border border-outline-variant/10 p-4 rounded-2xl flex justify-between items-center pointer-events-auto">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-primary-container">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a security director in a dark suit with a calm expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARrhIdJiTzIoJh-YG8Wkt0MKOxJdrL_rMTJYapP6MYsbNKQRx3dq72EEyTfnTV3kZbQVayA82jlfDD4vYI_huYtr26lcSWrxOpkLcot9MrIcrojXf_yvQ4NFYAerkzqOHiKTsTBhUBUV-6qulSkiIG6tfYu9Z6WL1w1LA2ldn8UgjQ8ipFWbJoWcBVXB37VV4oqMf3McxPcL1toO0Fu8Hf8AJGwOiMccbbDwhCoZiKctr4DWgGeI5_zIbyJeLUNcOWjzQW6pbcg6wD"/>
+</div>
+<div class="flex flex-col">
+<p class="text-xs font-bold text-on-surface uppercase">On-Call Director</p>
+<p class="text-[10px] text-on-surface-variant">Marcus Thorne</p>
+</div>
+</div>
+<button class="bg-primary text-on-primary-container px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">call</span>
+                Voice Call
+            </button>
+</div>
+</div>
+</body></html>

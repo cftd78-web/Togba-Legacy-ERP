@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Togba Legacy | Ledger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#adc6ff",
+              "on-secondary-fixed-variant": "#005236",
+              "on-primary-container": "#00285d",
+              "on-tertiary-fixed": "#2a1700",
+              "inverse-surface": "#dae2fd",
+              "on-error-container": "#ffdad6",
+              "surface-container-high": "#222a3d",
+              "secondary-container": "#00a572",
+              "on-secondary-fixed": "#002113",
+              "on-background": "#dae2fd",
+              "primary-fixed-dim": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "inverse-on-surface": "#283044",
+              "surface-dim": "#0b1326",
+              "surface-variant": "#2d3449",
+              "error": "#ffb4ab",
+              "surface-container": "#171f33",
+              "primary-container": "#4d8eff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "outline-variant": "#424754",
+              "secondary-fixed-dim": "#4edea3",
+              "primary-fixed": "#d8e2ff",
+              "on-primary": "#002e6a",
+              "surface-bright": "#31394d",
+              "on-secondary": "#003824",
+              "surface": "#0b1326",
+              "on-tertiary-container": "#3e2400",
+              "tertiary-fixed-dim": "#ffb95f",
+              "surface-container-lowest": "#060e20",
+              "tertiary": "#ffb95f",
+              "on-tertiary": "#472a00",
+              "outline": "#8c909f",
+              "on-error": "#690005",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#004395",
+              "surface-container-low": "#131b2e",
+              "surface-container-highest": "#2d3449",
+              "on-secondary-container": "#00311f",
+              "secondary": "#4edea3",
+              "tertiary-container": "#ca8100",
+              "surface-tint": "#adc6ff",
+              "inverse-primary": "#005ac2",
+              "on-surface-variant": "#c2c6d6",
+              "tertiary-fixed": "#ffddb8",
+              "background": "#0b1326",
+              "secondary-fixed": "#6ffbbe",
+              "on-primary-fixed": "#001a42"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-gradient { background: linear-gradient(135deg, rgba(173, 198, 255, 0.1) 0%, rgba(77, 142, 255, 0.05) 100%); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32 selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#0b1326] shadow-[0_32px_64px_rgba(6,14,32,0.06)]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center border border-outline-variant/10">
+<img alt="Family Crest" class="w-8 h-8 opacity-80" data-alt="heraldic golden lion crest on a deep navy shield background with elegant flourishes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFFi9rcY3FaayE9psCqaeJLWSGr047AekeaXsY3TgjJJEbTgyuTHWJjxWnBN-xEh5gXNegFMIJFFvdu3WxyhrtzWjo8nE0ousDZaSmG-eCWGVjFGYik4XJ8IFYyb_LUAHIC4X5mUR935nlM33sUt9tZkDOWWVbvSAPW3XwWZYJwTbqqiorwT4jFnxSAu7acKC23LcGMoAW5tdK4ni3muIEIhTXqdsnAVuPVaId9U15MYl36nwUgS6AGQkw3WmuQrNjYLydV3b9xhh0"/>
+</div>
+<span class="text-lg font-bold text-[#dae2fd] tracking-[0.05em] uppercase">Togba Legacy</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#1a2337] transition-colors duration-300 active:opacity-80 transition-all">
+<span class="material-symbols-outlined text-[#adc6ff]">notifications</span>
+</button>
+</header>
+<main class="mt-20 px-6 space-y-8">
+<!-- Dashboard Header / Total Pool Stats -->
+<section class="space-y-2">
+<p class="label-md uppercase tracking-[0.05em] text-on-surface-variant font-medium">Global Contribution Vault</p>
+<h1 class="text-[2.75rem] font-extrabold leading-tight tracking-tight text-on-surface">
+                $1,284,500<span class="text-secondary font-medium text-xl ml-2">.00</span>
+</h1>
+<div class="flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+<span class="font-semibold text-sm">+12.4% this quarter</span>
+</div>
+</section>
+<!-- Bento Grid: Pool Stats -->
+<section class="grid grid-cols-2 gap-4">
+<!-- Growth Card -->
+<div class="col-span-1 p-5 rounded-xl bg-surface-container-low space-y-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<div>
+<p class="text-xs text-on-surface-variant font-medium uppercase tracking-wider">My Stake</p>
+<p class="text-xl font-bold text-on-surface">$42,500</p>
+</div>
+</div>
+<!-- Yield Card -->
+<div class="col-span-1 p-5 rounded-xl bg-surface-container-low space-y-4 border-l-2 border-secondary/20">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">eco</span>
+<div>
+<p class="text-xs text-on-surface-variant font-medium uppercase tracking-wider">Yield Earned</p>
+<p class="text-xl font-bold text-on-surface">$1,120</p>
+</div>
+</div>
+<!-- Wide Chart Area (Placeholder) -->
+<div class="col-span-2 p-6 rounded-xl bg-surface-container-low relative overflow-hidden h-40">
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<img alt="Contribution Graph" class="w-full h-full object-cover" data-alt="minimalist wave graph showing steady upward growth with glowing blue lines on a dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWPMXTuIGPIt8UhLLntvhTimXJjMs-7867GVfouMxQ5W8jMbZgcy3HV-qnhIdXXNpbJjMwFo-s0HlG17CdC-LzUcAbzW1iRKcWy7n_2pj5jBbp62mXBbsCHM0xB7dsxnhsTO6hVTLnw_FNJwXERQAQ1ANpojHP2MbKmOsvPwsfHPtQ8sN0rjAI-skUtAujMfRw6H03iDCV4YSSyFsp9hrt1jRasxRIgsXs9B3A5xQ7BfPZPYER0LFztyk7JvjpRtMrYImKlQpXKjiE"/>
+</div>
+<div class="relative z-10">
+<p class="text-xs text-on-surface-variant font-medium uppercase tracking-wider mb-1">Growth Trajectory</p>
+<p class="text-lg font-bold text-on-surface">Projected $1.5M</p>
+</div>
+</div>
+</section>
+<!-- Ledger History -->
+<section class="space-y-6">
+<div class="flex justify-between items-center">
+<h2 class="text-xl font-bold tracking-tight">Recent Ledger</h2>
+<button class="text-sm font-semibold text-primary">View All</button>
+</div>
+<div class="space-y-3">
+<!-- Transaction Item 1 -->
+<div class="flex items-center justify-between p-4 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors duration-300">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Monthly Deposit</p>
+<p class="text-xs text-on-surface-variant font-medium">Oct 12, 2023 • 09:41 AM</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-secondary">+$2,500.00</p>
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Cleared</p>
+</div>
+</div>
+<!-- Transaction Item 2 -->
+<div class="flex items-center justify-between p-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container transition-colors duration-300">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Admin Fee</p>
+<p class="text-xs text-on-surface-variant font-medium">Oct 01, 2023 • 12:00 AM</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-on-surface">-$15.00</p>
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Processed</p>
+</div>
+</div>
+<!-- Transaction Item 3 -->
+<div class="flex items-center justify-between p-4 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors duration-300">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">auto_graph</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Re-invested Yield</p>
+<p class="text-xs text-on-surface-variant font-medium">Sep 30, 2023 • 11:59 PM</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-secondary">+$412.80</p>
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Compounded</p>
+</div>
+</div>
+<!-- Transaction Item 4 -->
+<div class="flex items-center justify-between p-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container transition-colors duration-300">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Initial Seed</p>
+<p class="text-xs text-on-surface-variant font-medium">Sep 15, 2023 • 02:22 PM</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-secondary">+$40,000.00</p>
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Initial</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB for Contribution -->
+<button class="fixed right-6 bottom-32 w-16 h-16 bg-gradient-to-br from-primary to-primary-container rounded-2xl flex items-center justify-center shadow-[0_16px_32px_rgba(77,142,255,0.2)] z-50 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-on-primary-container text-3xl" style="font-variation-settings: 'wght' 600;">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#0b1326]/80 backdrop-blur-xl rounded-t-[16px] shadow-[0_-10px_40px_rgba(6,14,32,0.1)]">
+<!-- Vault (Active) -->
+<a class="flex flex-col items-center justify-center bg-[#1a2337] text-[#adc6ff] rounded-2xl px-4 py-2 transition-transform duration-200 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px]">Vault</span>
+</a>
+<!-- Growth -->
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50" href="#">
+<span class="material-symbols-outlined mb-1">trending_up</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px]">Growth</span>
+</a>
+<!-- Activity -->
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50" href="#">
+<span class="material-symbols-outlined mb-1">history_edu</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px]">Activity</span>
+</a>
+<!-- Strategy -->
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50" href="#">
+<span class="material-symbols-outlined mb-1">insights</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px]">Strategy</span>
+</a>
+</nav>
+</body></html>

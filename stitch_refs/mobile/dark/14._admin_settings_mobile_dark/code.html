@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Togba Legacy Admin Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#adc6ff",
+              "on-secondary-fixed-variant": "#005236",
+              "on-primary-container": "#00285d",
+              "on-tertiary-fixed": "#2a1700",
+              "inverse-surface": "#dae2fd",
+              "on-error-container": "#ffdad6",
+              "surface-container-high": "#222a3d",
+              "secondary-container": "#00a572",
+              "on-secondary-fixed": "#002113",
+              "on-background": "#dae2fd",
+              "primary-fixed-dim": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "inverse-on-surface": "#283044",
+              "surface-dim": "#0b1326",
+              "surface-variant": "#2d3449",
+              "error": "#ffb4ab",
+              "surface-container": "#171f33",
+              "primary-container": "#4d8eff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "outline-variant": "#424754",
+              "secondary-fixed-dim": "#4edea3",
+              "primary-fixed": "#d8e2ff",
+              "on-primary": "#002e6a",
+              "surface-bright": "#31394d",
+              "on-secondary": "#003824",
+              "surface": "#0b1326",
+              "on-tertiary-container": "#3e2400",
+              "tertiary-fixed-dim": "#ffb95f",
+              "surface-container-lowest": "#060e20",
+              "tertiary": "#ffb95f",
+              "on-tertiary": "#472a00",
+              "outline": "#8c909f",
+              "on-error": "#690005",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#004395",
+              "surface-container-low": "#131b2e",
+              "surface-container-highest": "#2d3449",
+              "on-secondary-container": "#00311f",
+              "secondary": "#4edea3",
+              "tertiary-container": "#ca8100",
+              "surface-tint": "#adc6ff",
+              "inverse-primary": "#005ac2",
+              "on-surface-variant": "#c2c6d6",
+              "tertiary-fixed": "#ffddb8",
+              "background": "#0b1326",
+              "secondary-fixed": "#6ffbbe",
+              "on-primary-fixed": "#001a42"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0b1326;
+            color: #dae2fd;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-header {
+            backdrop-filter: blur(20px);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#0b1326] dark:bg-[#0b1326] shadow-[0_32px_64px_rgba(6,14,32,0.06)]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="Close up portrait of a professional man in a dark suit with a neutral, confident expression, high-end studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmWSn5dpPsZem5VaHOgfH0fWEAnrPvenW7tzUd8EO83pJpDgSnWsGXb-05ibxaL04CaHrHjicMUKGtF0m8VLQb6fHjlQBm9kgqloC1Aw6K37v9GwxCfTJmzLPAcDfpEUyzlNtGmpRYbAzWpZUhw56rHe7S8ROUtqZ0twSlBcYA9siu8c2a7NDtKbv7OrUjfeW0uto5EO4lnpG6qc8gaNJrqi6FfvDDNUMsvVZntLOhEy4XLqL0pKkaSoAOAm6uYch81jD9Clf04EDf"/>
+</div>
+<div class="flex flex-col">
+<span class="text-lg font-bold text-[#dae2fd] tracking-[0.05em] uppercase">Togba Legacy</span>
+<span class="text-[10px] text-primary-fixed-dim tracking-widest uppercase opacity-70">Admin Terminal</span>
+</div>
+</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#1a2337] transition-colors duration-300">
+<span class="material-symbols-outlined text-[#adc6ff]">notifications</span>
+</button>
+</header>
+<main class="mt-24 px-6">
+<!-- Breadcrumb / Header Section -->
+<section class="mb-8">
+<h1 class="font-sans text-[#dae2fd] tracking-tight text-3xl font-extrabold mb-1">Security Console</h1>
+<p class="text-on-surface-variant text-sm opacity-80">Access control and vault encryption protocols</p>
+</section>
+<!-- User Permissions Grid (Asymmetric Bento) -->
+<section class="mb-10">
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-sans text-lg font-bold tracking-tight text-on-surface">Member Permissions</h2>
+<button class="text-primary-fixed-dim text-xs font-bold uppercase tracking-widest flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">add</span> Add Member
+                </button>
+</div>
+<div class="space-y-4">
+<!-- Primary User Card -->
+<div class="bg-surface-container-low rounded-xl p-5 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+</div>
+<div>
+<h3 class="font-bold text-on-surface">Elena Togba</h3>
+<p class="text-xs text-on-surface-variant">Global Trustee</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded-md bg-secondary/10 text-secondary text-[10px] font-bold uppercase tracking-tighter">Full Access</span>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="bg-surface-container-lowest p-3 rounded-lg">
+<p class="text-[10px] uppercase text-on-surface-variant tracking-widest mb-1">Vault Key</p>
+<p class="text-sm font-semibold text-primary">Master Tier</p>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded-lg">
+<p class="text-[10px] uppercase text-on-surface-variant tracking-widest mb-1">Last Sync</p>
+<p class="text-sm font-semibold text-on-surface">2m ago</p>
+</div>
+</div>
+</div>
+<!-- Bento Permissions Grid -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-low rounded-xl p-4 flex flex-col justify-between aspect-square">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-2xl">fingerprint</span>
+<div>
+<h4 class="text-sm font-bold text-on-surface mb-1">Biometrics</h4>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full">
+<div class="h-full w-4/5 bg-secondary rounded-full"></div>
+</div>
+<p class="text-[10px] text-on-surface-variant mt-2">Active Enforcement</p>
+</div>
+</div>
+<div class="bg-surface-container-high rounded-xl p-4 flex flex-col justify-between aspect-square">
+<span class="material-symbols-outlined text-primary text-2xl">lock_open</span>
+<div>
+<h4 class="text-sm font-bold text-on-surface mb-1">Timelock</h4>
+<p class="text-[10px] text-on-surface-variant">24h Execution Delay enabled for transfers.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Security Controls -->
+<section class="mb-10">
+<h2 class="font-sans text-lg font-bold tracking-tight text-on-surface mb-4">Security Protocols</h2>
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<div class="flex items-center justify-between p-4 border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">vpn_key</span>
+<div>
+<p class="text-sm font-medium text-on-surface">Multi-Sig Approval</p>
+<p class="text-xs text-on-surface-variant">Requires 2/3 signatures</p>
+</div>
+</div>
+<div class="w-10 h-5 bg-secondary rounded-full relative p-0.5">
+<div class="w-4 h-4 bg-on-secondary rounded-full translate-x-5"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">location_on</span>
+<div>
+<p class="text-sm font-medium text-on-surface">Geo-Fencing</p>
+<p class="text-xs text-on-surface-variant">Access restricted to London Hub</p>
+</div>
+</div>
+<div class="w-10 h-5 bg-surface-container-highest rounded-full relative p-0.5">
+<div class="w-4 h-4 bg-on-surface-variant rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary">warning</span>
+<div>
+<p class="text-sm font-medium text-on-surface">Dead Man's Switch</p>
+<p class="text-xs text-on-surface-variant">Inactive • Trigger after 90 days</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-xl">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Asset Protection Banner -->
+<section class="mb-10">
+<div class="relative h-32 rounded-xl overflow-hidden">
+<img alt="Server Room" class="w-full h-full object-cover" data-alt="Futuristic dark server room with glowing blue led lights and sleek metallic surfaces, shallow depth of field" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCX5umF-NQ7Gck6zp4mCV45f8TRvPK0BJuL4ZgxD5XVpE7i7jxFRIkqilLFLM1baWzak2KtDVQ2y4tLpPpoYzPV2hS6ioEw66CAqu7_n5QcsU0GeffBphCA2A0yxWpdvtre-XN1KO9jgW5qCpBfy5Wt6GtWUE_mHK_RTUKYDGfQ17-2g6GI-GsgoCtdGkZh8_nRKpvKVP8q4xvmSPfOUoGIv6-YNLd6AxXHYcTxdcTksLM9RiXd2Z-483IYPXoBwLElE7gcf4jzF0fO"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface-container-lowest to-transparent flex flex-col justify-center px-6">
+<p class="text-[10px] uppercase font-bold tracking-widest text-primary mb-1">Cold Storage</p>
+<h3 class="text-lg font-extrabold text-on-surface">Hardware Encryption</h3>
+<button class="mt-2 text-xs font-bold text-on-surface-variant flex items-center gap-1">
+                        View Hardware Logs <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Recent Activity Mini-Feed -->
+<section class="mb-4">
+<h2 class="font-sans text-lg font-bold tracking-tight text-on-surface mb-4">Security Logs</h2>
+<div class="space-y-3">
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-xs">edit</span>
+</div>
+<div class="flex flex-col">
+<p class="text-sm text-on-surface">Elena updated <span class="font-bold">Withdrawal Limits</span></p>
+<p class="text-xs text-on-surface-variant">Today, 09:42 AM</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-error/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-xs text-error">lock</span>
+</div>
+<div class="flex flex-col">
+<p class="text-sm text-on-surface">Account locked due to <span class="font-bold">Failed Login</span></p>
+<p class="text-xs text-on-surface-variant">Yesterday, 11:15 PM • IP 192.168.1.1</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#0b1326]/80 backdrop-blur-xl dark:bg-[#0b1326]/80 shadow-[0_-10px_40px_rgba(6,14,32,0.1)] rounded-t-[16px]">
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50" href="#">
+<span class="material-symbols-outlined mb-1">account_balance</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px]">Vault</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50" href="#">
+<span class="material-symbols-outlined mb-1">trending_up</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px]">Growth</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50" href="#">
+<span class="material-symbols-outlined mb-1">history_edu</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px]">Activity</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#1a2337] text-[#adc6ff] rounded-2xl px-4 py-2" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] text-[10px]">Strategy</span>
+</a>
+</nav>
+</body></html>

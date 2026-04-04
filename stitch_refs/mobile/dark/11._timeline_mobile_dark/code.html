@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#adc6ff",
+              "on-secondary-fixed-variant": "#005236",
+              "on-primary-container": "#00285d",
+              "on-tertiary-fixed": "#2a1700",
+              "inverse-surface": "#dae2fd",
+              "on-error-container": "#ffdad6",
+              "surface-container-high": "#222a3d",
+              "secondary-container": "#00a572",
+              "on-secondary-fixed": "#002113",
+              "on-background": "#dae2fd",
+              "primary-fixed-dim": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "inverse-on-surface": "#283044",
+              "surface-dim": "#0b1326",
+              "surface-variant": "#2d3449",
+              "error": "#ffb4ab",
+              "surface-container": "#171f33",
+              "primary-container": "#4d8eff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "outline-variant": "#424754",
+              "secondary-fixed-dim": "#4edea3",
+              "primary-fixed": "#d8e2ff",
+              "on-primary": "#002e6a",
+              "surface-bright": "#31394d",
+              "on-secondary": "#003824",
+              "surface": "#0b1326",
+              "on-tertiary-container": "#3e2400",
+              "tertiary-fixed-dim": "#ffb95f",
+              "surface-container-lowest": "#060e20",
+              "tertiary": "#ffb95f",
+              "on-tertiary": "#472a00",
+              "outline": "#8c909f",
+              "on-error": "#690005",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#004395",
+              "surface-container-low": "#131b2e",
+              "surface-container-highest": "#2d3449",
+              "on-secondary-container": "#00311f",
+              "secondary": "#4edea3",
+              "tertiary-container": "#ca8100",
+              "surface-tint": "#adc6ff",
+              "inverse-primary": "#005ac2",
+              "on-surface-variant": "#c2c6d6",
+              "tertiary-fixed": "#ffddb8",
+              "background": "#0b1326",
+              "secondary-fixed": "#6ffbbe",
+              "on-primary-fixed": "#001a42"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body selection:bg-primary/30 min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#0b1326] dark:bg-[#0b1326] shadow-[0_32px_64px_rgba(6,14,32,0.06)]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border border-outline-variant/20">
+<img alt="Family Crest" data-alt="Traditional ornate family crest featuring a shield and lion in deep gold and navy blue tones on a dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCt9p9PHluv07uXicMtwPApIJkPx-kgxX-RvXQCmTIDmHZweuUIUTedh26Pi0F_FafsRSiySxssHhylqvjRCTIRTV4ANiQRQeU44oE2Ls6euANToLT43q_4-WlVfza9Ak8lZ_pfdBtG0LcBs3Lr46TYBdZyZHG2PYfXXhniyTqKoUZzzZnhzos2iHpw37oM4ZwD3-kGNtSBVhER7Efy1AprlcrJ7JmUF-zbB8g4SWaPOFyqh9SIctP6EzTB7YFrzC5HRREf70Jia0RP"/>
+</div>
+<h1 class="text-lg font-bold text-[#dae2fd] tracking-[0.05em] uppercase font-sans">Togba Legacy</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#1a2337] transition-colors duration-300 active:opacity-80 transition-all scale-95">
+<span class="material-symbols-outlined text-[#adc6ff]">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 px-6 max-w-2xl mx-auto">
+<!-- Asset Ribbon (Ticker) -->
+<div class="mb-10 overflow-hidden relative">
+<div class="flex gap-4 overflow-x-auto no-scrollbar py-2">
+<div class="flex-none bg-surface-container-lowest rounded-xl px-4 py-2 flex items-center gap-2">
+<span class="text-secondary font-bold">$TOGB</span>
+<span class="text-on-surface-variant label-md">+2.4%</span>
+</div>
+<div class="flex-none bg-surface-container-lowest rounded-xl px-4 py-2 flex items-center gap-2">
+<span class="text-primary font-bold">ESTATE</span>
+<span class="text-on-surface-variant label-md">0.8%</span>
+</div>
+<div class="flex-none bg-surface-container-lowest rounded-xl px-4 py-2 flex items-center gap-2">
+<span class="text-tertiary font-bold">GOLD</span>
+<span class="text-on-surface-variant label-md">-1.2%</span>
+</div>
+</div>
+<div class="absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-background to-transparent pointer-events-none"></div>
+</div>
+<!-- Timeline Title -->
+<section class="mb-8">
+<p class="label-md uppercase tracking-[0.2em] text-primary mb-2">Chronicle</p>
+<h2 class="headline-lg text-[#dae2fd] font-extrabold tracking-tight">The Ancestral Voyage</h2>
+</section>
+<!-- Vertical Timeline Logic -->
+<div class="relative space-y-12">
+<!-- Timeline Path (Conceptual Shadow Line) -->
+<div class="absolute left-4 top-0 bottom-0 w-[2px] bg-gradient-to-b from-primary/40 via-surface-variant to-transparent"></div>
+<!-- Milestone 1: Media Rich -->
+<article class="relative pl-12 group">
+<div class="absolute left-[10px] top-2 w-4 h-4 rounded-full bg-primary ring-4 ring-background z-10"></div>
+<div class="space-y-4">
+<header>
+<time class="text-secondary font-mono text-sm tracking-widest">JUNE 1948</time>
+<h3 class="text-2xl font-bold text-on-surface mt-1">Foundation of the Estate</h3>
+</header>
+<!-- Glassmorphism Card -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden shadow-xl">
+<div class="aspect-video w-full bg-surface-variant relative overflow-hidden">
+<img alt="Vintage Estate" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" data-alt="Black and white historical photograph of a grand manor house with sprawling gardens and misty morning fog in a cinematic style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbkHVqN-nU3zKJEYoLROIhqeyKZh9aqpwaCElGKVhr9MY84LQIlGa4hFYsl3OXUpv3F21PK0Thav8aAEWrz3vZ5G2Tmm_VcbxU_76YrDZQD_70AW9DS2Af4GPg5RLhVNvXtqAunR05452dYMSCzMGTbndaMnYix76dK8zxG_wEls4nUZ5oV1XIPvKxKsikbAp4YLNI4KvbCPK-t3WitzAllBPMC76YAKPt84wg4XsKDrRV-Go2f7nb37LAkKplZ9-DfVMJG-I7ghSb"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent"></div>
+</div>
+<div class="p-6">
+<p class="text-on-surface-variant body-md leading-relaxed">
+                                The original purchase of the Togba hills marked the transition from nomadic trading to permanent regional influence. Secured with a handshake and a chest of solid gold.
+                            </p>
+<div class="mt-4 flex items-center gap-4">
+<button class="flex items-center gap-2 text-primary text-sm font-semibold transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm">article</span>
+                                    VIEW DEED
+                                </button>
+<button class="flex items-center gap-2 text-on-surface-variant text-sm font-semibold transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm">share</span>
+                                    SHARE
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Milestone 2: Asymmetric Content -->
+<article class="relative pl-12">
+<div class="absolute left-[10px] top-2 w-4 h-4 rounded-full bg-surface-variant border-2 border-primary ring-4 ring-background z-10"></div>
+<div class="space-y-4">
+<header>
+<time class="text-on-surface-variant font-mono text-sm tracking-widest">SEPT 1972</time>
+<h3 class="text-2xl font-bold text-on-surface mt-1">The Industrial Expansion</h3>
+</header>
+<div class="grid grid-cols-2 gap-3">
+<div class="h-32 bg-surface-container-high rounded-xl overflow-hidden">
+<img alt="Machinery" class="w-full h-full object-cover" data-alt="Close-up of polished vintage brass and steel machinery gears reflecting cool blue industrial lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVdLfRfyWazvqx4h4GjYoZ5K3T4oKx6i0lsQ7XB5-azPr5yFvUNgv57vA3xQTpU58rHoyPJf37zf-t4DP_ruyho6Ahbsg2KDWxGmqIq9zAmiitR7K9jG5kYTdr1DXXydpUkSNG5xXx0IMSC0ABxrBOdl8QX90pjJZNyB_48TNmGf1MO2AGcWqrIIW6xg-EM6O1GpHYCdMCDujBVMXZJMF9NEN4qtYjZI1dOkSQtqdiwwp2Y1WuJbphG89rbzb3ulQdpZZYoHMigWgN"/>
+</div>
+<div class="h-32 bg-surface-container-high rounded-xl overflow-hidden flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-4xl" data-weight="fill">insights</span>
+</div>
+<div class="col-span-2 bg-surface-container rounded-xl p-5 border-l-4 border-secondary/30">
+<p class="text-on-surface body-md italic font-medium">
+                                "The iron we pull from the earth will be the bones of the cities our children build."
+                            </p>
+<cite class="block mt-2 text-on-surface-variant text-xs uppercase tracking-wider">— Alistair Togba I</cite>
+</div>
+</div>
+</div>
+</article>
+<!-- Milestone 3: Transactional Log Style -->
+<article class="relative pl-12">
+<div class="absolute left-[10px] top-2 w-4 h-4 rounded-full bg-tertiary ring-4 ring-background z-10"></div>
+<div class="space-y-4">
+<header>
+<time class="text-tertiary font-mono text-sm tracking-widest">JAN 2005</time>
+<h3 class="text-2xl font-bold text-on-surface mt-1">Digital Sovereign Shift</h3>
+</header>
+<div class="space-y-2">
+<div class="bg-surface-container-low p-4 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">cloud_done</span>
+</div>
+<div>
+<p class="text-sm font-bold">Archives Encrypted</p>
+<p class="text-xs text-on-surface-variant">L-Protocol Active</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">account_balance</span>
+</div>
+<div>
+<p class="text-sm font-bold">Global Ledger Launch</p>
+<p class="text-xs text-on-surface-variant">42 Active Nodes</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+</div>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- FAB for Timeline Action -->
+<button class="fixed bottom-28 right-6 w-14 h-14 bg-gradient-to-br from-primary to-primary-container rounded-2xl shadow-lg flex items-center justify-center text-on-primary-container active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined text-3xl">add_photo_alternate</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#0b1326]/80 backdrop-blur-xl dark:bg-[#0b1326]/80 rounded-t-[16px] shadow-[0_-10px_40px_rgba(6,14,32,0.1)]">
+<div class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-colors duration-200">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] mt-1">Vault</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-colors duration-200">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] mt-1">Growth</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-[#1a2337] text-[#adc6ff] rounded-2xl px-4 py-2 transition-transform duration-200 ease-out">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] mt-1">Activity</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#c2c6d6] px-4 py-2 hover:bg-[#1a2337]/50 transition-colors duration-200">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-sans label-md uppercase tracking-[0.05em] mt-1">Strategy</span>
+</div>
+</nav>
+</body></html>

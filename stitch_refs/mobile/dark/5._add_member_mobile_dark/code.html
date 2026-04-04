@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Togba Legacy - Add Member</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#adc6ff",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-primary-container": "#00285d",
+                        "on-tertiary-fixed": "#2a1700",
+                        "inverse-surface": "#dae2fd",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-high": "#222a3d",
+                        "secondary-container": "#00a572",
+                        "on-secondary-fixed": "#002113",
+                        "on-background": "#dae2fd",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-surface": "#dae2fd",
+                        "inverse-on-surface": "#283044",
+                        "surface-dim": "#0b1326",
+                        "surface-variant": "#2d3449",
+                        "error": "#ffb4ab",
+                        "surface-container": "#171f33",
+                        "primary-container": "#4d8eff",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "outline-variant": "#424754",
+                        "secondary-fixed-dim": "#4edea3",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary": "#002e6a",
+                        "surface-bright": "#31394d",
+                        "on-secondary": "#003824",
+                        "surface": "#0b1326",
+                        "on-tertiary-container": "#3e2400",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "surface-container-lowest": "#060e20",
+                        "tertiary": "#ffb95f",
+                        "on-tertiary": "#472a00",
+                        "outline": "#8c909f",
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "on-primary-fixed-variant": "#004395",
+                        "surface-container-low": "#131b2e",
+                        "surface-container-highest": "#2d3449",
+                        "on-secondary-container": "#00311f",
+                        "secondary": "#4edea3",
+                        "tertiary-container": "#ca8100",
+                        "surface-tint": "#adc6ff",
+                        "inverse-primary": "#005ac2",
+                        "on-surface-variant": "#c2c6d6",
+                        "tertiary-fixed": "#ffddb8",
+                        "background": "#0b1326",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-primary-fixed": "#001a42"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0b1326;
+            color: #dae2fd;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col">
+<!-- Top Navigation Header -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#0b1326] shadow-[0_32px_64px_rgba(6,14,32,0.06)]">
+<div class="flex items-center gap-4">
+<button class="text-[#adc6ff] active:opacity-80 transition-all">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h1 class="text-lg font-bold text-[#dae2fd] tracking-[0.05em] uppercase">Togba Legacy</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-sm font-medium text-[#adc6ff]">Step 2 of 4</span>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 mt-16 px-6 pb-24 pt-8">
+<!-- Progress Indicator -->
+<div class="flex gap-1.5 mb-10 h-1">
+<div class="flex-1 bg-primary rounded-full"></div>
+<div class="flex-1 bg-primary rounded-full"></div>
+<div class="flex-1 bg-surface-variant rounded-full"></div>
+<div class="flex-1 bg-surface-variant rounded-full"></div>
+</div>
+<!-- Headline Section -->
+<div class="mb-10">
+<h2 class="text-[2rem] font-bold leading-tight text-on-surface tracking-tight mb-3">Member Identity</h2>
+<p class="text-on-surface-variant body-md max-w-[280px]">Define the administrative role and generational tier within the family vault.</p>
+</div>
+<!-- Form Section: Asymmetric Layout -->
+<div class="space-y-8">
+<!-- Identity Selection (Bento-style selection) -->
+<div class="grid grid-cols-2 gap-4">
+<div class="col-span-2 surface-container-low rounded-xl p-5 border-2 border-primary">
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+</div>
+<span class="material-symbols-outlined text-primary">check_circle</span>
+</div>
+<p class="label-md uppercase tracking-[0.05em] text-primary mb-1">Active</p>
+<h3 class="text-xl font-bold text-on-surface">Vault Guardian</h3>
+<p class="text-sm text-on-surface-variant mt-2">Full administrative access to assets, documents, and historical ledgers.</p>
+</div>
+<div class="surface-container-lowest rounded-xl p-5 hover:bg-surface-container-low transition-colors duration-300">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-on-surface-variant">visibility</span>
+</div>
+<h3 class="font-bold text-on-surface">Observer</h3>
+<p class="text-xs text-on-surface-variant mt-2">Read-only transparency.</p>
+</div>
+<div class="surface-container-lowest rounded-xl p-5 hover:bg-surface-container-low transition-colors duration-300">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-on-surface-variant">history_edu</span>
+</div>
+<h3 class="font-bold text-on-surface">Beneficiary</h3>
+<p class="text-xs text-on-surface-variant mt-2">Conditional access rights.</p>
+</div>
+</div>
+<!-- Input Fields -->
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Legal Full Name</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl px-5 py-4 text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none" type="text" value="Alexander Togba IV"/>
+</div>
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Secure Email Access</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl px-5 py-4 text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="alex@togbalegacy.com" type="email"/>
+</div>
+</div>
+<!-- Profile Image Section (Institutional Aesthetic) -->
+<div class="surface-container-low rounded-xl p-6 flex items-center gap-5">
+<div class="relative">
+<img alt="Member Avatar" class="w-16 h-16 rounded-full object-cover grayscale brightness-90" data-alt="Close-up portrait of a professional man in a dark suit with soft cinematic lighting and a deep blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCo5UEr5wTfYYxj245yuICdpctLzm6INJzYdyXgkDX_VdW2vCr1Ov9pD8nMMnLIll98K3bibOm2VfR6vC5Unr40wIu70N5LRX_xEskoakA1VzEs8NOqzTgHqjiUCYb9RZa9dL25YiextWcIZea6gc_1HAVpkDOwNnt0cWcgE2rCZrnF7gSYnlVm8hlxah4yduzygGFlfC_dFctHNpdy4ixU-LNSQzUw4O7QfT2x2pbkAIwjKPoZ5zORoPlLDdOkbEfPxS0llPLGDCIV"/>
+<div class="absolute -bottom-1 -right-1 bg-primary text-on-primary-container w-6 h-6 rounded-full flex items-center justify-center border-2 border-surface">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'wght' 700;">edit</span>
+</div>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Biometric ID Photo</h4>
+<p class="text-xs text-on-surface-variant">Required for hardware vault access</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Actions Container -->
+<div class="fixed bottom-0 left-0 w-full px-6 py-6 bg-[#0b1326]/80 backdrop-blur-xl flex flex-col gap-4">
+<button class="w-full h-14 bg-gradient-to-r from-primary to-primary-container rounded-xl flex items-center justify-center gap-2 text-on-primary-container font-bold text-lg shadow-[0_10px_30px_rgba(77,142,255,0.2)] active:scale-95 transition-all">
+            Continue Registration
+            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="w-full py-2 text-on-surface-variant text-sm font-medium active:opacity-60 transition-opacity">
+            Save Draft &amp; Exit
+        </button>
+</div>
+<!-- Background Decoration (Subtle Glows) -->
+<div class="fixed top-[-10%] right-[-20%] w-[80%] h-[50%] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+<div class="fixed bottom-[-5%] left-[-10%] w-[60%] h-[40%] bg-secondary/5 blur-[100px] rounded-full pointer-events-none -z-10"></div>
+</body></html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Togba Legacy - Secure Access</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#adc6ff",
+              "on-secondary-fixed-variant": "#005236",
+              "on-primary-container": "#00285d",
+              "on-tertiary-fixed": "#2a1700",
+              "inverse-surface": "#dae2fd",
+              "on-error-container": "#ffdad6",
+              "surface-container-high": "#222a3d",
+              "secondary-container": "#00a572",
+              "on-secondary-fixed": "#002113",
+              "on-background": "#dae2fd",
+              "primary-fixed-dim": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "inverse-on-surface": "#283044",
+              "surface-dim": "#0b1326",
+              "surface-variant": "#2d3449",
+              "error": "#ffb4ab",
+              "surface-container": "#171f33",
+              "primary-container": "#4d8eff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "outline-variant": "#424754",
+              "secondary-fixed-dim": "#4edea3",
+              "primary-fixed": "#d8e2ff",
+              "on-primary": "#002e6a",
+              "surface-bright": "#31394d",
+              "on-secondary": "#003824",
+              "surface": "#0b1326",
+              "on-tertiary-container": "#3e2400",
+              "tertiary-fixed-dim": "#ffb95f",
+              "surface-container-lowest": "#060e20",
+              "tertiary": "#ffb95f",
+              "on-tertiary": "#472a00",
+              "outline": "#8c909f",
+              "on-error": "#690005",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#004395",
+              "surface-container-low": "#131b2e",
+              "surface-container-highest": "#2d3449",
+              "on-secondary-container": "#00311f",
+              "secondary": "#4edea3",
+              "tertiary-container": "#ca8100",
+              "surface-tint": "#adc6ff",
+              "inverse-primary": "#005ac2",
+              "on-surface-variant": "#c2c6d6",
+              "tertiary-fixed": "#ffddb8",
+              "background": "#0b1326",
+              "secondary-fixed": "#6ffbbe",
+              "on-primary-fixed": "#001a42"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .vault-gradient {
+            background: linear-gradient(135deg, #adc6ff 0%, #4d8eff 100%);
+        }
+        .glass-panel {
+            background: rgba(45, 52, 73, 0.4);
+            backdrop-filter: blur(16px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen flex flex-col items-center justify-center overflow-hidden">
+<!-- Top Glow Background -->
+<div class="fixed top-[-20%] left-[-10%] w-[120%] h-[60%] rounded-full bg-primary/5 blur-[120px] pointer-events-none"></div>
+<main class="w-full max-w-md px-8 relative z-10 flex flex-col items-center">
+<!-- Logo Branding -->
+<div class="mb-12 text-center">
+<div class="w-20 h-20 mx-auto mb-6 flex items-center justify-center rounded-2xl bg-surface-container-highest relative group">
+<div class="absolute inset-0 rounded-2xl bg-primary/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="shield_lock" style="font-variation-settings: 'FILL' 1;">shield_lock</span>
+</div>
+<h1 class="font-headline text-3xl font-extrabold tracking-tight text-on-surface mb-2">Togba Legacy</h1>
+<p class="font-body text-on-surface-variant text-sm tracking-wide">SECURE ACCESS GATEWAY</p>
+</div>
+<!-- Identity Section (The Sovereign Vault Aesthetic) -->
+<div class="w-full space-y-8">
+<div class="text-center space-y-2">
+<h2 class="text-xl font-semibold text-on-surface">Verification Required</h2>
+<p class="text-on-surface-variant body-md max-w-[280px] mx-auto">Please enter the one-time vault key sent to your registered device.</p>
+</div>
+<!-- OTP Input Field Logic -->
+<div class="flex justify-between gap-3 px-2">
+<input class="w-14 h-16 text-center text-2xl font-bold bg-surface-container-highest rounded-xl border-none ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-primary focus:bg-surface-container-high transition-all text-on-surface" maxlength="1" placeholder="•" type="text"/>
+<input class="w-14 h-16 text-center text-2xl font-bold bg-surface-container-highest rounded-xl border-none ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-primary focus:bg-surface-container-high transition-all text-on-surface" maxlength="1" placeholder="•" type="text"/>
+<input class="w-14 h-16 text-center text-2xl font-bold bg-surface-container-highest rounded-xl border-none ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-primary focus:bg-surface-container-high transition-all text-on-surface" maxlength="1" placeholder="•" type="text"/>
+<input class="w-14 h-16 text-center text-2xl font-bold bg-surface-container-highest rounded-xl border-none ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-primary focus:bg-surface-container-high transition-all text-on-surface" maxlength="1" placeholder="•" type="text"/>
+</div>
+<!-- Action Buttons -->
+<div class="space-y-4 pt-4">
+<button class="vault-gradient w-full py-4 rounded-xl text-on-primary-container font-bold text-lg shadow-2xl shadow-primary/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+<span>Unlock Vault</span>
+<span class="material-symbols-outlined text-xl" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="w-full py-4 rounded-xl text-primary-fixed-dim font-medium text-sm hover:bg-surface-variant/20 transition-colors flex items-center justify-center gap-2">
+<span>Request New Key</span>
+<span class="material-symbols-outlined text-lg" data-icon="refresh">refresh</span>
+</button>
+</div>
+</div>
+<!-- Security Badge Container -->
+<div class="mt-16 w-full flex items-center justify-center gap-6 px-6 py-4 rounded-2xl bg-surface-container-low/50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="verified_user" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">256-Bit Encrypted</span>
+</div>
+<div class="w-px h-4 bg-outline-variant/20"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="fingerprint">fingerprint</span>
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Biometric Ready</span>
+</div>
+</div>
+</main>
+<!-- Footer Meta -->
+<footer class="fixed bottom-8 text-center w-full px-8">
+<p class="text-[11px] text-on-surface-variant opacity-60 max-w-[240px] mx-auto leading-relaxed">
+            Authorized access only. All sessions within Togba Legacy are monitored and recorded for institutional security.
+        </p>
+</footer>
+<!-- Decorative Bottom Glow -->
+<div class="fixed bottom-[-10%] right-[-10%] w-[80%] h-[40%] rounded-full bg-secondary/5 blur-[100px] pointer-events-none"></div>
+</body></html>
