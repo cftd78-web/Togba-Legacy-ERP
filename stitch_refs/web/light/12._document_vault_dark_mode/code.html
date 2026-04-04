@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Togba Legacy | Document Vault</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#31394d",
+              "secondary-fixed": "#6ffbbe",
+              "inverse-primary": "#005ac2",
+              "surface-container-low": "#131b2e",
+              "inverse-on-surface": "#283044",
+              "on-primary": "#002e6a",
+              "secondary": "#4edea3",
+              "on-secondary": "#003824",
+              "on-error-container": "#ffdad6",
+              "error": "#ffb4ab",
+              "on-primary-fixed": "#001a42",
+              "on-tertiary-fixed": "#2a1700",
+              "primary-container": "#4d8eff",
+              "surface": "#0b1326",
+              "on-tertiary": "#472a00",
+              "surface-variant": "#2d3449",
+              "outline": "#8c909f",
+              "on-primary-container": "#00285d",
+              "inverse-surface": "#dae2fd",
+              "surface-container": "#171f33",
+              "on-secondary-fixed": "#002113",
+              "error-container": "#93000a",
+              "on-secondary-container": "#00311f",
+              "surface-container-lowest": "#060e20",
+              "on-secondary-fixed-variant": "#005236",
+              "surface-dim": "#0b1326",
+              "on-primary-fixed-variant": "#004395",
+              "primary": "#adc6ff",
+              "secondary-fixed-dim": "#4edea3",
+              "on-background": "#dae2fd",
+              "surface-container-highest": "#2d3449",
+              "outline-variant": "#424754",
+              "tertiary-fixed": "#ffddb8",
+              "surface-container-high": "#222a3d",
+              "on-surface-variant": "#c2c6d6",
+              "surface-tint": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "on-error": "#690005",
+              "primary-fixed": "#d8e2ff",
+              "tertiary": "#ffb95f",
+              "tertiary-container": "#ca8100",
+              "tertiary-fixed-dim": "#ffb95f",
+              "secondary-container": "#00a572",
+              "primary-fixed-dim": "#adc6ff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "on-tertiary-container": "#3e2400",
+              "background": "#0b1326"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        background-color: #0b1326;
+        color: #dae2fd;
+        font-family: 'Inter', sans-serif;
+      }
+      .glass-effect {
+        backdrop-filter: blur(12px);
+        background: rgba(49, 57, 77, 0.8);
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+</head>
+<body class="bg-surface selection:bg-primary/30 selection:text-primary">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 flex flex-col bg-[#0b1326] shadow-2xl shadow-black/20 border-r border-transparent px-4 py-6 overflow-y-auto z-50">
+<div class="mb-10 px-2">
+<h1 class="text-xl font-bold tracking-tighter text-[#dae2fd]">Togba Legacy</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-[#adc6ff] mt-1 font-semibold opacity-70">The Sovereign Vault</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium tracking-tight text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-medium tracking-tight text-sm">Family Registry</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-medium tracking-tight text-sm">Contributions &amp; Finance</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-medium tracking-tight text-sm">Investment Allocation</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-medium tracking-tight text-sm">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">how_to_vote</span>
+<span class="font-medium tracking-tight text-sm">Governance / Voting</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">mail</span>
+<span class="font-medium tracking-tight text-sm">Messaging</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-medium tracking-tight text-sm">Timeline</span>
+</a>
+<!-- Active Navigation Item: Documents -->
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#adc6ff] font-semibold bg-[#1a2337] rounded-lg group scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-medium tracking-tight text-sm">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">emergency</span>
+<span class="font-medium tracking-tight text-sm">SOS / Emergency</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium tracking-tight text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6">
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-medium tracking-tight text-sm">Profile</span>
+</a>
+</div>
+</aside>
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 ml-64 bg-transparent backdrop-blur-md">
+<div class="flex items-center gap-4">
+<nav class="flex items-center text-xs tracking-wide font-['Inter']">
+<span class="text-[#c2c6d6] hover:text-[#dae2fd] transition-all cursor-pointer">Vault</span>
+<span class="material-symbols-outlined text-[14px] mx-2 text-outline">chevron_right</span>
+<span class="text-[#adc6ff] font-bold">Archives</span>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container rounded-full text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder:text-outline-variant" placeholder="Search the Vault..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-[#c2c6d6]">
+<button class="material-symbols-outlined hover:text-[#dae2fd] transition-all opacity-80 hover:opacity-100">notifications</button>
+<button class="px-4 py-1.5 bg-error-container text-on-error-container text-xs font-bold rounded-lg hover:brightness-110 transition-all">SOS</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img class="h-full w-full object-cover" data-alt="close-up portrait of a mature man with a composed expression and grey beard in professional office lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJ0MbVM_rydGQQXTVVBdvmznp1SAqYclnmYqqE4fxZ-CkFM6WCX-nSVpv__hSZGXYqXhsep_oyPV4coYPSnafFfE8JrGDlcFbluaF6se-57eJXnGQ7L5kEkgEXbFP3AYOABksVtbHWHe9UP5Lee_mutOtcPqP5pzCgf4qJDoosthV8w-EQgTcAhgFVf5jINaFYVdqjzZLtkscy4Tdi8rH8Wq0SWFdyizSCRgpa9K3EAE8rcpQf425PTLVbmiXKmdZFXOq33S8w6avO"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-8 min-h-screen">
+<div class="max-w-7xl mx-auto">
+<!-- Header & Storage Ribbon -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
+<div>
+<h2 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Document Vault</h2>
+<p class="text-on-surface-variant max-w-xl">Centralized repository for the Togba Family's sovereign assets, legal frameworks, and historical identities. Secured with quantum-resistant encryption.</p>
+</div>
+<div class="w-full md:w-80 bg-surface-container-low p-5 rounded-xl border-l-4 border-primary shadow-xl">
+<div class="flex justify-between items-center mb-3">
+<span class="text-xs font-bold uppercase tracking-widest text-[#adc6ff]">Vault Capacity</span>
+<span class="text-sm font-semibold text-on-surface">64% Full</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container w-[64%]"></div>
+</div>
+<div class="mt-3 flex justify-between text-[10px] text-on-surface-variant font-medium">
+<span>1.28 TB Used</span>
+<span>2.00 TB Total</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Hierarchy -->
+<div class="grid grid-cols-12 gap-6 mb-12">
+<!-- Main Folders -->
+<div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Legal Folder -->
+<div class="bg-surface-container hover:bg-surface-container-high transition-all duration-300 rounded-xl p-6 flex flex-col group cursor-pointer shadow-lg shadow-black/5">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-primary/10 rounded-lg text-primary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">gavel</span>
+</div>
+<button class="text-outline-variant hover:text-on-surface"><span class="material-symbols-outlined">more_vert</span></button>
+</div>
+<h3 class="text-lg font-bold text-on-surface mb-1">Legal</h3>
+<p class="text-xs text-on-surface-variant mb-4">Trusts, Wills, &amp; Entity Filings</p>
+<div class="mt-auto pt-4 border-t border-outline-variant/10 flex justify-between items-center">
+<span class="text-[10px] font-bold text-outline uppercase tracking-wider">142 Files</span>
+<span class="material-symbols-outlined text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</div>
+</div>
+<!-- Finance Folder -->
+<div class="bg-surface-container hover:bg-surface-container-high transition-all duration-300 rounded-xl p-6 flex flex-col group cursor-pointer shadow-lg shadow-black/5">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-secondary/10 rounded-lg text-secondary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+<button class="text-outline-variant hover:text-on-surface"><span class="material-symbols-outlined">more_vert</span></button>
+</div>
+<h3 class="text-lg font-bold text-on-surface mb-1">Finance</h3>
+<p class="text-xs text-on-surface-variant mb-4">Tax Records &amp; Portfolios</p>
+<div class="mt-auto pt-4 border-t border-outline-variant/10 flex justify-between items-center">
+<span class="text-[10px] font-bold text-outline uppercase tracking-wider">892 Files</span>
+<span class="material-symbols-outlined text-sm text-secondary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</div>
+</div>
+<!-- Identity Folder -->
+<div class="bg-surface-container hover:bg-surface-container-high transition-all duration-300 rounded-xl p-6 flex flex-col group cursor-pointer shadow-lg shadow-black/5">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-tertiary/10 rounded-lg text-tertiary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">badge</span>
+</div>
+<button class="text-outline-variant hover:text-on-surface"><span class="material-symbols-outlined">more_vert</span></button>
+</div>
+<h3 class="text-lg font-bold text-on-surface mb-1">Identity</h3>
+<p class="text-xs text-on-surface-variant mb-4">Passports &amp; Credentials</p>
+<div class="mt-auto pt-4 border-t border-outline-variant/10 flex justify-between items-center">
+<span class="text-[10px] font-bold text-outline uppercase tracking-wider">34 Files</span>
+<span class="material-symbols-outlined text-sm text-tertiary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- Action Hub / Quick Upload -->
+<div class="col-span-12 lg:col-span-4 bg-gradient-to-br from-surface-container-high to-surface-container rounded-xl p-8 flex flex-col justify-center border border-primary/10 shadow-2xl relative overflow-hidden">
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="relative z-10 text-center">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(173,198,255,0.3)]">
+<span class="material-symbols-outlined text-3xl text-on-primary-container">cloud_upload</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-2">Secure Deposit</h3>
+<p class="text-sm text-on-surface-variant mb-8">Drag files here to encrypt and store in the sovereign vault.</p>
+<button class="w-full py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-bold rounded-xl hover:scale-[1.02] transition-transform active:scale-95 shadow-lg">
+                            New Upload
+                        </button>
+</div>
+</div>
+</div>
+<!-- Recent Documents Section -->
+<div class="bg-surface-container-low rounded-2xl overflow-hidden shadow-2xl">
+<div class="px-8 py-6 flex justify-between items-center border-b border-outline-variant/5">
+<h3 class="text-xl font-bold text-on-surface">Recent Documents</h3>
+<div class="flex gap-2">
+<button class="p-2 text-on-surface-variant hover:text-on-surface bg-surface-container-highest rounded-lg transition-colors"><span class="material-symbols-outlined">grid_view</span></button>
+<button class="p-2 text-primary bg-surface-container-high rounded-lg transition-colors"><span class="material-symbols-outlined">list</span></button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container-lowest/50 text-[10px] uppercase tracking-widest text-outline">
+<th class="px-8 py-4 font-bold">Document Name</th>
+<th class="px-8 py-4 font-bold">Category</th>
+<th class="px-8 py-4 font-bold">Modified</th>
+<th class="px-8 py-4 font-bold text-right">Size</th>
+<th class="px-8 py-4 font-bold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<!-- File 1: PDF -->
+<tr class="hover:bg-surface-container-high/40 transition-colors cursor-pointer group">
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-error/10 flex items-center justify-center text-error">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">picture_as_pdf</span>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface">Q3_Wealth_Report_2023.pdf</div>
+<div class="text-[10px] text-on-surface-variant font-medium">Internal Ledger • Togba Capital</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-5">
+<span class="px-3 py-1 bg-secondary/10 text-secondary text-[10px] font-bold rounded-full uppercase tracking-tighter">Finance</span>
+</td>
+<td class="px-8 py-5 text-sm text-on-surface-variant">2 hours ago</td>
+<td class="px-8 py-5 text-sm text-on-surface-variant text-right">12.4 MB</td>
+<td class="px-8 py-5 text-right">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors">download</button>
+</td>
+</tr>
+<!-- File 2: Identity -->
+<tr class="hover:bg-surface-container-high/40 transition-colors cursor-pointer group">
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">image</span>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface">Passport_Scan_Marcus.png</div>
+<div class="text-[10px] text-on-surface-variant font-medium">ID Records • Global Access</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-5">
+<span class="px-3 py-1 bg-tertiary/10 text-tertiary text-[10px] font-bold rounded-full uppercase tracking-tighter">Identity</span>
+</td>
+<td class="px-8 py-5 text-sm text-on-surface-variant">Yesterday</td>
+<td class="px-8 py-5 text-sm text-on-surface-variant text-right">4.8 MB</td>
+<td class="px-8 py-5 text-right">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors">visibility</button>
+</td>
+</tr>
+<!-- File 3: Spreadsheet -->
+<tr class="hover:bg-surface-container-high/40 transition-colors cursor-pointer group">
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">table_chart</span>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface">Asset_Allocation_Master_Sheet.xlsx</div>
+<div class="text-[10px] text-on-surface-variant font-medium">Real Estate • Diversified</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-5">
+<span class="px-3 py-1 bg-secondary/10 text-secondary text-[10px] font-bold rounded-full uppercase tracking-tighter">Finance</span>
+</td>
+<td class="px-8 py-5 text-sm text-on-surface-variant">Oct 12, 2023</td>
+<td class="px-8 py-5 text-sm text-on-surface-variant text-right">24.1 MB</td>
+<td class="px-8 py-5 text-right">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors">download</button>
+</td>
+</tr>
+<!-- File 4: Legal -->
+<tr class="hover:bg-surface-container-high/40 transition-colors cursor-pointer group">
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history_edu</span>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface">Family_Charter_Amendment_v4.docx</div>
+<div class="text-[10px] text-on-surface-variant font-medium">Governance • Notarized</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-5">
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase tracking-tighter">Legal</span>
+</td>
+<td class="px-8 py-5 text-sm text-on-surface-variant">Oct 08, 2023</td>
+<td class="px-8 py-5 text-sm text-on-surface-variant text-right">1.2 MB</td>
+<td class="px-8 py-5 text-right">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors">share</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Asset Ribbon (Horizontal Tickers) -->
+<div class="mt-12 bg-surface-container-lowest rounded-xl p-4 overflow-hidden relative">
+<div class="flex items-center gap-8 whitespace-nowrap animate-marquee">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-outline uppercase">Network Status</span>
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_#4edea3]"></div>
+<span class="text-xs font-bold text-on-surface">End-to-End Encrypted</span>
+</div>
+<div class="w-px h-4 bg-outline-variant opacity-20"></div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-outline uppercase">Last Audit</span>
+<span class="text-xs font-bold text-on-surface">Sept 28, 2023</span>
+</div>
+<div class="w-px h-4 bg-outline-variant opacity-20"></div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-outline uppercase">Redundancy nodes</span>
+<span class="text-xs font-bold text-on-surface">3 Active (Geneva, Singapore, NY)</span>
+</div>
+<div class="w-px h-4 bg-outline-variant opacity-20"></div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-outline uppercase">IPFS Peer ID</span>
+<span class="text-xs font-mono text-primary truncate w-48">QmXoypizjW3WknFiJnKLwHC...</span>
+</div>
+</div>
+<div class="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-surface-container-lowest to-transparent pointer-events-none"></div>
+<div class="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-surface-container-lowest to-transparent pointer-events-none"></div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Only on specific screens, but relevant here for New Folder/Upload) -->
+<button class="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-tr from-primary to-primary-container rounded-full flex items-center justify-center text-on-primary-container shadow-2xl hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</body></html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Governance Voting Interface | Togba Legacy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#31394d",
+              "secondary-fixed": "#6ffbbe",
+              "inverse-primary": "#005ac2",
+              "surface-container-low": "#131b2e",
+              "inverse-on-surface": "#283044",
+              "on-primary": "#002e6a",
+              "secondary": "#4edea3",
+              "on-secondary": "#003824",
+              "on-error-container": "#ffdad6",
+              "error": "#ffb4ab",
+              "on-primary-fixed": "#001a42",
+              "on-tertiary-fixed": "#2a1700",
+              "primary-container": "#4d8eff",
+              "surface": "#0b1326",
+              "on-tertiary": "#472a00",
+              "surface-variant": "#2d3449",
+              "outline": "#8c909f",
+              "on-primary-container": "#00285d",
+              "inverse-surface": "#dae2fd",
+              "surface-container": "#171f33",
+              "on-secondary-fixed": "#002113",
+              "error-container": "#93000a",
+              "on-secondary-container": "#00311f",
+              "surface-container-lowest": "#060e20",
+              "on-secondary-fixed-variant": "#005236",
+              "surface-dim": "#0b1326",
+              "on-primary-fixed-variant": "#004395",
+              "primary": "#adc6ff",
+              "secondary-fixed-dim": "#4edea3",
+              "on-background": "#dae2fd",
+              "surface-container-highest": "#2d3449",
+              "outline-variant": "#424754",
+              "tertiary-fixed": "#ffddb8",
+              "surface-container-high": "#222a3d",
+              "on-surface-variant": "#c2c6d6",
+              "surface-tint": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "on-error": "#690005",
+              "primary-fixed": "#d8e2ff",
+              "tertiary": "#ffb95f",
+              "tertiary-container": "#ca8100",
+              "tertiary-fixed-dim": "#ffb95f",
+              "secondary-container": "#00a572",
+              "primary-fixed-dim": "#adc6ff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "on-tertiary-container": "#3e2400",
+              "background": "#0b1326"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #0b1326; }
+      ::-webkit-scrollbar-thumb { background: #2d3449; border-radius: 10px; }
+      .glass-card {
+        background: rgba(23, 31, 51, 0.7);
+        backdrop-filter: blur(12px);
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full overflow-y-auto px-4 py-6 h-screen w-64 flex flex-col border-r border-transparent bg-[#060e20] shadow-2xl shadow-black/20 z-50">
+<div class="mb-10 px-2">
+<h1 class="text-xl font-bold tracking-tighter text-[#dae2fd]">Togba Legacy</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-primary/60 mt-1">The Sovereign Vault</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+                Family Registry
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+                Contributions &amp; Finance
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+                Investment Allocation
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+                Projects
+            </a>
+<!-- Active Tab: Governance / Voting -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#adc6ff] font-semibold bg-[#1a2337] rounded-lg font-['Inter'] tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="how_to_vote" style="font-variation-settings: 'FILL' 1;">how_to_vote</span>
+                Governance / Voting
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+                Messaging
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+                Timeline
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+                Documents
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="emergency">emergency</span>
+                SOS / Emergency
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/10">
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+                Profile
+            </a>
+</div>
+</aside>
+<!-- TopAppBar Shell -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 ml-64 bg-transparent backdrop-blur-md text-[#adc6ff] font-['Inter'] text-sm tracking-wide">
+<div class="flex items-center gap-4">
+<div class="flex items-center text-on-surface-variant gap-2 text-xs">
+<span>Vault</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-[#adc6ff] font-bold">Governance / Voting</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="opacity-80 hover:opacity-100 transition-all">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="opacity-80 hover:opacity-100 transition-all relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-tertiary rounded-full"></span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="User Profile" data-alt="professional portrait of an executive male in his 50s with silvering hair and dark business suit against a dark grey background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCD07CW_SVoWQwzm72xRi_d1_0b3AXGkTXhjXYWO8OxBMDnmd3Es-Cq32qLqoe3qjNO1hr43sM66WIapFRQXYE4mXq8FKi9X0tbugNt0eZgA14p0qsG-hPN8sDpLLgioN8UCIKq-QCbezqaIvQDh-BO3K0a7Ztu_VN9IHdvmoOVyoiDJv2bWxPKT5Jazj6JguUAad5HXLaxmoZfLaGH82LwhL83VduMQTzV-uWy8Sx5631TUYAHbNVOdw8ra5Kocsuv-Fd5l8RuK6RE"/>
+</div>
+<button class="bg-error-container/20 text-error px-4 py-1.5 rounded-full text-xs font-bold tracking-widest border border-error/20 hover:bg-error-container/40 transition-colors">
+                SOS
+            </button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-8 min-h-screen">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
+<div>
+<h2 class="text-4xl font-extrabold tracking-tighter text-on-surface mb-2">Governance Dashboard</h2>
+<p class="text-on-surface-variant max-w-xl">Unified control for family constitutional amendments, major liquidations, and sovereign trust management.</p>
+</div>
+<div class="bg-surface-container-low px-6 py-4 rounded-xl flex items-center gap-8 shadow-sm">
+<div>
+<span class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Your Voting Power</span>
+<span class="text-2xl font-bold text-primary">12.4% <span class="text-xs font-normal text-on-surface-variant/60 ml-1">(2,480 Units)</span></span>
+</div>
+<div class="h-10 w-[1px] bg-outline-variant/20"></div>
+<div>
+<span class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Active Proposals</span>
+<span class="text-2xl font-bold text-on-surface">04</span>
+</div>
+</div>
+</div>
+<!-- Proposals Grid (Asymmetric Bento-ish Layout) -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Featured Proposal: Trust Amendment -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-low rounded-xl overflow-hidden shadow-black/10 border-none relative group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-50"></div>
+<div class="p-8 relative z-10 h-full flex flex-col">
+<div class="flex justify-between items-start mb-8">
+<div>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4 inline-block">High Priority</span>
+<h3 class="text-2xl font-bold text-on-surface">Trust Amendment: Multi-Sig Threshold Extension</h3>
+<p class="text-on-surface-variant mt-2 max-w-lg leading-relaxed">Proposal to increase the signature requirement for assets exceeding $50M from 3 of 5 to 4 of 7 family trustees to bolster security for the Generation 3 legacy accounts.</p>
+</div>
+<div class="text-right">
+<span class="block text-xs text-on-surface-variant mb-1">Closing in:</span>
+<span class="text-xl font-mono text-tertiary">42:15:08</span>
+</div>
+</div>
+<div class="mt-auto space-y-6">
+<!-- Progress Visual -->
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-semibold">
+<span class="text-secondary uppercase tracking-wider">In Favor (68%)</span>
+<span class="text-error uppercase tracking-wider">Opposed (22%)</span>
+</div>
+<div class="h-3 w-full bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="h-full bg-secondary" style="width: 68%"></div>
+<div class="h-full bg-surface-variant/40" style="width: 10%"></div>
+<div class="h-full bg-error" style="width: 22%"></div>
+</div>
+<div class="flex justify-between text-[10px] text-on-surface-variant/60 uppercase tracking-widest">
+<span>Quorum Reached</span>
+<span>10% Abstain</span>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="flex-1 py-4 px-6 rounded-xl bg-gradient-to-br from-secondary to-secondary-container text-on-secondary font-bold tracking-wide hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                Vote in Favor
+                            </button>
+<button class="flex-1 py-4 px-6 rounded-xl border border-outline-variant/30 text-on-surface hover:bg-surface-variant/20 transition-all font-bold tracking-wide flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="cancel">cancel</span>
+                                Cast Opposition
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Sidebar Stat: Participation -->
+<div class="col-span-12 lg:col-span-4 glass-card rounded-xl p-8 border border-outline-variant/10 flex flex-col justify-between">
+<div>
+<h4 class="text-lg font-bold mb-6">Participation Health</h4>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant text-sm">Family Quorum</span>
+<span class="text-secondary text-sm font-bold">Met (82%)</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant text-sm">Direct Votes</span>
+<span class="text-on-surface text-sm font-bold">14 Entities</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant text-sm">Delegated Votes</span>
+<span class="text-on-surface text-sm font-bold">06 Entities</span>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-8 border-t border-outline-variant/10">
+<img alt="Data visualization" class="rounded-lg h-32 w-full object-cover opacity-60 grayscale" data-alt="close up of a digital screen showing a high-tech financial dashboard with glowing blue and green data points and charts in a dark room" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzZ-406WreG0TSVZCzrZwvoTXWNjZ-78bR3s5ffRXQ39irxqx_Ap7XTbPVIrw8PL2c1dq6fPmDouTCF8KfQfhuSB11-c-w7U29cV8UUqvYhzk5_4c1SrM-cGRgCwGUG8WpkYsMCah38yZR4q0BlWgCcq7MAsAcAIXVwtZtGesVkU8PRhaMU_Q52hnZq4f8SnYor9zCQVHRBgPxBiZIKGoU7vNUl3yaqdc3sTZZjT2CswwzU_9AlN8IvDMmccW6EkXoLRpG5FDvN9YN"/>
+<p class="text-[10px] text-on-surface-variant mt-4 text-center italic">Governance score is 12% higher than last quarter.</p>
+</div>
+</div>
+<!-- Proposal: Asset Liquidation -->
+<div class="col-span-12 md:col-span-6 bg-surface-container rounded-xl p-6 border-none group hover:bg-surface-container-high transition-colors">
+<div class="flex justify-between mb-4">
+<span class="bg-tertiary/10 text-tertiary px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest">Financial Action</span>
+<span class="text-[10px] text-on-surface-variant uppercase tracking-widest">PROP-402</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-2">Asset Liquidation: Tokyo Tech Hub Portfolio</h3>
+<p class="text-on-surface-variant text-sm mb-6 line-clamp-2">Exiting the commercial real estate position in Shibuya District to reallocate capital into sovereign-backed renewable bonds.</p>
+<div class="space-y-4 mb-6">
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="h-full bg-secondary" style="width: 45%"></div>
+<div class="h-full bg-error" style="width: 50%"></div>
+</div>
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant">Yes: 45%</span>
+<span class="text-on-surface-variant">No: 50%</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 py-3 bg-surface-container-highest rounded-lg text-sm font-bold hover:bg-primary/20 hover:text-primary transition-all">Review Details</button>
+<button class="flex-1 py-3 bg-primary text-on-primary-container rounded-lg text-sm font-bold hover:brightness-110 transition-all">Vote</button>
+</div>
+</div>
+<!-- Proposal: Philanthropy Foundation -->
+<div class="col-span-12 md:col-span-6 bg-surface-container rounded-xl p-6 border-none group hover:bg-surface-container-high transition-colors">
+<div class="flex justify-between mb-4">
+<span class="bg-secondary/10 text-secondary px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest">Social Impact</span>
+<span class="text-[10px] text-on-surface-variant uppercase tracking-widest">PROP-398</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-2">Philanthropy Charter: 2024 Educational Grants</h3>
+<p class="text-on-surface-variant text-sm mb-6 line-clamp-2">Establishing a $2M annual endowment for STEM scholarships across sub-Saharan emerging economies.</p>
+<div class="space-y-4 mb-6">
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="h-full bg-secondary" style="width: 92%"></div>
+<div class="h-full bg-error" style="width: 4%"></div>
+</div>
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant">Yes: 92%</span>
+<span class="text-on-surface-variant">No: 4%</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 py-3 bg-surface-container-highest rounded-lg text-sm font-bold hover:bg-primary/20 hover:text-primary transition-all">Review Details</button>
+<button class="flex-1 py-3 bg-primary text-on-primary-container rounded-lg text-sm font-bold hover:brightness-110 transition-all">Vote</button>
+</div>
+</div>
+<!-- Recent Activity Ticker (Asset Ribbon Pattern) -->
+<div class="col-span-12 bg-surface-container-lowest py-4 rounded-xl relative overflow-hidden">
+<div class="flex items-center gap-12 whitespace-nowrap animate-marquee px-6">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-[10px] uppercase font-bold tracking-tighter text-on-surface">VOTE RECORDED:</span>
+<span class="text-[10px] text-on-surface-variant">Trustee Arthur T. voted YES on PROP-398</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="text-[10px] uppercase font-bold tracking-tighter text-on-surface">QUORUM ALERT:</span>
+<span class="text-[10px] text-on-surface-variant">PROP-402 reached 50% participation</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-[10px] uppercase font-bold tracking-tighter text-on-surface">NEW PROPOSAL:</span>
+<span class="text-[10px] text-on-surface-variant">Constitutional Amendment 7B submitted by Council</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-[10px] uppercase font-bold tracking-tighter text-on-surface">PASSED:</span>
+<span class="text-[10px] text-on-surface-variant">Quarterly Audit Protocol 2024 finalized</span>
+</div>
+</div>
+<!-- Fade Mask -->
+<div class="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-surface-container-lowest to-transparent z-10 pointer-events-none"></div>
+<div class="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-surface-container-lowest to-transparent z-10 pointer-events-none"></div>
+</div>
+<!-- Delegated Voting Section -->
+<div class="col-span-12 lg:col-span-6 bg-surface-container-low rounded-xl p-8">
+<h4 class="text-lg font-bold mb-6">Proxy &amp; Delegation</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg">
+<div class="flex items-center gap-3">
+<img alt="Proxy Avatar" class="w-10 h-10 rounded-full border border-outline-variant/30" data-alt="Close-up portrait of a professional man in spectacles and a charcoal grey suit with a serious expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxakfttUXUM91g5WNcpM6LvrvHHNKByCwWfeCONy8l9x2LZwDL9_X4xZBe6eUoqj7X8giUteIp0zOQpKrcNqc0LlrKIgt2ceeuwboaCbudB9P4o5R5nV7kH0yfxdada5a477P8be7JGctPrkyMKzZBuLQpMLRTlrJUgZwQrvdsNk-wh0byzW5GjtMgmDrIEuVKMvAJimBOkBkOlLwa_EfA39uhq0H6pNamUr0R589qSRA2UJNnSt1BS_GGpQBnPM8AvTgkpgH_eMgD"/>
+<div>
+<p class="text-sm font-bold text-on-surface">Elena S. Togba</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Senior Legal Counsel</p>
+</div>
+</div>
+<div class="text-right">
+<span class="block text-xs font-bold text-primary">2,100 Units</span>
+<span class="text-[10px] text-on-surface-variant">Delegated Authority</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg border border-dashed border-outline-variant/30 opacity-60">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">add</span>
+</div>
+<p class="text-sm text-on-surface-variant">Add Proxy Delegate...</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Governance History / Archives -->
+<div class="col-span-12 lg:col-span-6 bg-surface-container-low rounded-xl p-8">
+<div class="flex justify-between items-center mb-6">
+<h4 class="text-lg font-bold">Session History</h4>
+<button class="text-xs text-primary font-bold hover:underline">View All</button>
+</div>
+<div class="space-y-4">
+<div class="flex gap-4 group">
+<div class="flex flex-col items-center">
+<div class="w-2 h-2 rounded-full bg-secondary-container mt-2"></div>
+<div class="w-[1px] h-full bg-outline-variant/20"></div>
+</div>
+<div class="pb-6">
+<span class="text-[10px] text-on-surface-variant font-mono">OCT 12, 2023</span>
+<p class="text-sm font-bold group-hover:text-primary transition-colors">Expansion into Nordic Green Energy Funds</p>
+<p class="text-xs text-on-surface-variant/70">Ratified with 89% majority approval.</p>
+</div>
+</div>
+<div class="flex gap-4 group">
+<div class="flex flex-col items-center">
+<div class="w-2 h-2 rounded-full bg-error mt-2"></div>
+<div class="w-[1px] h-full bg-outline-variant/20"></div>
+</div>
+<div class="pb-2">
+<span class="text-[10px] text-on-surface-variant font-mono">SEP 04, 2023</span>
+<p class="text-sm font-bold group-hover:text-primary transition-colors">Revision of Article 4 (Lineage Transfer)</p>
+<p class="text-xs text-on-surface-variant/70">Rejected. Failed to meet 75% special quorum.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (Contextual for Governance) -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary-container text-on-primary-container shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-transform group">
+<span class="material-symbols-outlined text-3xl" data-icon="add_box" style="font-variation-settings: 'FILL' 1;">add_box</span>
+<div class="absolute right-full mr-4 bg-surface-bright px-4 py-2 rounded-lg text-xs font-bold text-on-surface whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                Draft New Proposal
+            </div>
+</button>
+</div>
+</body></html>
