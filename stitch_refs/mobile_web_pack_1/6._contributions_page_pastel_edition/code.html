@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Financial Contributions | TOGBA LEGACY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary": "#ffffff",
+              "outline-variant": "#c1c6d7",
+              "primary-container": "#0070eb",
+              "inverse-on-surface": "#f0f0f5",
+              "surface-bright": "#f9f9fe",
+              "on-primary": "#ffffff",
+              "on-secondary-fixed": "#002107",
+              "on-error-container": "#93000a",
+              "on-tertiary-container": "#fffbff",
+              "on-secondary-fixed-variant": "#00531c",
+              "surface": "#f9f9fe",
+              "on-primary-container": "#fefcff",
+              "on-background": "#1a1c1f",
+              "on-secondary-container": "#00732a",
+              "on-error": "#ffffff",
+              "on-primary-fixed": "#001a41",
+              "primary": "#0058bc",
+              "error-container": "#ffdad6",
+              "surface-container-highest": "#e2e2e7",
+              "background": "#f9f9fe",
+              "surface-container-high": "#e8e8ed",
+              "secondary": "#006e28",
+              "surface-variant": "#e2e2e7",
+              "tertiary-container": "#6664e4",
+              "tertiary": "#4c4aca",
+              "secondary-container": "#6ffb85",
+              "secondary-fixed-dim": "#53e16f",
+              "on-secondary": "#ffffff",
+              "primary-fixed-dim": "#adc6ff",
+              "surface-tint": "#005bc1",
+              "on-primary-fixed-variant": "#004493",
+              "on-tertiary-fixed": "#0c006a",
+              "surface-container-low": "#f3f3f8",
+              "primary-fixed": "#d8e2ff",
+              "outline": "#717786",
+              "on-surface-variant": "#414755",
+              "error": "#ba1a1a",
+              "tertiary-fixed-dim": "#c2c1ff",
+              "inverse-surface": "#2e3034",
+              "secondary-fixed": "#72fe88",
+              "on-tertiary-fixed-variant": "#3631b4",
+              "inverse-primary": "#adc6ff",
+              "surface-container-lowest": "#ffffff",
+              "on-surface": "#1a1c1f",
+              "tertiary-fixed": "#e2dfff",
+              "surface-container": "#ededf2",
+              "surface-dim": "#d9dade"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fdfaf5; /* Warm cream/beige pastel tint as requested */
+        }
+        .custom-glass {
+            background: rgba(249, 249, 254, 0.8);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="docked sticky top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-2xl shadow-sm dark:shadow-none flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant/20">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="close-up portrait of a professional man in a light blue shirt with a warm, friendly expression against a soft-focus office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCquqZVwWtihcQVF-PR3qmrCdqTp1L8DPdiNBwNJ9EEbyiSYW3Ib8ziEKuA7bMBL_Mlm8s379B6ZbC_qBQA-YToLjslQDfkiOBq15BvUosZtVj-SSTvA9YrsnNC1XJYdQM4LN6k0BtywptSVSBZW5AQxSU11ZPKfeTlXslt6GtG_hukNeZ1mJBrRh2aT43o5wvvKl7lytMjbrYksVZGVXx6k38XP_na1BDuHV1dsjKjP-6hYBMz-e_WDsjMrOzyivasafIXuN6UFPii"/>
+</div>
+<h1 class="text-lg font-bold tracking-[-0.02em] text-[#1a1c1f] dark:text-[#f9f9fe]">TOGBA LEGACY</h1>
+</div>
+<button class="active:scale-95 transition-transform hover:opacity-80 transition-opacity text-[#0058bc] dark:text-[#0070eb]">
+<span class="material-symbols-outlined" data-icon="emergency">emergency</span>
+</button>
+</header>
+<main class="flex-grow p-6 space-y-8 max-w-5xl mx-auto w-full pb-24">
+<!-- Header Section -->
+<section class="space-y-2">
+<h2 class="text-3xl font-extrabold tracking-tight text-on-surface">Financial Contributions</h2>
+<p class="text-on-surface-variant font-medium label-md uppercase tracking-wider">Asset Management &amp; Registry</p>
+</section>
+<!-- Total Family Pool (Prominent Green Container) -->
+<section class="bg-secondary-container rounded-3xl p-8 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="absolute top-0 right-0 w-64 h-64 bg-secondary-fixed-dim/20 rounded-full -mr-24 -mt-24 blur-3xl"></div>
+<div class="relative z-10">
+<p class="text-on-secondary-container font-bold text-sm tracking-widest uppercase mb-1">Total Family Pool</p>
+<div class="flex items-baseline gap-2">
+<span class="text-5xl font-extrabold tracking-tighter text-on-secondary-container">$248,500</span>
+<span class="text-on-secondary-container/70 font-bold text-xl">.00</span>
+</div>
+<div class="mt-4 inline-flex items-center gap-2 px-3 py-1 bg-on-secondary-container/10 rounded-full">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+<span class="text-xs font-bold">+12.4% from last quarter</span>
+</div>
+</div>
+<div class="relative z-10 flex gap-4">
+<div class="p-4 bg-white/40 backdrop-blur-md rounded-2xl border border-white/50">
+<p class="text-[10px] font-bold uppercase text-on-secondary-fixed-variant opacity-70">Contributors</p>
+<p class="text-xl font-bold text-on-secondary-fixed-variant">14 Members</p>
+</div>
+<div class="p-4 bg-white/40 backdrop-blur-md rounded-2xl border border-white/50">
+<p class="text-[10px] font-bold uppercase text-on-secondary-fixed-variant opacity-70">Next Payout</p>
+<p class="text-xl font-bold text-on-secondary-fixed-variant">Oct 12</p>
+</div>
+</div>
+</section>
+<!-- Bento Grid Insights -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-1 bg-surface-container-low rounded-2xl p-6 border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary mb-4" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<h3 class="font-bold text-on-surface text-lg">Growth Analysis</h3>
+<p class="text-on-surface-variant text-sm mt-2 leading-relaxed">Your legacy pool has outperformed the market average by 4.2% this fiscal year.</p>
+</div>
+<div class="md:col-span-2 bg-primary p-6 rounded-2xl text-on-primary flex items-center justify-between relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-bold text-xl">Smart Reinvestment Active</h3>
+<p class="opacity-90 text-sm mt-1">Automatic allocation is currently optimizing 15% of all new contributions into diversified bonds.</p>
+</div>
+<span class="material-symbols-outlined text-6xl opacity-20 relative z-10" data-icon="auto_awesome">auto_awesome</span>
+<div class="absolute bottom-0 left-0 w-full h-1 bg-white/20">
+<div class="bg-white h-full w-2/3"></div>
+</div>
+</div>
+</div>
+<!-- Transaction Ledger (Soft Blue-Grey Container) -->
+<section class="bg-surface-container rounded-3xl overflow-hidden shadow-sm">
+<div class="p-6 flex justify-between items-center bg-surface-container-high/50">
+<h3 class="font-bold text-xl text-on-surface">Recent Ledger Activities</h3>
+<button class="text-primary font-bold text-sm hover:underline">Download PDF</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high/30 border-b border-outline-variant/20">
+<th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Member</th>
+<th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Category</th>
+<th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Date</th>
+<th class="px-6 py-4 text-right text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Amount</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="bg-surface-container-lowest/40 hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed-dim flex items-center justify-center font-bold text-xs text-primary">JT</div>
+<span class="font-semibold text-on-surface">Julian Togba</span>
+</div>
+</td>
+<td class="px-6 py-4"><span class="px-2 py-1 bg-surface-container-highest rounded-full text-xs font-medium">Monthly Dues</span></td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Sep 24, 2023</td>
+<td class="px-6 py-4 text-right font-bold text-secondary">+$1,250.00</td>
+</tr>
+<tr class="bg-surface-container/20 hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed-dim flex items-center justify-center font-bold text-xs text-tertiary">MT</div>
+<span class="font-semibold text-on-surface">Marie Togba</span>
+</div>
+</td>
+<td class="px-6 py-4"><span class="px-2 py-1 bg-surface-container-highest rounded-full text-xs font-medium">Education Fund</span></td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Sep 22, 2023</td>
+<td class="px-6 py-4 text-right font-bold text-secondary">+$5,000.00</td>
+</tr>
+<tr class="bg-surface-container-lowest/40 hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center font-bold text-xs text-on-surface-variant">AL</div>
+<span class="font-semibold text-on-surface">Amani Lawson</span>
+</div>
+</td>
+<td class="px-6 py-4"><span class="px-2 py-1 bg-surface-container-highest rounded-full text-xs font-medium">Project X</span></td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Sep 19, 2023</td>
+<td class="px-6 py-4 text-right font-bold text-secondary">+$850.00</td>
+</tr>
+<tr class="bg-surface-container/20 hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-error-container flex items-center justify-center font-bold text-xs text-error">CL</div>
+<span class="font-semibold text-on-surface">Corey Legacy</span>
+</div>
+</td>
+<td class="px-6 py-4"><span class="px-2 py-1 bg-error-container/30 text-error rounded-full text-xs font-medium">Maintenance</span></td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Sep 15, 2023</td>
+<td class="px-6 py-4 text-right font-bold text-error">-$2,100.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 flex justify-center bg-surface-container-high/20 border-t border-outline-variant/10">
+<button class="text-primary-container font-bold text-sm py-2 px-4 rounded-xl hover:bg-primary-fixed-dim/20 transition-colors">View All Transactions</button>
+</div>
+</section>
+</main>
+<!-- New Contribution FAB -->
+<button class="fixed bottom-24 right-6 w-16 h-16 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-2xl shadow-xl flex items-center justify-center active:scale-95 transition-transform z-50 group">
+<span class="material-symbols-outlined text-3xl group-hover:rotate-90 transition-transform duration-300" data-icon="add">add</span>
+<span class="absolute right-full mr-4 bg-inverse-surface text-inverse-on-surface px-4 py-2 rounded-xl text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">New Contribution</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="docked fixed bottom-0 w-full z-50 rounded-t-2xl bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-2xl border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_20px_rgba(26,28,31,0.04)] flex justify-around items-center px-4 pt-3 pb-6">
+<a class="flex flex-col items-center justify-center text-[#414755] dark:text-[#c1c6d7] opacity-70 active:scale-90 transition-transform duration-200 hover:bg-slate-100/50 dark:hover:bg-slate-800/50" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-medium tracking-[0.05em] uppercase font-['Inter'] mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#0058bc] dark:text-[#0070eb] font-bold active:scale-90 transition-transform duration-200 hover:bg-slate-100/50 dark:hover:bg-slate-800/50" href="#">
+<span class="material-symbols-outlined" data-icon="folder_shared" style="font-variation-settings: 'FILL' 1;">folder_shared</span>
+<span class="text-[10px] font-medium tracking-[0.05em] uppercase font-['Inter'] mt-1">Registry</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#414755] dark:text-[#c1c6d7] opacity-70 active:scale-90 transition-transform duration-200 hover:bg-slate-100/50 dark:hover:bg-slate-800/50" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="text-[10px] font-medium tracking-[0.05em] uppercase font-['Inter'] mt-1">Messaging</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#414755] dark:text-[#c1c6d7] opacity-70 active:scale-90 transition-transform duration-200 hover:bg-slate-100/50 dark:hover:bg-slate-800/50" href="#">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+<span class="text-[10px] font-medium tracking-[0.05em] uppercase font-['Inter'] mt-1">More</span>
+</a>
+</nav>
+</body></html>

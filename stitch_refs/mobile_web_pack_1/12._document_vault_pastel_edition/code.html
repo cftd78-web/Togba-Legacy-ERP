@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Togba Legacy | Document Vault</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed": "#001a41",
+              "background": "#f9f9fe",
+              "on-error": "#ffffff",
+              "primary-fixed-dim": "#adc6ff",
+              "surface-container": "#ededf2",
+              "tertiary-fixed": "#e2dfff",
+              "surface-tint": "#005bc1",
+              "secondary": "#006e28",
+              "surface": "#f9f9fe",
+              "surface-container-low": "#f3f3f8",
+              "surface-bright": "#f9f9fe",
+              "on-surface-variant": "#414755",
+              "on-surface": "#1a1c1f",
+              "on-tertiary-container": "#fffbff",
+              "on-primary-container": "#fefcff",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e2e2e7",
+              "on-background": "#1a1c1f",
+              "inverse-on-surface": "#f0f0f5",
+              "surface-dim": "#d9dade",
+              "outline": "#717786",
+              "on-tertiary-fixed": "#0c006a",
+              "on-secondary-container": "#00732a",
+              "outline-variant": "#c1c6d7",
+              "secondary-fixed-dim": "#53e16f",
+              "secondary-fixed": "#72fe88",
+              "primary-container": "#0070eb",
+              "tertiary": "#4c4aca",
+              "on-secondary-fixed": "#002107",
+              "on-primary-fixed-variant": "#004493",
+              "inverse-surface": "#2e3034",
+              "tertiary-fixed-dim": "#c2c1ff",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-highest": "#e2e2e7",
+              "on-secondary": "#ffffff",
+              "tertiary-container": "#6664e4",
+              "secondary-container": "#6ffb85",
+              "on-tertiary-fixed-variant": "#3631b4",
+              "error-container": "#ffdad6",
+              "inverse-primary": "#adc6ff",
+              "surface-container-high": "#e8e8ed",
+              "primary-fixed": "#d8e2ff",
+              "primary": "#0058bc",
+              "on-secondary-fixed-variant": "#00531c",
+              "on-primary": "#ffffff",
+              "error": "#ba1a1a"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f3f8; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-header { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface bg-surface-container-low min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="account_balance">account_balance</span>
+<h1 class="text-xl font-extrabold tracking-tighter text-blue-800 dark:text-blue-400 font-['Inter']">Togba Legacy</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex gap-6 mr-6">
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-2 py-1 rounded" href="#">Dashboard</a>
+<a class="text-blue-700 dark:text-blue-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-2 py-1 rounded" href="#">Registry</a>
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-2 py-1 rounded" href="#">Messaging</a>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center overflow-hidden border-2 border-surface-container-highest">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="close-up portrait of a professional man in a charcoal suit with soft office lighting background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKvFY7FnBmywUykGC76U4FgCGs2lpFgXHN2gLNG3aaiIrmPgSTEwhBzK29FkcoTv-3F8119hp1eUbg2TZ5jJEs-Vr_dNC4lW4iM0whH-hi-EyIwJ3ZMNepq1-nmpdPg-iRpw27uEgPvmuWINWU5FcVgaMywdhldpZNzhiBNYjJfICpF-BYF7StwPJAyhNa2hYaZvADVC9AyW5MSO4dp_Fg73y0nZGsRnb01RGX7K3mCrEor-YYNsQTuRviczvLFbxo165t1FC75Rj8"/>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 pt-8 space-y-8">
+<!-- Header Section with Asymmetry -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+<div class="space-y-1">
+<span class="text-[11px] font-medium uppercase tracking-wider text-on-surface-variant">Asset Depository</span>
+<h2 class="text-4xl font-bold tracking-tight text-on-surface">Document Vault</h2>
+</div>
+<!-- Vault Capacity Meter Card -->
+<div class="w-full md:w-80 bg-secondary-container rounded-xl p-5 shadow-sm">
+<div class="flex justify-between items-center mb-3">
+<span class="text-sm font-semibold text-on-secondary-container">Vault Capacity</span>
+<span class="text-xs font-bold text-on-secondary-container">64% Full</span>
+</div>
+<div class="w-full bg-white/40 h-3 rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[64%] rounded-full"></div>
+</div>
+<p class="mt-3 text-[11px] text-on-secondary-container leading-tight">
+                    12.8 GB of 20 GB used. 45 files remaining for legacy encryption.
+                </p>
+</div>
+</div>
+<!-- Folder Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Legal Folder -->
+<div class="group bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10 hover:shadow-lg transition-all duration-300">
+<div class="w-12 h-12 bg-primary-fixed/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary" data-icon="gavel">gavel</span>
+</div>
+<h3 class="headline-sm font-bold text-on-surface mb-1">Legal</h3>
+<p class="text-sm text-on-surface-variant">Wills, Trusts &amp; Power of Attorney</p>
+<div class="mt-6 flex justify-between items-center">
+<span class="label-md font-bold text-primary">14 Files</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Finance Folder -->
+<div class="group bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10 hover:shadow-lg transition-all duration-300">
+<div class="w-12 h-12 bg-tertiary-fixed/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-tertiary" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+<h3 class="headline-sm font-bold text-on-surface mb-1">Finance</h3>
+<p class="text-sm text-on-surface-variant">Tax Records &amp; Investment Portfolios</p>
+<div class="mt-6 flex justify-between items-center">
+<span class="label-md font-bold text-tertiary">32 Files</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-tertiary transition-colors" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Identity Folder -->
+<div class="group bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10 hover:shadow-lg transition-all duration-300">
+<div class="w-12 h-12 bg-secondary-container/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-secondary" data-icon="badge">badge</span>
+</div>
+<h3 class="headline-sm font-bold text-on-surface mb-1">Identity</h3>
+<p class="text-sm text-on-surface-variant">Passports, Certificates &amp; Credentials</p>
+<div class="mt-6 flex justify-between items-center">
+<span class="label-md font-bold text-secondary">08 Files</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-secondary transition-colors" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</section>
+<!-- Recent Documents List -->
+<section class="bg-surface-container rounded-2xl p-8 mb-12">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-2xl font-bold tracking-tight text-on-surface">Recent Documents</h3>
+<button class="text-sm font-semibold text-primary hover:underline">View Library</button>
+</div>
+<div class="space-y-4">
+<!-- Document Item -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-4 rounded-xl transition-all duration-200 hover:translate-x-1">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-error-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-error" data-icon="picture_as_pdf">picture_as_pdf</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">2023_Legacy_Trust_Final.pdf</p>
+<p class="text-xs text-on-surface-variant">Updated 2 hours ago • 4.2 MB</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline p-2 hover:bg-surface-container rounded-full cursor-pointer transition-colors" data-icon="visibility">visibility</span>
+<span class="material-symbols-outlined text-outline p-2 hover:bg-surface-container rounded-full cursor-pointer transition-colors" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+<!-- Document Item -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-4 rounded-xl transition-all duration-200 hover:translate-x-1">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-primary-fixed rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="description">description</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Property_Deed_Registry.docx</p>
+<p class="text-xs text-on-surface-variant">Updated Yesterday • 1.8 MB</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline p-2 hover:bg-surface-container rounded-full cursor-pointer transition-colors" data-icon="visibility">visibility</span>
+<span class="material-symbols-outlined text-outline p-2 hover:bg-surface-container rounded-full cursor-pointer transition-colors" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+<!-- Document Item -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-4 rounded-xl transition-all duration-200 hover:translate-x-1">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-secondary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" data-icon="image">image</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Family_Crest_HighRes.png</p>
+<p class="text-xs text-on-surface-variant">Updated 3 days ago • 12.5 MB</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline p-2 hover:bg-surface-container rounded-full cursor-pointer transition-colors" data-icon="visibility">visibility</span>
+<span class="material-symbols-outlined text-outline p-2 hover:bg-surface-container rounded-full cursor-pointer transition-colors" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB: Upload Document -->
+<button class="fixed bottom-24 right-6 md:bottom-8 md:right-8 bg-gradient-to-br from-primary to-primary-container text-on-primary w-16 h-16 md:w-auto md:px-6 rounded-full md:rounded-xl shadow-2xl flex items-center justify-center gap-3 active:scale-95 transition-all duration-200 group z-50">
+<span class="material-symbols-outlined" data-icon="cloud_upload">cloud_upload</span>
+<span class="hidden md:block font-bold tracking-tight">Upload Document</span>
+</button>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 pb-safe bg-[#f3f3f8] dark:bg-[#1a1c1f] border-t border-slate-200/30 dark:border-slate-800/30 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] flex justify-around items-center px-4 py-3 w-full">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 hover:text-blue-600 dark:hover:text-blue-300 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-white dark:bg-slate-800 text-[#0058bc] dark:text-blue-400 rounded-xl px-4 py-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="inventory_2" data-weight="fill" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider">Registry</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 hover:text-blue-600 dark:hover:text-blue-300 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="forum">forum</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider">Messaging</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 hover:text-blue-600 dark:hover:text-blue-300 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="more_horiz">more_horiz</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider">More</span>
+</a>
+</nav>
+</body></html>

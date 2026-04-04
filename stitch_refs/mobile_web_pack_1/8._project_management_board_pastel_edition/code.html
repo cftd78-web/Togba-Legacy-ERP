@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed": "#001a41",
+              "background": "#f9f9fe",
+              "on-error": "#ffffff",
+              "primary-fixed-dim": "#adc6ff",
+              "surface-container": "#ededf2",
+              "tertiary-fixed": "#e2dfff",
+              "surface-tint": "#005bc1",
+              "secondary": "#006e28",
+              "surface": "#f9f9fe",
+              "surface-container-low": "#f3f3f8",
+              "surface-bright": "#f9f9fe",
+              "on-surface-variant": "#414755",
+              "on-surface": "#1a1c1f",
+              "on-tertiary-container": "#fffbff",
+              "on-primary-container": "#fefcff",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e2e2e7",
+              "on-background": "#1a1c1f",
+              "inverse-on-surface": "#f0f0f5",
+              "surface-dim": "#d9dade",
+              "outline": "#717786",
+              "on-tertiary-fixed": "#0c006a",
+              "on-secondary-container": "#00732a",
+              "outline-variant": "#c1c6d7",
+              "secondary-fixed-dim": "#53e16f",
+              "secondary-fixed": "#72fe88",
+              "primary-container": "#0070eb",
+              "tertiary": "#4c4aca",
+              "on-secondary-fixed": "#002107",
+              "on-primary-fixed-variant": "#004493",
+              "inverse-surface": "#2e3034",
+              "tertiary-fixed-dim": "#c2c1ff",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-highest": "#e2e2e7",
+              "on-secondary": "#ffffff",
+              "tertiary-container": "#6664e4",
+              "secondary-container": "#6ffb85",
+              "on-tertiary-fixed-variant": "#3631b4",
+              "error-container": "#ffdad6",
+              "inverse-primary": "#adc6ff",
+              "surface-container-high": "#e8e8ed",
+              "primary-fixed": "#d8e2ff",
+              "primary": "#0058bc",
+              "on-secondary-fixed-variant": "#00531c",
+              "on-primary": "#ffffff",
+              "error": "#ba1a1a"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .glass-effect { backdrop-filter: blur(12px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 sticky z-50 bg-slate-50/80 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-700" data-icon="account_balance">account_balance</span>
+<h1 class="text-xl font-extrabold tracking-tighter text-blue-800">Togba Legacy</h1>
+</div>
+<!-- Tablet/Desktop Navigation -->
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-blue-700 font-bold font-['Inter'] tracking-tight transition-all active:scale-95 duration-200" href="#">Dashboard</a>
+<a class="text-slate-500 hover:bg-slate-100 px-3 py-1 rounded transition-colors font-['Inter'] tracking-tight" href="#">Registry</a>
+<a class="text-slate-500 hover:bg-slate-100 px-3 py-1 rounded transition-colors font-['Inter'] tracking-tight" href="#">Messaging</a>
+<a class="text-slate-500 hover:bg-slate-100 px-3 py-1 rounded transition-colors font-['Inter'] tracking-tight" href="#">More</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center overflow-hidden border-2 border-primary/10">
+<img class="w-full h-full object-cover" data-alt="heraldic shield emblem with silver and blue accents on a clean white background, royal institutional style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtMMmQMudQ9yZlpXReK763eUb3qtIYPDnLXlQPs86uF-j7MKdxnJ_JEdiVCIK8JJitPXVd3mA6dY1DG0rykQRS2waI5_Hp7uE1wWUMzJJ-bXPqXjLGVB90YMF1MowvrvNE4bT9kjZJqtlgtFx9AE8yNfUZcCmohu3RtHz0uAD5Tjt6NbsNpzoVAnDSSZYy41v4llopTZYC2oVGw7uNPccG4XwZhXH19UsywIkqzdj2ISMndbG4r37XuOu63avxh7M6Ues2wM5BAJ41"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-[1440px] mx-auto px-6 pt-8 pb-24">
+<!-- Dashboard Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+<div>
+<span class="label-md text-on-surface-variant font-medium tracking-widest uppercase text-xs">Estate Portfolio</span>
+<h2 class="text-4xl font-extrabold tracking-tight text-on-surface mt-1">Estate Management</h2>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface-container-low text-on-surface-variant px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+                    Filter
+                </button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-sm transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                    New Asset Task
+                </button>
+</div>
+</div>
+<!-- Kanban Board -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+<!-- Column: Backlog -->
+<div class="flex flex-col gap-5">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-slate-400"></div>
+<h3 class="font-bold text-on-surface tracking-tight">Backlog</h3>
+<span class="text-on-surface-variant bg-surface-container px-2 py-0.5 rounded text-xs font-bold">4</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="more_horiz">more_horiz</span>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Task Card 1 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/15 hover:shadow-lg transition-all duration-300 group">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-error-container text-on-error-container text-[10px] font-extrabold uppercase tracking-wider px-2 py-1 rounded">High</span>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors cursor-pointer" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<h4 class="font-bold text-on-surface leading-snug mb-2">Heritage Site Structural Survey</h4>
+<p class="text-on-surface-variant text-sm mb-4 leading-relaxed">Comprehensive inspection of the north-wing foundation and timber beams.</p>
+<div class="space-y-2">
+<div class="flex justify-between text-[11px] font-bold text-on-surface-variant">
+<span>Progress</span>
+<span>0%</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[0%]"></div>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-surface-container flex justify-between items-center">
+<div class="flex -space-x-2">
+<div class="w-7 h-7 rounded-full border-2 border-white bg-slate-200"></div>
+<div class="w-7 h-7 rounded-full border-2 border-white bg-slate-300"></div>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant text-xs">
+<span class="material-symbols-outlined text-sm" data-icon="calendar_today">calendar_today</span>
+                                Oct 24
+                            </div>
+</div>
+</div>
+<!-- Task Card 2 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/15 hover:shadow-lg transition-all duration-300 group">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-extrabold uppercase tracking-wider px-2 py-1 rounded">Low</span>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors cursor-pointer" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<h4 class="font-bold text-on-surface leading-snug mb-2">Quarterly Asset Revaluation</h4>
+<p class="text-on-surface-variant text-sm mb-4 leading-relaxed">Update ledger with current market appraisals for the coastal holdings.</p>
+<div class="space-y-2">
+<div class="flex justify-between text-[11px] font-bold text-on-surface-variant">
+<span>Progress</span>
+<span>15%</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[15%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: In Progress -->
+<div class="flex flex-col gap-5">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-blue-500"></div>
+<h3 class="font-bold text-on-surface tracking-tight">In Progress</h3>
+<span class="text-blue-700 bg-blue-50 px-2 py-0.5 rounded text-xs font-bold">2</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="more_horiz">more_horiz</span>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Task Card 3 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/15 hover:shadow-lg transition-all duration-300 group">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-extrabold uppercase tracking-wider px-2 py-1 rounded">Med</span>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors cursor-pointer" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<h4 class="font-bold text-on-surface leading-snug mb-2">Landscape Restoration Plan</h4>
+<p class="text-on-surface-variant text-sm mb-4 leading-relaxed">Designing the sustainable water irrigation system for the South Orchards.</p>
+<div class="space-y-2">
+<div class="flex justify-between text-[11px] font-bold text-on-surface-variant">
+<span>Progress</span>
+<span>65%</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[65%]"></div>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-surface-container flex justify-between items-center">
+<img class="w-full h-24 object-cover rounded-lg mb-2" data-alt="scenic view of a manicured orchard with stone walls and geometric irrigation channels under a soft hazy sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDe8g6SbtnehMoZPGuLfWQxsNJpPl0IMQD4rNUQF9_LPWdKuOBCDjpVK_pO6IS8V6o-a9A4HrBsWsi_yMIwyIKS2w-g5DsjavgnwjCsOD1gOsotZUR9Aq-amSU0GYaKBS0HpltrDoNCX4Cl1jlYSWbV-W0gEh6otEjWtUhxc8O1fClTHDcThZghxL1jlk9zYpf3qZqGH-zwe2ZN6Wp4zuAlMFaOmOMY1wgOi7B27Vr1_PtaMQ04NcGM79SgDuajjbIK5rEB0HUEnSQw"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Completed -->
+<div class="flex flex-col gap-5">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+<h3 class="font-bold text-on-surface tracking-tight">Completed</h3>
+<span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-xs font-bold">12</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="more_horiz">more_horiz</span>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Task Card 4 -->
+<div class="bg-slate-50/50 p-5 rounded-xl border border-dashed border-outline-variant/30 opacity-80 group">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-extrabold uppercase tracking-wider px-2 py-1 rounded">Low</span>
+<span class="material-symbols-outlined text-emerald-600" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h4 class="font-bold text-on-surface-variant leading-snug mb-2 line-through">Security Protocol Update</h4>
+<p class="text-on-surface-variant text-sm mb-4 leading-relaxed">Review and update biometric access logs for the archive vault.</p>
+<div class="space-y-2">
+<div class="flex justify-between text-[11px] font-bold text-emerald-600">
+<span>Completed</span>
+<span>100%</span>
+</div>
+<div class="w-full bg-emerald-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[100%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 w-full z-50 pb-safe md:hidden bg-[#f3f3f8] border-t border-slate-200/30 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+<div class="flex justify-around items-center px-4 py-3 w-full">
+<a class="flex flex-col items-center justify-center bg-white text-[#0058bc] rounded-xl px-4 py-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 px-4 py-2 hover:text-blue-600 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Registry</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 px-4 py-2 hover:text-blue-600 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Messaging</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 px-4 py-2 hover:text-blue-600 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">More</span>
+</a>
+</div>
+</nav>
+</body></html>
