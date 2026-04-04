@@ -25,6 +25,21 @@ let homeLoaded = false
 let financeLoaded = false
 let adminLoaded = false
 let familyLoaded = false
+let developerBypassActive = false
+
+function setBypassBanner(message, type){
+const el = document.getElementById("dev-bypass-banner")
+if(!el) return
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+el.className = "hidden mb-3 text-xs rounded-xl border px-3 py-2"
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
+el.className = `mb-3 text-xs rounded-xl border px-3 py-2 ${type==="error" ? "border-red-200 bg-red-50 text-red-700" : "border-amber-200 bg-amber-50 text-amber-800"}`
+}
 
 function setLoginMessage(message, type){
 const el = document.getElementById("login-state-message")
@@ -83,6 +98,9 @@ document.getElementById("email").value = ""
 setButtonBusy("btn-get-code", false, "Sending...", "Send One-Time Code")
 setButtonBusy("btn-verify", false, "Verifying...", "Verify")
 if(message) alert(message)
+if(developerBypassActive){
+initializeAuthView()
+}
 }
 
 function onServerFailure(err){
@@ -91,6 +109,50 @@ resetToLogin("Your session expired. Please login again.")
 return
 }
 alert((err && err.message) || "Request failed.")
+}
+
+function initializeAuthView(){
+setBypassBanner("")
+setLoginMessage("")
+google.script.run
+.withSuccessHandler(config=>{
+const bypassEnabled = !!(config && config.developerBypassEnabled)
+if(!bypassEnabled){
+developerBypassActive = false
+return
+}
+
+developerBypassActive = true
+setBypassBanner("Developer bypass is ACTIVE (temporary). OTP login is skipped for UI debugging.")
+setLoginMessage("Developer bypass active. Starting debug session...")
+setButtonBusy("btn-get-code", true, "Bypassed", "Send One-Time Code")
+setButtonBusy("btn-verify", true, "Bypassed", "Verify")
+
+google.script.run
+.withSuccessHandler(res=>{
+token = (res && res.token) || ""
+if(!token){
+setBypassBanner("Developer bypass failed: empty session token.", "error")
+setLoginMessage("Unable to initialize developer bypass session.", "error")
+setButtonBusy("btn-get-code", false, "Bypassed", "Send One-Time Code")
+setButtonBusy("btn-verify", false, "Bypassed", "Verify")
+return
+}
+initApp()
+})
+.withFailureHandler(err=>{
+setBypassBanner("Developer bypass failed. Check Code.gs toggle and logs.", "error")
+setLoginMessage((err && err.message) || "Failed to start bypass session.", "error")
+setButtonBusy("btn-get-code", false, "Bypassed", "Send One-Time Code")
+setButtonBusy("btn-verify", false, "Bypassed", "Verify")
+})
+.startDeveloperBypassSession()
+})
+.withFailureHandler(err=>{
+setBypassBanner("Unable to load auth mode config.", "error")
+setLoginMessage((err && err.message) || "Unable to initialize login screen.", "error")
+})
+.getAuthModeConfig()
 }
 
 function escapeHtml(value){
@@ -236,6 +298,10 @@ return `${Number(value || 0).toFixed(2)}%`
 }
 
 function handleOTP(){
+if(developerBypassActive){
+setLoginMessage("Developer bypass mode is active. OTP flow is disabled in this debug session.", "error")
+return
+}
 setLoginMessage("")
 setButtonBusy("btn-get-code", true, "Sending...", "Send One-Time Code")
 google.script.run
@@ -257,6 +323,10 @@ onServerFailure(err)
 }
 
 function handleVerify(){
+if(developerBypassActive){
+setLoginMessage("Developer bypass mode is active. OTP verification is disabled in this debug session.", "error")
+return
+}
 setLoginMessage("")
 setButtonBusy("btn-verify", true, "Verifying...", "Verify")
 google.script.run
@@ -297,6 +367,8 @@ loadHomeEssentials()
 .withFailureHandler(onServerFailure)
 .getStartupBootstrap(token)
 }
+
+document.addEventListener("DOMContentLoaded", initializeAuthView)
 
 function loadHomeEssentials(){
 if(homeLoaded) return
