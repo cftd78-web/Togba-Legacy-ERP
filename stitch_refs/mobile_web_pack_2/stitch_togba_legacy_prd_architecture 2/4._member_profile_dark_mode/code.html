@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-bright": "#31394d",
+                        "secondary-fixed": "#6ffbbe",
+                        "inverse-primary": "#005ac2",
+                        "surface-container-low": "#131b2e",
+                        "inverse-on-surface": "#283044",
+                        "on-primary": "#002e6a",
+                        "secondary": "#4edea3",
+                        "on-secondary": "#003824",
+                        "on-error-container": "#ffdad6",
+                        "error": "#ffb4ab",
+                        "on-primary-fixed": "#001a42",
+                        "on-tertiary-fixed": "#2a1700",
+                        "primary-container": "#4d8eff",
+                        "surface": "#0b1326",
+                        "on-tertiary": "#472a00",
+                        "surface-variant": "#2d3449",
+                        "outline": "#8c909f",
+                        "on-primary-container": "#00285d",
+                        "inverse-surface": "#dae2fd",
+                        "surface-container": "#171f33",
+                        "on-secondary-fixed": "#002113",
+                        "error-container": "#93000a",
+                        "on-secondary-container": "#00311f",
+                        "surface-container-lowest": "#060e20",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-dim": "#0b1326",
+                        "on-primary-fixed-variant": "#004395",
+                        "primary": "#adc6ff",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-background": "#dae2fd",
+                        "surface-container-highest": "#2d3449",
+                        "outline-variant": "#424754",
+                        "tertiary-fixed": "#ffddb8",
+                        "surface-container-high": "#222a3d",
+                        "on-surface-variant": "#c2c6d6",
+                        "surface-tint": "#adc6ff",
+                        "on-surface": "#dae2fd",
+                        "on-error": "#690005",
+                        "primary-fixed": "#d8e2ff",
+                        "tertiary": "#ffb95f",
+                        "tertiary-container": "#ca8100",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "secondary-container": "#00a572",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-tertiary-container": "#3e2400",
+                        "background": "#0b1326"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #0b1326;
+            color: #dae2fd;
+            font-family: 'Inter', sans-serif;
+        }
+        .vault-gradient {
+            background: linear-gradient(135deg, #adc6ff 0%, #4d8eff 100%);
+        }
+        .glass-panel {
+            background: rgba(49, 57, 77, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        /* Hide scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="antialiased overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full overflow-y-auto px-4 py-6 h-screen w-64 flex flex-col border-r border-transparent bg-[#060e20] shadow-2xl shadow-black/20 z-50">
+<div class="mb-8 px-2 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg vault-gradient flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tighter text-[#dae2fd]">Togba Legacy</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-[#adc6ff]/60">The Sovereign Vault</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Navigation Items -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg">dashboard</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#adc6ff] font-semibold bg-[#1a2337] rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Family Registry</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg">account_balance_wallet</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Contributions &amp; Finance</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg">account_tree</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Investment Allocation</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg">folder_shared</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg">how_to_vote</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Governance / Voting</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg">mail</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Messaging</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg">history</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Timeline</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg">description</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg">emergency</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">SOS / Emergency</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg">settings</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Settings</span>
+</a>
+</nav>
+<div class="pt-6 border-t border-outline-variant/10">
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-lg">person</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Profile</span>
+</a>
+</div>
+</aside>
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 ml-64 bg-transparent backdrop-blur-md">
+<div class="flex items-center gap-4">
+<div class="flex items-center text-[#c2c6d6] text-sm tracking-wide gap-2">
+<span>Family Registry</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-[#adc6ff] font-bold">Alexander Togba</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-[#c2c6d6]">
+<button class="opacity-80 hover:opacity-100 transition-all">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="opacity-80 hover:opacity-100 transition-all relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+</div>
+<button class="bg-error-container/20 text-error px-4 py-1.5 rounded-lg text-xs font-bold tracking-widest hover:bg-error-container/40 transition-all">
+                SOS
+            </button>
+<div class="w-10 h-10 rounded-full border-2 border-primary/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a mature man with graying hair, sophisticated expression, in a tailored dark suit against a minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_pqZndsIRNXuREUCsPnMRUktpEDfKELoB5SI6PT_214ZW_760paG51IrXijQ1c4vNsPlzOhG__wqf3YLGbuHXnfu21HV-w_FstITVqnIRWgffkVJ09RJHhrHl-DLC1xkl5cFsZksi0Bfgld-b3sBISABmygybANPMVRDD4xqDoLPgbEpUZMAqFz64qZ3sOX9qd3TuTimbMUXicNlirVupIDr8bSV2TaLwbROfmdF33LZkMx6T0gvN2BL131QZ1ELUWPobU-RD8gfO"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 p-8 overflow-y-auto h-[calc(100vh-72px)] no-scrollbar">
+<!-- Profile Header Section -->
+<div class="grid grid-cols-12 gap-8 mb-8">
+<div class="col-span-12 lg:col-span-8 flex items-end gap-8">
+<div class="w-48 h-48 rounded-xl overflow-hidden shadow-2xl shadow-black/40 ring-4 ring-surface-container-high relative group">
+<img class="w-full h-full object-cover" data-alt="Portrait of Alexander Togba, a distinguished elder family member, high contrast black and white photography with deep shadows and soft highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbLSANWs_U2qaZFIwgDXcTFUDJR_1fH0h_KX5QImJxYHg3xfNihwKLyH8v8CfeaSHF80i7u0y8940nLu07mko-4DT-Rf3G486UMKspjecKFkd_VRzXgVZpLZvGx6Rn0hN7HpFmmOmHwpuVSZ4XSUagMWb0gsMu2dyjhCI54m7tZJBTf4gnlFy2apKqfrfW7lwsULBcPw0hgLDacG139n8NN54wlZiLrtKqf-tweOxxaskFkinhX4YSfj0XQ1xAFg0kVEM7sX-P_qad"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-40"></div>
+</div>
+<div class="flex-1 pb-4">
+<div class="flex items-center gap-4 mb-2">
+<h2 class="text-4xl font-extrabold tracking-tight text-on-surface">Alexander Togba</h2>
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest rounded-full border border-primary/20">Patriarch Tier</span>
+</div>
+<p class="text-on-surface-variant text-lg max-w-2xl font-light italic mb-6">"Our heritage is not a relic to be guarded, but a foundation upon which we build the next century."</p>
+<div class="flex gap-12">
+<div>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant/60 mb-1">Total Contribution</p>
+<p class="text-2xl font-bold text-secondary">$14.2M</p>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant/60 mb-1">Participation Rate</p>
+<p class="text-2xl font-bold text-primary">98.4%</p>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant/60 mb-1">Projects Led</p>
+<p class="text-2xl font-bold text-tertiary">12</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Actions / Status -->
+<div class="col-span-12 lg:col-span-4">
+<div class="bg-surface-container-low rounded-xl p-6 h-full flex flex-col justify-between">
+<div>
+<h3 class="text-xs font-bold uppercase tracking-[0.2em] text-[#adc6ff] mb-4">Governance Status</h3>
+<div class="flex items-center justify-between mb-2">
+<span class="text-sm text-on-surface-variant">Voting Power</span>
+<span class="text-sm font-bold">Level 4 Vault Access</span>
+</div>
+<div class="w-full bg-surface-container-highest h-2 rounded-full mb-6 overflow-hidden">
+<div class="h-full vault-gradient w-[98%]"></div>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full py-3 rounded-lg vault-gradient text-on-primary-container font-bold text-sm shadow-lg shadow-primary/10">Message Member</button>
+<button class="w-full py-3 rounded-lg bg-surface-container-highest text-on-surface font-semibold text-sm hover:bg-surface-bright transition-colors">Request Joint Venture</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Biography Section (Asymmetric Left) -->
+<div class="col-span-12 lg:col-span-7 bg-surface-container-low rounded-xl p-8 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-8 opacity-5">
+<span class="material-symbols-outlined text-9xl">format_quote</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-6 flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">history_edu</span>
+                    Biography
+                </h3>
+<div class="space-y-4 text-on-surface-variant leading-relaxed font-light">
+<p>Alexander Togba serves as the primary architect of the Sovereign Vault's current investment philosophy. With over four decades of experience in emerging markets and private equity, he has steered the family office through multiple global economic shifts, emphasizing capital preservation through tactical diversification.</p>
+<p>A graduate of the London School of Economics, his early career in maritime logistics provided the capital foundation for the Togba Group's initial expansion. Today, he focuses his efforts on the "Century Plan," a project dedicated to ensuring educational and professional pathways for family members into the year 2100.</p>
+</div>
+<div class="mt-8 pt-8 border-t border-outline-variant/10 grid grid-cols-3 gap-4">
+<div>
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant/40 block mb-1">Focus</span>
+<span class="text-sm font-medium">Wealth Architecture</span>
+</div>
+<div>
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant/40 block mb-1">Tenure</span>
+<span class="text-sm font-medium">32 Years</span>
+</div>
+<div>
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant/40 block mb-1">Specialty</span>
+<span class="text-sm font-medium">Risk Mitigation</span>
+</div>
+</div>
+</div>
+<!-- Active Projects (Asymmetric Right) -->
+<div class="col-span-12 lg:col-span-5 flex flex-col gap-8">
+<div class="bg-surface-container rounded-xl p-6">
+<h3 class="text-sm font-bold uppercase tracking-widest text-[#adc6ff] mb-6">Active Projects</h3>
+<div class="space-y-4">
+<!-- Project Card 1 -->
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center gap-4 hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Green Corridor Initiative</p>
+<p class="text-xs text-on-surface-variant">Infrastructure • 84% Complete</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant/20 group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<!-- Project Card 2 -->
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center gap-4 hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-lg bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">2100 Scholars Fund</p>
+<p class="text-xs text-on-surface-variant">Education • Ongoing</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant/20 group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<!-- Project Card 3 -->
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center gap-4 hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">token</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Family DAO Layer 2</p>
+<p class="text-xs text-on-surface-variant">Governance • Beta Phase</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant/20 group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Financial Ledger (Wide Column) -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-low rounded-xl p-8">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-xl font-bold text-on-surface flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">account_balance</span>
+                        Contribution Ledger
+                    </h3>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-highest text-xs font-medium hover:bg-surface-bright">All Tiers</button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-highest text-xs font-medium hover:bg-surface-bright">Export CSV</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/50 border-b border-outline-variant/10">
+<th class="pb-4 font-semibold">Date</th>
+<th class="pb-4 font-semibold">Asset / Type</th>
+<th class="pb-4 font-semibold text-right">Amount</th>
+<th class="pb-4 font-semibold text-right">Status</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-4 text-on-surface-variant">Oct 12, 2023</td>
+<td class="py-4">
+<p class="font-semibold">Direct Liquidity Deposit</p>
+<p class="text-xs text-on-surface-variant/60">Institutional Cash Vault</p>
+</td>
+<td class="py-4 text-right font-mono font-bold text-secondary">+$2,450,000</td>
+<td class="py-4 text-right"><span class="px-2 py-0.5 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold">SETTLED</span></td>
+</tr>
+<tr class="hover:bg-surface-container/50 transition-colors border-t border-outline-variant/5">
+<td class="py-4 text-on-surface-variant">Sep 28, 2023</td>
+<td class="py-4">
+<p class="font-semibold">Real Estate Deed Transfer</p>
+<p class="text-xs text-on-surface-variant/60">Berlin Logistics Hub</p>
+</td>
+<td class="py-4 text-right font-mono font-bold text-secondary">+$5,800,000</td>
+<td class="py-4 text-right"><span class="px-2 py-0.5 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold">SETTLED</span></td>
+</tr>
+<tr class="hover:bg-surface-container/50 transition-colors border-t border-outline-variant/5">
+<td class="py-4 text-on-surface-variant">Aug 15, 2023</td>
+<td class="py-4">
+<p class="font-semibold">Series C Participation</p>
+<p class="text-xs text-on-surface-variant/60">Quantum Compute Partners</p>
+</td>
+<td class="py-4 text-right font-mono font-bold text-primary">-$1,200,000</td>
+<td class="py-4 text-right"><span class="px-2 py-0.5 rounded-full bg-surface-bright text-on-surface-variant text-[10px] font-bold">PROVISIONED</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Participation & Governance Stats (Narrow Column) -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-8">
+<!-- Premium Photo Card -->
+<div class="h-64 rounded-xl overflow-hidden relative group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Dark, moodily lit skyscraper architectural details with sleek glass and steel, echoing high-end corporate power and stability" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5KuHE6L0ogZ7cj-j99osU-aqi6oAUcH3bjxtxLemjM0K4yTzELp-QYXjjvsLC6BzjwsjOV5Cer5LQ6e61vJWz5wGsyg90jk4OF4ko92dcZHuldDTnZ9sicRKIgSvcOnnEvJ6hRWkOz7EZkz0QfOz7y8EaAo5w-5A4JKwdwBN_H4fa4w4znP532hVj5JkZHsE3ui5kiyGHRiPSfkPUsj4NbCkHKrx3LonRyKBxxNMbuAEIa7pUOu1QXTrAOszrxMTLkEUjfuTPJvcT"/>
+<div class="absolute inset-0 bg-surface/60 backdrop-blur-[2px] flex flex-col justify-end p-6">
+<p class="text-[10px] uppercase tracking-widest text-secondary font-bold mb-1">Strategic Asset</p>
+<h4 class="text-xl font-bold text-on-surface">European Core Holdings</h4>
+<p class="text-xs text-on-surface-variant">Managed by Alexander T. since 2012</p>
+</div>
+</div>
+<!-- Governance Metric -->
+<div class="bg-surface-container-high rounded-xl p-8 border border-outline-variant/10">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-xs font-bold uppercase tracking-widest text-primary">Governance Index</h3>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">how_to_vote</span>
+</div>
+<div class="flex items-center justify-center py-4">
+<div class="relative w-32 h-32 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-highest" cx="64" cy="64" fill="transparent" r="56" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="64" cy="64" fill="transparent" r="56" stroke="currentColor" stroke-dasharray="351.8" stroke-dashoffset="7" stroke-width="8"></circle>
+</svg>
+<span class="absolute text-2xl font-black">98%</span>
+</div>
+</div>
+<div class="mt-6 space-y-3">
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant">Council Attendance</span>
+<span class="font-bold">100%</span>
+</div>
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant">Proposals Sponsered</span>
+<span class="font-bold">42</span>
+</div>
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant">Community Trust Factor</span>
+<span class="font-bold">9.8/10</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

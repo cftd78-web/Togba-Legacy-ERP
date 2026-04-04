@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#31394d",
+              "secondary-fixed": "#6ffbbe",
+              "inverse-primary": "#005ac2",
+              "surface-container-low": "#131b2e",
+              "inverse-on-surface": "#283044",
+              "on-primary": "#002e6a",
+              "secondary": "#4edea3",
+              "on-secondary": "#003824",
+              "on-error-container": "#ffdad6",
+              "error": "#ffb4ab",
+              "on-primary-fixed": "#001a42",
+              "on-tertiary-fixed": "#2a1700",
+              "primary-container": "#4d8eff",
+              "surface": "#0b1326",
+              "on-tertiary": "#472a00",
+              "surface-variant": "#2d3449",
+              "outline": "#8c909f",
+              "on-primary-container": "#00285d",
+              "inverse-surface": "#dae2fd",
+              "surface-container": "#171f33",
+              "on-secondary-fixed": "#002113",
+              "error-container": "#93000a",
+              "on-secondary-container": "#00311f",
+              "surface-container-lowest": "#060e20",
+              "on-secondary-fixed-variant": "#005236",
+              "surface-dim": "#0b1326",
+              "on-primary-fixed-variant": "#004395",
+              "primary": "#adc6ff",
+              "secondary-fixed-dim": "#4edea3",
+              "on-background": "#dae2fd",
+              "surface-container-highest": "#2d3449",
+              "outline-variant": "#424754",
+              "tertiary-fixed": "#ffddb8",
+              "surface-container-high": "#222a3d",
+              "on-surface-variant": "#c2c6d6",
+              "surface-tint": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "on-error": "#690005",
+              "primary-fixed": "#d8e2ff",
+              "tertiary": "#ffb95f",
+              "tertiary-container": "#ca8100",
+              "tertiary-fixed-dim": "#ffb95f",
+              "secondary-container": "#00a572",
+              "primary-fixed-dim": "#adc6ff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "on-tertiary-container": "#3e2400",
+              "background": "#0b1326"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .emergency-glow {
+            box-shadow: 0 0 50px -10px rgba(147, 0, 10, 0.5);
+        }
+        .map-gradient-overlay {
+            background: linear-gradient(to bottom, rgba(11, 19, 38, 0) 0%, rgba(11, 19, 38, 1) 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 bg-transparent backdrop-blur-md ml-0 md:ml-64">
+<div class="flex items-center gap-4">
+<nav class="flex items-center gap-2">
+<span class="text-on-surface-variant text-sm font-['Inter'] tracking-wide">Togba Legacy</span>
+<span class="material-symbols-outlined text-xs text-on-surface-variant">chevron_right</span>
+<span class="text-primary font-bold text-sm tracking-wide">SOS / Emergency</span>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<button class="opacity-80 hover:opacity-100 transition-all">
+<span class="material-symbols-outlined text-primary">search</span>
+</button>
+<button class="opacity-80 hover:opacity-100 transition-all">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="User Profile" data-alt="Close up portrait of a middle-aged executive man with a professional and serious expression, studio lighting, dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjnmG5UGFPQ2uTvxAQ0yNC84b2Aj_JDk8A_QP2yjEu6jgQ0WuHB00VcAR7eVgon0nRzLeRqCvWlHiJpNlrlXNEA6Y5xYRYwWF9SCA90mKJIEvwa4vC4cA0qGEI_QIolvNROEBVfjZFurXAS1QzrBWXYcS4n3JQvvA0nk_SApG3FTdjjIipy78lGGFEaUYZi3s3QSDJmlJhcZEM6VgOEB_A7HLbcrzwbewJ7PWML0XZt3VDkyexhb3M0CqebA9luXAciOrQjx7r8KLL"/>
+</div>
+</div>
+</header>
+<!-- SideNav -->
+<aside class="fixed left-0 top-0 h-full overflow-y-auto px-4 py-6 h-screen w-64 flex flex-col bg-[#0b1326] shadow-2xl shadow-black/20 z-50 hidden md:flex">
+<div class="mb-10 px-2">
+<h1 class="text-xl font-bold tracking-tighter text-[#dae2fd]">Togba Legacy</h1>
+<p class="text-xs text-on-surface-variant uppercase tracking-widest mt-1">The Sovereign Vault</p>
+</div>
+<nav class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Family Registry</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Contributions &amp; Finance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">account_tree</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Investment Allocation</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">folder_shared</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">how_to_vote</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Governance / Voting</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Messaging</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">history</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Timeline</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">description</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#adc6ff] font-semibold bg-[#1a2337]" href="#">
+<span class="material-symbols-outlined text-[20px]">emergency</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">SOS / Emergency</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/10">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">person</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Profile</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="md:ml-64 p-8 min-h-screen bg-surface">
+<!-- Dashboard Header for SOS Context -->
+<div class="mb-10 flex flex-col md:flex-row justify-between items-end gap-6">
+<div>
+<h2 class="text-[2.75rem] font-headline font-bold text-on-surface leading-tight tracking-tight">System Lockdown</h2>
+<p class="text-error font-medium flex items-center gap-2 mt-2">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
+</span>
+                    CRITICAL ALERT: Emergency Protocols Active
+                </p>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-3 rounded-xl bg-surface-container-high text-on-surface-variant font-semibold border border-outline-variant/20 hover:bg-surface-bright transition-all">
+                    Cancel Response
+                </button>
+</div>
+</div>
+<!-- SOS Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Primary Action & Info -->
+<div class="lg:col-span-4 space-y-8 h-full flex flex-col">
+<!-- The SOS Trigger -->
+<div class="bg-surface-container-low rounded-xl p-10 flex flex-col items-center justify-center text-center space-y-8 flex-1 border border-error-container/20 emergency-glow">
+<div class="relative group">
+<div class="absolute inset-0 bg-error rounded-full blur-2xl opacity-20 group-active:opacity-50 transition-opacity"></div>
+<button class="relative w-48 h-48 rounded-full bg-gradient-to-br from-error-container to-error flex items-center justify-center border-[8px] border-surface shadow-2xl active:scale-95 transition-transform duration-75">
+<span class="material-symbols-outlined text-6xl text-on-error-container" style="font-variation-settings: 'FILL' 1;">emergency</span>
+</button>
+</div>
+<div>
+<h3 class="text-xl font-bold text-on-surface">SOS Activation</h3>
+<p class="text-on-surface-variant mt-2 max-w-[200px]">Press and hold for 3 seconds to alert private security and family</p>
+</div>
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-error h-full w-0 transition-all duration-[3000ms]" id="activation-bar"></div>
+</div>
+</div>
+<!-- Medical Quick Look -->
+<div class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/10">
+<div class="flex justify-between items-center mb-6">
+<h4 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Medical Passport</h4>
+<span class="material-symbols-outlined text-primary text-sm">medical_services</span>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+<span class="text-on-surface-variant text-sm">Blood Type</span>
+<span class="text-on-surface font-bold text-lg">O-Negative</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+<span class="text-on-surface-variant text-sm">Allergies</span>
+<span class="text-on-surface font-bold">Penicillin, Latex</span>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="text-on-surface-variant text-sm">Conditions</span>
+<span class="text-on-surface font-bold">Hypertension</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Middle Column: Live Map & Status -->
+<div class="lg:col-span-5 space-y-8">
+<!-- Map Section -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden h-[500px] relative border border-outline-variant/10 group">
+<img alt="Map of Geneva" class="w-full h-full object-cover grayscale opacity-50 contrast-125" data-alt="Modern dark mode stylized map of Geneva, Switzerland with glowing blue grid lines and architectural silhouettes" data-location="Geneva" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGY2WLYIBE3VKokxATMbbBm3NSpbuVxuZiCaZ6VFf7ykzNlbY4qliVnw8odVHNl6fPkAE8nWgBSzWh_Qi_9SWNWbxo6PK9q6w5aznGaJBslFGQnHivx_xBwQ7lVaZh-XQ7IkeaQgdqmMWipuxxnOdf4sQ17bxyCwwgLbGQODWXdr8pSH0GGJh242R6vcZFexh25qhHhsQ7-iuBvvVFXQOOLamBysBMjKToRVSzeGCqGNk_D1Hz5okxnpTu1Hu1xMMY2IiEOducPpfy"/>
+<div class="absolute inset-0 map-gradient-overlay pointer-events-none"></div>
+<div class="absolute top-6 left-6 bg-surface-container-lowest/80 backdrop-blur-md px-4 py-2 rounded-full border border-primary/20 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-xs font-bold text-on-surface tracking-wide">LIVE GPS TRACKING</span>
+</div>
+<div class="absolute bottom-6 left-6 right-6 flex flex-col gap-2">
+<div class="flex items-end justify-between">
+<div>
+<span class="text-[0.65rem] uppercase tracking-widest text-on-surface-variant">Current Coordinates</span>
+<p class="text-lg font-headline font-bold text-on-surface">46.2044° N, 6.1432° E</p>
+<p class="text-sm text-on-surface-variant">Quai Gustave-Ador, Geneva</p>
+</div>
+<div class="bg-primary-container text-on-primary-container p-3 rounded-xl shadow-lg">
+<span class="material-symbols-outlined">my_location</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Asset Ribbon / Status -->
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-8 overflow-hidden relative border border-outline-variant/5">
+<div class="flex-shrink-0 flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">security</span>
+<span class="text-xs font-bold uppercase tracking-tighter text-on-surface">Node Health</span>
+</div>
+<div class="flex items-center gap-6 animate-pulse">
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-on-surface-variant uppercase">Biometrics</span>
+<span class="text-xs font-bold text-secondary">72 BPM</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-on-surface-variant uppercase">Sat-Link</span>
+<span class="text-xs font-bold text-secondary">Active</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-on-surface-variant uppercase">Vault Integrity</span>
+<span class="text-xs font-bold text-secondary">Locked</span>
+</div>
+</div>
+<div class="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-surface-container-lowest to-transparent"></div>
+</div>
+</div>
+<!-- Right Column: Priority Contacts -->
+<div class="lg:col-span-3 space-y-6">
+<div class="flex justify-between items-center px-2">
+<h4 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Priority Contacts</h4>
+<span class="text-xs font-semibold text-primary">Edit</span>
+</div>
+<div class="space-y-3">
+<!-- Contact Card 1 -->
+<div class="bg-surface-container-low p-4 rounded-xl flex items-center justify-between border border-outline-variant/10 hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 rounded-xl bg-surface-variant flex items-center justify-center overflow-hidden">
+<img alt="Priority Contact" data-alt="Professional portrait of a high-status woman with confident posture, elegant suit, studio background with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6JN6UtakmP-jASgBP53i4qiADRlNd6E44Jn3nCOcYpWhy_0EneWuNSugxczX3ZFB0wsLAGsuynorfSUSllhCla-LczjntlnSLrMy_IsKVdos0tBOh36qkZThF-oEdbrgLQ6-E7W-pb4Z02ZI_gRtHYMtWTZLYMnxVMNpRXO7QYFNCq1SKzYtvJG_ZPTTuZn7_CrWh8G1B9h5sWkCf-9meBRf_-WogeIXYdNcUIWOqbyC8fb7WsdI7fxWeFTx8pA5IqTSQ2zQ1PMWp"/>
+</div>
+<div>
+<h5 class="text-sm font-bold text-on-surface">Dr. Elena Togba</h5>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Spouse / Primary</p>
+</div>
+</div>
+<button class="h-10 w-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">call</span>
+</button>
+</div>
+<!-- Contact Card 2 -->
+<div class="bg-surface-container-low p-4 rounded-xl flex items-center justify-between border border-outline-variant/10 hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 rounded-xl bg-surface-variant flex items-center justify-center overflow-hidden">
+<img alt="Priority Contact" data-alt="Close up of an older man in a high-end security uniform, looking focused and capable, cinematic dark lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDb51F_V5ixkmS01NMXynIKHfDzpTGx9KGX6dUV6u-WDNi2mBK-MpAaR6sJmEWVQBtmJWlMpzDNLPI17YWgALWQqYYkVGfhZi2zWN9sX5N9AfiWi8hO5L88zboQxCxji5SzhTr1RPGbaXE0xRDUxR4e3DimAcbVAwYDHChvaWza9O9AiilH087S64KvFzHLG5FyagptWqLTjiSHVpBd0vgwB81wlDdpfR1G5QcjJYOjLKnpmfcYyjnjvClONPrcTlgRJMxR0IcciZFi"/>
+</div>
+<div>
+<h5 class="text-sm font-bold text-on-surface">Julian Vane</h5>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Head of Security</p>
+</div>
+</div>
+<button class="h-10 w-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">call</span>
+</button>
+</div>
+<!-- Contact Card 3 -->
+<div class="bg-surface-container-low p-4 rounded-xl flex items-center justify-between border border-outline-variant/10 hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 rounded-xl bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">local_police</span>
+</div>
+<div>
+<h5 class="text-sm font-bold text-on-surface">Global Response</h5>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Private Military</p>
+</div>
+</div>
+<button class="h-10 w-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">call</span>
+</button>
+</div>
+</div>
+<!-- Auxiliary Actions -->
+<div class="grid grid-cols-2 gap-4 pt-4">
+<button class="flex flex-col items-center justify-center gap-3 p-6 bg-surface-container-low rounded-xl border border-outline-variant/10 hover:border-primary/40 transition-all">
+<span class="material-symbols-outlined text-primary text-3xl">broadcast_on_home</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Loud Alarm</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-3 p-6 bg-surface-container-low rounded-xl border border-outline-variant/10 hover:border-primary/40 transition-all">
+<span class="material-symbols-outlined text-primary text-3xl">light_mode</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Strobe Light</span>
+</button>
+</div>
+</div>
+</div>
+<!-- System Footer -->
+<footer class="mt-20 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-6 opacity-60">
+<div class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant">
+                Authenticated Secure Terminal: GVA-8829-SOS
+            </div>
+<div class="flex gap-8">
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant">Privacy Shield Active</span>
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant">End-to-End Encrypted</span>
+</div>
+</footer>
+</main>
+</body></html>
