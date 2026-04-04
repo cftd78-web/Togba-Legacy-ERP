@@ -38,6 +38,10 @@ function doGet() {
   }
 }
 
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
 /* =====================================================
    ATOMIC OTP GENERATION
 ===================================================== */
