@@ -13,14 +13,67 @@
 
 <style>
 
+:root{
+--app-bg:#f3f6fb;
+--panel:#ffffff;
+--panel-alt:#f8fafc;
+--ink:#0f172a;
+--muted:#64748b;
+--accent:#2563eb;
+--accent-soft:#dbeafe;
+--line:#e2e8f0;
+}
+
+@media (prefers-color-scheme:dark){
+:root{
+--app-bg:#0b1326;
+--panel:#111a2d;
+--panel-alt:#1a2236;
+--ink:#e2e8f0;
+--muted:#94a3b8;
+--accent:#7aa2ff;
+--accent-soft:#22335f;
+--line:#28354f;
+}
+body{background:var(--app-bg)!important;color:var(--ink);}
+}
+
 .page{display:none;}
 .page.active{display:block;}
+
+.app-shell{max-width:1280px;margin:0 auto;padding:1rem 1rem 6rem 1rem;}
+
+.topbar{
+position:sticky;
+top:0;
+z-index:40;
+backdrop-filter:blur(12px);
+background:color-mix(in srgb,var(--app-bg) 78%, transparent);
+border-bottom:1px solid var(--line);
+}
+
+.topbar-row{max-width:1280px;margin:0 auto;padding:.85rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;}
+
+.brand-mark{
+display:flex;align-items:center;gap:.75rem;
+}
+.brand-dot{
+width:2.1rem;height:2.1rem;border-radius:.8rem;background:linear-gradient(145deg,var(--accent),#60a5fa);box-shadow:0 10px 22px rgba(37,99,235,.22);
+}
 
 nav button{
 display:flex;
 flex-direction:column;
 align-items:center;
 font-size:12px;
+color:var(--muted);
+border-radius:.8rem;
+padding:.4rem .25rem;
+transition:all .2s ease;
+}
+nav button.active{
+color:var(--accent);
+background:var(--accent-soft);
 }
 
 .chart-shell{
@@ -43,10 +96,10 @@ max-width:300px;
 
 .dashboard-tile{
 display:block;
-border:1px solid rgb(226 232 240);
+border:1px solid var(--line);
 border-radius:1rem;
 padding:0.9rem;
-background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);
+background:linear-gradient(180deg,var(--panel) 0%,var(--panel-alt) 100%);
 transition:all .2s ease;
 cursor:pointer;
 }
@@ -54,7 +107,45 @@ cursor:pointer;
 .dashboard-tile:hover{
 transform:translateY(-2px);
 box-shadow:0 10px 20px rgba(15,23,42,.08);
-border-color:rgb(191 219 254);
+border-color:color-mix(in srgb,var(--accent) 40%, white);
+}
+
+.state-box{
+border:1px dashed var(--line);
+background:var(--panel-alt);
+border-radius:1rem;
+padding:1rem;
+font-size:.86rem;
+color:var(--muted);
+}
+
+.login-shell{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:1.25rem;
+background:
+radial-gradient(70rem 32rem at 10% -15%, rgba(37,99,235,.14), transparent),
+radial-gradient(58rem 30rem at 90% 110%, rgba(139,92,246,.16), transparent),
+var(--app-bg);
+}
+
+.login-card{
+width:100%;
+max-width:430px;
+background:color-mix(in srgb,var(--panel) 92%, transparent);
+border:1px solid var(--line);
+border-radius:1.5rem;
+box-shadow:0 20px 40px rgba(15,23,42,.13);
+padding:1.4rem;
+}
+
+.otp-code{letter-spacing:.5rem;font-size:1.45rem;font-weight:700;text-align:center;}
+
+@media (min-width:768px){
+.app-shell{padding:1.25rem 1.25rem 7.5rem 1.25rem;}
+.login-card{padding:1.8rem;}
 }
 
 .calendar-shell{
@@ -138,67 +229,73 @@ background:linear-gradient(180deg,#eff6ff 0%,#ffffff 100%);
 
 </head>
 
-<body class="bg-slate-50 font-sans">
+<body class="font-sans">
 
 <!-- LOGIN VIEW -->
 
-<div id="view-login" class="min-h-screen flex items-center justify-center p-6">
-
-<div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-sm">
-
-<h1 class="text-2xl font-bold mb-6 text-center">
-Togba Legacy
-</h1>
-
+<div id="view-login" class="login-shell">
+<div class="login-card">
+<div class="text-center mb-6">
+<div class="inline-flex items-center justify-center mb-3 h-12 w-12 rounded-2xl bg-blue-50 border border-blue-100">
+<span class="material-icons-round text-blue-600">account_balance</span>
+</div>
+<h1 class="text-2xl font-bold">Togba Legacy</h1>
+<p class="text-sm text-slate-500 mt-1">Secure institutional access</p>
+</div>
+<div id="login-state-message" class="hidden mb-3 text-xs rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-blue-700"></div>
 <div id="step-1">
-
-<input id="email"
-type="email"
-placeholder="Email"
-class="w-full p-4 bg-slate-100 rounded-xl mb-4">
-
-<button onclick="handleOTP()"
-class="w-full bg-black text-white p-4 rounded-xl font-bold">
-
-Get Code
-
-</button>
-
+<label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Registry Email</label>
+<input id="email" type="email" placeholder="name@family-office.com" class="w-full p-4 bg-slate-100 rounded-xl mb-4 border border-transparent focus:border-blue-200 focus:outline-none">
+<button id="btn-get-code" onclick="handleOTP()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold">Send One-Time Code</button>
 </div>
-
 <div id="step-2" class="hidden">
-
-<input id="otp"
-type="text"
-placeholder="000000"
-class="w-full p-4 bg-slate-100 rounded-xl mb-4 text-center text-2xl tracking-widest">
-
-<button onclick="handleVerify()"
-class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold">
-
-Verify
-
-</button>
-
+<div class="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">Enter the 6-digit code sent to your email. This code expires quickly for security.</div>
+<input id="otp" type="text" placeholder="000000" maxlength="6" class="otp-code w-full p-4 bg-slate-100 rounded-xl mb-3 border border-transparent focus:border-blue-200 focus:outline-none">
+<div class="grid grid-cols-2 gap-2">
+<button id="btn-verify" onclick="handleVerify()" class="bg-blue-600 text-white p-4 rounded-xl font-bold">Verify</button>
+<button onclick="resetToStepOne()" class="bg-slate-200 text-slate-700 p-4 rounded-xl font-bold">Back</button>
 </div>
-
 </div>
-
+</div>
 </div>
 
 <!-- APP VIEW -->
 
 <div id="view-app" class="hidden pb-24">
+<header class="topbar">
+<div class="topbar-row">
+<div class="brand-mark">
+<div class="brand-dot"></div>
+<div>
+<div class="text-xs uppercase tracking-[0.15em] text-slate-500">Togba Legacy</div>
+<h2 id="welcome-name" class="text-base sm:text-lg font-bold leading-tight">Welcome</h2>
+</div>
+</div>
+<button onclick="resetToLogin('Logged out.')" class="text-xs px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-600">Logout</button>
+</div>
+</header>
+<div class="app-shell">
 
 <!-- HOME PAGE -->
 
-<div id="page-home" class="page active p-6">
-
-<h2 id="welcome-name" class="text-2xl font-bold mb-4"></h2>
+<div id="page-home" class="page active">
 
 <div id="home-error" class="hidden text-sm text-red-600 mb-3"></div>
+<div id="home-status" class="state-box mb-4 hidden"></div>
 
-<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-4">
+<div class="grid gap-4 lg:grid-cols-3 mb-4">
+<div class="bg-white p-6 rounded-3xl shadow border border-slate-100 lg:col-span-2">
+<div class="text-xs uppercase text-slate-500 font-bold">Institutional Summary</div>
+<div class="text-2xl md:text-3xl font-extrabold text-slate-800 mt-2">Executive dashboard and strategic controls</div>
+<p class="text-slate-600 mt-2 max-w-2xl">Monitor capital movement, projects, governance participation, and timeline milestones from a single overview.</p>
+</div>
+<div class="bg-white p-5 rounded-3xl shadow border border-slate-100">
+<div class="text-xs uppercase text-slate-500 font-bold mb-1">System Status</div>
+<div id="home-system-status" class="text-sm text-slate-700">Waiting for dashboard metrics...</div>
+</div>
+</div>
+
+<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-5">
 <button onclick="showPage('finance')" class="dashboard-tile text-left">
 <div class="text-xs uppercase text-slate-500 font-bold">Finance Snapshot</div>
 <div class="text-sm text-slate-700 mt-1">View capital, locks, and allocation trends.</div>
@@ -226,6 +323,7 @@ Financial Distribution
 <div class="chart-shell">
 <canvas id="financeChart"></canvas>
 </div>
+<div id="home-chart-empty" class="hidden mt-3 text-xs text-slate-500">No chart data yet. Contributions and locks will appear here once records are available.</div>
 
 </div>
 
@@ -233,7 +331,7 @@ Financial Distribution
 
 <!-- FINANCE PAGE -->
 
-<div id="page-finance" class="page p-6">
+<div id="page-finance" class="page">
 
 <h2 class="text-2xl font-bold mb-4">Finance</h2>
 
@@ -282,7 +380,7 @@ Financial Distribution
 
 <!-- PROJECTS PAGE -->
 
-<div id="page-projects" class="page p-6">
+<div id="page-projects" class="page">
 
 <div class="flex items-center justify-between mb-4">
 <h2 class="text-2xl font-bold">Projects</h2>
@@ -365,7 +463,7 @@ Financial Distribution
 
 <!-- MESSAGES PAGE -->
 
-<div id="page-messages" class="page p-6">
+<div id="page-messages" class="page">
 
 <h2 class="text-2xl font-bold mb-4">Messaging</h2>
 
@@ -430,7 +528,7 @@ Financial Distribution
 
 <!-- SOS PAGE -->
 
-<div id="page-sos" class="page p-6">
+<div id="page-sos" class="page">
 
 <div class="flex items-center justify-between mb-4">
 <h2 class="text-2xl font-bold">Emergency SOS</h2>
@@ -475,7 +573,7 @@ Financial Distribution
 
 <!-- VOTING PAGE -->
 
-<div id="page-voting" class="page p-6">
+<div id="page-voting" class="page">
 
 <div class="flex items-center justify-between mb-4">
 <h2 class="text-2xl font-bold">Governance Voting</h2>
@@ -514,7 +612,7 @@ Financial Distribution
 
 <!-- TIMELINE PAGE -->
 
-<div id="page-timeline" class="page p-6">
+<div id="page-timeline" class="page">
 
 <div class="flex items-center justify-between mb-4">
 <h2 class="text-2xl font-bold">Family Timeline</h2>
@@ -545,7 +643,7 @@ Financial Distribution
 
 <!-- FAMILY PAGE -->
 
-<div id="page-family" class="page p-6">
+<div id="page-family" class="page">
 <div class="flex items-center justify-between mb-4">
 <h2 class="text-2xl font-bold">Family Data & Tree</h2>
 <button onclick="loadFamilyData()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
@@ -586,7 +684,7 @@ Financial Distribution
 
 <!-- ADMIN PAGE -->
 
-<div id="page-admin" class="page p-6">
+<div id="page-admin" class="page">
 
 <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
 <h2 class="text-2xl font-bold">Admin & System Controls</h2>
@@ -649,9 +747,11 @@ Financial Distribution
 
 </div>
 
+</div>
+
 <!-- NAVIGATION -->
 
-<nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
+<nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t p-2 sm:p-3 flex justify-around gap-1 overflow-x-auto">
 
 <button onclick="showPage('home')">
 <span class="material-icons-round text-blue-600">home</span>
@@ -732,6 +832,36 @@ let financeLoaded = false
 let adminLoaded = false
 let familyLoaded = false
 
+function setLoginMessage(message, type){
+const el = document.getElementById("login-state-message")
+if(!el) return
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+el.className = "hidden mb-3 text-xs rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-blue-700"
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
+el.className = `mb-3 text-xs rounded-xl border px-3 py-2 ${type==="error" ? "border-red-200 bg-red-50 text-red-700" : "border-blue-100 bg-blue-50 text-blue-700"}`
+}
+
+function setButtonBusy(id, isBusy, busyLabel, idleLabel){
+const button = document.getElementById(id)
+if(!button) return
+button.disabled = !!isBusy
+button.classList.toggle("opacity-70", !!isBusy)
+button.classList.toggle("cursor-not-allowed", !!isBusy)
+button.innerText = isBusy ? busyLabel : idleLabel
+}
+
+function resetToStepOne(){
+document.getElementById("step-1").classList.remove("hidden")
+document.getElementById("step-2").classList.add("hidden")
+document.getElementById("otp").value = ""
+setLoginMessage("")
+}
+
 function isSessionExpiredError(err){
 const msg = String((err && err.message) || err || "")
 return msg.toLowerCase().indexOf("session expired") !== -1
@@ -752,10 +882,12 @@ homeLoaded = false
 financeLoaded = false
 adminLoaded = false
 familyLoaded = false
-document.getElementById("step-1").classList.remove("hidden")
-document.getElementById("step-2").classList.add("hidden")
+resetToStepOne()
 document.getElementById("view-app").classList.add("hidden")
 document.getElementById("view-login").classList.remove("hidden")
+document.getElementById("email").value = ""
+setButtonBusy("btn-get-code", false, "Sending...", "Send One-Time Code")
+setButtonBusy("btn-verify", false, "Verifying...", "Verify")
 if(message) alert(message)
 }
 
@@ -779,6 +911,18 @@ return String(value || "")
 
 function setHomeError(message){
 const el = document.getElementById("home-error")
+if(!el) return
+if(!message){
+el.classList.add("hidden")
+el.innerText = ""
+return
+}
+el.classList.remove("hidden")
+el.innerText = message
+}
+
+function setHomeStatus(message){
+const el = document.getElementById("home-status")
 if(!el) return
 if(!message){
 el.classList.add("hidden")
@@ -898,25 +1042,40 @@ return `${Number(value || 0).toFixed(2)}%`
 }
 
 function handleOTP(){
+setLoginMessage("")
+setButtonBusy("btn-get-code", true, "Sending...", "Send One-Time Code")
 google.script.run
 .withSuccessHandler(res=>{
+setButtonBusy("btn-get-code", false, "Sending...", "Send One-Time Code")
 document.getElementById("step-1").classList.add("hidden")
 document.getElementById("step-2").classList.remove("hidden")
+setLoginMessage("One-time code sent. Enter your 6-digit code to continue.")
 if(res && res.deliveredByEmail===false){
 alert("OTP generated. Email delivery failed in this environment; you can still use the generated OTP from Access sheet as fallback.")
 }
 })
-.withFailureHandler(onServerFailure)
+.withFailureHandler(err=>{
+setButtonBusy("btn-get-code", false, "Sending...", "Send One-Time Code")
+setLoginMessage((err && err.message) || "Unable to send code right now.", "error")
+onServerFailure(err)
+})
 .loginStepOne(document.getElementById("email").value)
 }
 
 function handleVerify(){
+setLoginMessage("")
+setButtonBusy("btn-verify", true, "Verifying...", "Verify")
 google.script.run
 .withSuccessHandler(res=>{
+setButtonBusy("btn-verify", false, "Verifying...", "Verify")
 token = res.token
 initApp()
 })
-.withFailureHandler(onServerFailure)
+.withFailureHandler(err=>{
+setButtonBusy("btn-verify", false, "Verifying...", "Verify")
+setLoginMessage((err && err.message) || "Verification failed.", "error")
+onServerFailure(err)
+})
 .verifyStepTwo(
 document.getElementById("email").value,
 document.getElementById("otp").value
@@ -927,6 +1086,7 @@ function initApp(){
 document.getElementById("view-login").classList.add("hidden")
 document.getElementById("view-app").classList.remove("hidden")
 setHomeError("")
+setHomeStatus("Loading dashboard summary...")
 document.getElementById("btn-nav-admin").classList.add("hidden")
 
 google.script.run
@@ -948,6 +1108,9 @@ function loadHomeEssentials(){
 if(homeLoaded) return
 homeLoaded = true
 setHomeError("")
+setHomeStatus("Loading finance distribution and summary cards...")
+document.getElementById("home-system-status").innerText = "Syncing dashboard modules..."
+document.getElementById("home-chart-empty").classList.add("hidden")
 
 google.script.run
 .withSuccessHandler(data=>{
@@ -980,6 +1143,15 @@ legend:{position:"bottom"}
 }
 }
 )
+const points = Array.isArray(data && data.values) ? data.values.filter(v=>Number(v)>0) : []
+if(!points.length){
+document.getElementById("home-chart-empty").classList.remove("hidden")
+document.getElementById("home-system-status").innerText = "Connected. No contribution data available yet."
+setHomeStatus("Dashboard loaded with empty data state.")
+return
+}
+document.getElementById("home-system-status").innerText = "Connected and current as of this session."
+setHomeStatus("Dashboard loaded.")
 })
 .withFailureHandler(err=>{
 if(isSessionExpiredError(err)){
@@ -988,6 +1160,8 @@ return
 }
 homeLoaded = false
 setHomeError((err && err.message) || "Unable to load home dashboard.")
+setHomeStatus("Unable to sync dashboard summary. You can retry by revisiting Home.")
+document.getElementById("home-system-status").innerText = "Summary unavailable."
 })
 .getFinanceData(token)
 }
@@ -998,6 +1172,9 @@ document.querySelectorAll(".page")
 
 document.getElementById("page-"+page)
 .classList.add("active")
+document.querySelectorAll("#bottom-nav button").forEach(btn=>btn.classList.remove("active"))
+const activeBtn = document.querySelector(`#bottom-nav button[onclick="showPage('${page}')"]`)
+if(activeBtn) activeBtn.classList.add("active")
 
 if(page==="home") loadHomeEssentials()
 if(page==="admin"){
