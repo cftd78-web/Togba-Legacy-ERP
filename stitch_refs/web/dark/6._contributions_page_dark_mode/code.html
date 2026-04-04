@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Contributions Ledger - Togba Legacy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#31394d",
+              "secondary-fixed": "#6ffbbe",
+              "inverse-primary": "#005ac2",
+              "surface-container-low": "#131b2e",
+              "inverse-on-surface": "#283044",
+              "on-primary": "#002e6a",
+              "secondary": "#4edea3",
+              "on-secondary": "#003824",
+              "on-error-container": "#ffdad6",
+              "error": "#ffb4ab",
+              "on-primary-fixed": "#001a42",
+              "on-tertiary-fixed": "#2a1700",
+              "primary-container": "#4d8eff",
+              "surface": "#0b1326",
+              "on-tertiary": "#472a00",
+              "surface-variant": "#2d3449",
+              "outline": "#8c909f",
+              "on-primary-container": "#00285d",
+              "inverse-surface": "#dae2fd",
+              "surface-container": "#171f33",
+              "on-secondary-fixed": "#002113",
+              "error-container": "#93000a",
+              "on-secondary-container": "#00311f",
+              "surface-container-lowest": "#060e20",
+              "on-secondary-fixed-variant": "#005236",
+              "surface-dim": "#0b1326",
+              "on-primary-fixed-variant": "#004395",
+              "primary": "#adc6ff",
+              "secondary-fixed-dim": "#4edea3",
+              "on-background": "#dae2fd",
+              "surface-container-highest": "#2d3449",
+              "outline-variant": "#424754",
+              "tertiary-fixed": "#ffddb8",
+              "surface-container-high": "#222a3d",
+              "on-surface-variant": "#c2c6d6",
+              "surface-tint": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "on-error": "#690005",
+              "primary-fixed": "#d8e2ff",
+              "tertiary": "#ffb95f",
+              "tertiary-container": "#ca8100",
+              "tertiary-fixed-dim": "#ffb95f",
+              "secondary-container": "#00a572",
+              "primary-fixed-dim": "#adc6ff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "on-tertiary-container": "#3e2400",
+              "background": "#0b1326"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b1326;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2d3449;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full overflow-y-auto px-4 py-6 h-screen w-64 flex flex-col border-r border-transparent bg-[#0b1326] z-50">
+<div class="mb-10 px-2">
+<h1 class="text-xl font-bold tracking-tighter text-[#dae2fd]">Togba Legacy</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-primary/60 font-semibold mt-1">The Sovereign Vault</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Dashboard -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<!-- Family Registry -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="group">group</span>
+<span>Family Registry</span>
+</a>
+<!-- Contributions & Finance (ACTIVE) -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#adc6ff] font-semibold bg-[#1a2337] rounded-lg font-['Inter'] tracking-tight text-sm scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span>Contributions &amp; Finance</span>
+</a>
+<!-- Investment Allocation -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="account_tree">account_tree</span>
+<span>Investment Allocation</span>
+</a>
+<!-- Projects -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="folder_shared">folder_shared</span>
+<span>Projects</span>
+</a>
+<!-- Governance / Voting -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="how_to_vote">how_to_vote</span>
+<span>Governance / Voting</span>
+</a>
+<!-- Messaging -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="mail">mail</span>
+<span>Messaging</span>
+</a>
+<!-- Timeline -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="history">history</span>
+<span>Timeline</span>
+</a>
+<!-- Documents -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="description">description</span>
+<span>Documents</span>
+</a>
+<!-- SOS / Emergency -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="emergency">emergency</span>
+<span>SOS / Emergency</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-surface-variant/30">
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200 font-['Inter'] font-medium tracking-tight text-sm group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="person">person</span>
+<span>Profile</span>
+</a>
+</div>
+</aside>
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 ml-64 bg-transparent backdrop-blur-md text-[#adc6ff] font-['Inter'] text-sm tracking-wide">
+<div class="flex items-center gap-4">
+<nav class="flex items-center gap-2 text-on-surface-variant">
+<span>Vault</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-[#adc6ff] font-bold">Contributions Ledger</span>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-symbols-outlined cursor-pointer opacity-80 hover:opacity-100 transition-all" data-icon="search">search</span>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined cursor-pointer opacity-80 hover:opacity-100 transition-all" data-icon="notifications">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-secondary rounded-full"></span>
+</div>
+<button class="bg-error-container text-on-error-container px-4 py-1.5 rounded-lg font-bold flex items-center gap-2 hover:bg-error transition-colors shadow-lg shadow-error/10">
+<span class="material-symbols-outlined text-sm" data-icon="emergency">emergency</span>
+                SOS
+            </button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="professional male portrait with neutral background for user profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcZ3PuBj47moU-QXSyjME9OvTrk4SGuG1zbvporM1WNeEQ37yz8DA0LIMmImvKRaGMjIPFiT3wYaIJSdC2tsTKh68qLV00MEuumZ8_NsUC-HFmfUe9B1_JMlVH5_WXsrYrzWWOmyGa0GbNHpl795YvAh_IBsP4kSF5JBlHxVw9onuUTTGWnh66MT-MyQM59JYlD3DiYzQgaz4K6SWKWvLd6W2n8p3jkBvbHqcU7MTzKfihMqUmUaN-pmATZ7ItHaMQFP4SwjjoFCYW"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-8 min-h-screen">
+<!-- Hero Financial Summary (Bento Style) -->
+<section class="grid grid-cols-12 gap-6 mb-12">
+<!-- Main Total Card -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-low rounded-xl p-8 flex flex-col justify-between relative overflow-hidden">
+<div class="relative z-10">
+<h2 class="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em] mb-4">Total Family Pool</h2>
+<div class="flex items-end gap-4">
+<span class="text-5xl font-extrabold tracking-tighter text-on-surface">$248,500.00</span>
+<div class="flex items-center text-secondary mb-1">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>
+<span class="text-sm font-bold">+12.4% this quarter</span>
+</div>
+</div>
+<p class="text-on-surface-variant text-sm mt-6 max-w-md leading-relaxed">
+                        Consolidated liquid assets across all family verticals. All deposits are verified and secured via institutional escrow.
+                    </p>
+</div>
+<div class="mt-8 flex gap-4 relative z-10">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-container px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-transform active:scale-95 shadow-xl shadow-primary/10">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                        New Contribution
+                    </button>
+<button class="bg-transparent border border-outline-variant/30 hover:bg-surface-variant/20 text-on-surface px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+                        Download PDF
+                    </button>
+</div>
+<!-- Abstract Visual Background Decoration -->
+<div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none"></div>
+<div class="absolute -bottom-12 -right-12 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+</div>
+<!-- Quick Metrics Sidebar -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<div class="bg-surface-container-highest rounded-xl p-6">
+<span class="text-on-surface-variant font-label text-[10px] uppercase tracking-widest block mb-2">Growth Target</span>
+<div class="flex justify-between items-center mb-4">
+<span class="text-2xl font-bold text-on-surface">$300,000</span>
+<span class="text-sm font-medium text-secondary">82%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[82%] rounded-full shadow-[0_0_12px_rgba(78,222,163,0.3)]"></div>
+</div>
+</div>
+<div class="bg-surface-container-high rounded-xl p-6 flex items-center justify-between">
+<div>
+<span class="text-on-surface-variant font-label text-[10px] uppercase tracking-widest block mb-1">Active Projects</span>
+<span class="text-xl font-bold text-on-surface">14 Secure Vaults</span>
+</div>
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="verified_user">verified_user</span>
+</div>
+</div>
+</section>
+<!-- Ledger Table Section -->
+<section class="bg-surface-container-lowest rounded-xl p-1 overflow-hidden">
+<div class="p-6 flex justify-between items-center bg-surface-container-low/50">
+<h3 class="text-lg font-bold text-on-surface">Recent Transaction Ledger</h3>
+<div class="flex items-center gap-2">
+<span class="text-xs text-on-surface-variant mr-2">Sort by: Date</span>
+<button class="p-2 hover:bg-surface-variant/30 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-[10px] uppercase tracking-widest text-on-surface-variant border-b border-outline-variant/10">
+<th class="px-6 py-4 font-semibold">Transaction ID</th>
+<th class="px-6 py-4 font-semibold">Origin Member</th>
+<th class="px-6 py-4 font-semibold">Date &amp; Time</th>
+<th class="px-6 py-4 font-semibold">Type</th>
+<th class="px-6 py-4 font-semibold text-right">Amount</th>
+<th class="px-6 py-4 font-semibold text-center">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<!-- Ledger Row 1 -->
+<tr class="group hover:bg-[#1a2337]/40 transition-colors">
+<td class="px-6 py-5">
+<span class="font-mono text-xs text-primary/80">#TL-9902-X</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-[10px] font-bold">MK</div>
+<span class="text-sm font-medium">Marcus Kwane</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="text-sm text-on-surface">Oct 24, 2023</span>
+<span class="text-xs text-on-surface-variant">14:22 GMT</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs font-medium px-2 py-1 bg-surface-container-highest rounded-md">Direct Deposit</span>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="text-sm font-bold text-secondary">+$12,500.00</span>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+</tr>
+<!-- Ledger Row 2 -->
+<tr class="group bg-[#1a2337]/20 hover:bg-[#1a2337]/40 transition-colors">
+<td class="px-6 py-5">
+<span class="font-mono text-xs text-primary/80">#TL-9884-Z</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-[10px] font-bold">ST</div>
+<span class="text-sm font-medium">Sarah Togba</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="text-sm text-on-surface">Oct 22, 2023</span>
+<span class="text-xs text-on-surface-variant">09:15 GMT</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs font-medium px-2 py-1 bg-surface-container-highest rounded-md">Quarterly Dividends</span>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="text-sm font-bold text-secondary">+$8,200.00</span>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+</tr>
+<!-- Ledger Row 3 -->
+<tr class="group hover:bg-[#1a2337]/40 transition-colors">
+<td class="px-6 py-5">
+<span class="font-mono text-xs text-primary/80">#TL-9851-A</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-[10px] font-bold">ET</div>
+<span class="text-sm font-medium">Estate Trust</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="text-sm text-on-surface">Oct 18, 2023</span>
+<span class="text-xs text-on-surface-variant">16:45 GMT</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs font-medium px-2 py-1 bg-surface-container-highest rounded-md">Maintenance Fee</span>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="text-sm font-bold text-on-surface-variant">-$1,450.00</span>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+</tr>
+<!-- Ledger Row 4 -->
+<tr class="group bg-[#1a2337]/20 hover:bg-[#1a2337]/40 transition-colors">
+<td class="px-6 py-5">
+<span class="font-mono text-xs text-primary/80">#TL-9840-C</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-[10px] font-bold">JK</div>
+<span class="text-sm font-medium">James Kwane</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="text-sm text-on-surface">Oct 15, 2023</span>
+<span class="text-xs text-on-surface-variant">11:02 GMT</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs font-medium px-2 py-1 bg-surface-container-highest rounded-md">Capital Contribution</span>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="text-sm font-bold text-secondary">+$25,000.00</span>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="material-symbols-outlined text-tertiary text-lg" data-icon="pending" data-weight="fill" style="font-variation-settings: 'FILL' 1;">pending</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-6 border-t border-outline-variant/10 flex items-center justify-between">
+<span class="text-xs text-on-surface-variant">Showing 4 of 128 recorded transactions</span>
+<div class="flex gap-2">
+<button class="px-3 py-1 bg-surface-container hover:bg-surface-container-high rounded text-xs transition-colors">Previous</button>
+<button class="px-3 py-1 bg-surface-container-high text-primary rounded text-xs font-bold transition-colors">1</button>
+<button class="px-3 py-1 bg-surface-container hover:bg-surface-container-high rounded text-xs transition-colors">2</button>
+<button class="px-3 py-1 bg-surface-container hover:bg-surface-container-high rounded text-xs transition-colors">3</button>
+<button class="px-3 py-1 bg-surface-container hover:bg-surface-container-high rounded text-xs transition-colors">Next</button>
+</div>
+</div>
+</section>
+<!-- Dynamic Asset Ribbon -->
+<section class="mt-12 overflow-hidden relative group">
+<div class="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-surface to-transparent z-10"></div>
+<div class="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-surface to-transparent z-10"></div>
+<div class="flex gap-8 whitespace-nowrap animate-marquee py-4 bg-surface-container-lowest/50 rounded-lg">
+<div class="flex items-center gap-4 px-6 border-r border-outline-variant/10">
+<span class="text-[10px] font-bold text-on-surface-variant">VAULT_A</span>
+<span class="text-sm font-mono text-secondary">+$14,200.44</span>
+</div>
+<div class="flex items-center gap-4 px-6 border-r border-outline-variant/10">
+<span class="text-[10px] font-bold text-on-surface-variant">CRYPTO_EQUITY</span>
+<span class="text-sm font-mono text-tertiary">-$2,110.12</span>
+</div>
+<div class="flex items-center gap-4 px-6 border-r border-outline-variant/10">
+<span class="text-[10px] font-bold text-on-surface-variant">REAL_ESTATE_HLD</span>
+<span class="text-sm font-mono text-secondary">+$45,000.00</span>
+</div>
+<div class="flex items-center gap-4 px-6 border-r border-outline-variant/10">
+<span class="text-[10px] font-bold text-on-surface-variant">GOLD_RESERVE</span>
+<span class="text-sm font-mono text-on-surface">$1,980.00/oz</span>
+</div>
+<div class="flex items-center gap-4 px-6 border-r border-outline-variant/10">
+<span class="text-[10px] font-bold text-on-surface-variant">EURO_HEDGE</span>
+<span class="text-sm font-mono text-secondary">+$3,440.00</span>
+</div>
+<div class="flex items-center gap-4 px-6">
+<span class="text-[10px] font-bold text-on-surface-variant">TREASURY_BILLS</span>
+<span class="text-sm font-mono text-on-surface">+$128.90</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Contextual Information Overlay (Asymmetric Element) -->
+<div class="fixed bottom-8 right-8 w-72 bg-surface-bright/80 backdrop-blur-xl p-6 rounded-xl border border-outline-variant/20 shadow-2xl z-50">
+<div class="flex items-start justify-between mb-4">
+<span class="text-xs font-bold text-primary uppercase tracking-widest">Vault Security</span>
+<span class="material-symbols-outlined text-secondary text-sm">lock</span>
+</div>
+<p class="text-xs leading-relaxed text-on-surface-variant">
+            All transaction hashes are recorded on the family's private ledger. Any changes require multi-sig approval from the Governance Board.
+        </p>
+<div class="mt-4 pt-4 border-t border-outline-variant/20 flex items-center gap-2">
+<div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
+<span class="text-[10px] text-on-surface font-medium uppercase tracking-tighter">Encrypted Connection Active</span>
+</div>
+</div>
+</body></html>

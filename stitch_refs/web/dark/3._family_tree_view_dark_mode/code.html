@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Family Tree View | Togba Legacy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#31394d",
+              "secondary-fixed": "#6ffbbe",
+              "inverse-primary": "#005ac2",
+              "surface-container-low": "#131b2e",
+              "inverse-on-surface": "#283044",
+              "on-primary": "#002e6a",
+              "secondary": "#4edea3",
+              "on-secondary": "#003824",
+              "on-error-container": "#ffdad6",
+              "error": "#ffb4ab",
+              "on-primary-fixed": "#001a42",
+              "on-tertiary-fixed": "#2a1700",
+              "primary-container": "#4d8eff",
+              "surface": "#0b1326",
+              "on-tertiary": "#472a00",
+              "surface-variant": "#2d3449",
+              "outline": "#8c909f",
+              "on-primary-container": "#00285d",
+              "inverse-surface": "#dae2fd",
+              "surface-container": "#171f33",
+              "on-secondary-fixed": "#002113",
+              "error-container": "#93000a",
+              "on-secondary-container": "#00311f",
+              "surface-container-lowest": "#060e20",
+              "on-secondary-fixed-variant": "#005236",
+              "surface-dim": "#0b1326",
+              "on-primary-fixed-variant": "#004395",
+              "primary": "#adc6ff",
+              "secondary-fixed-dim": "#4edea3",
+              "on-background": "#dae2fd",
+              "surface-container-highest": "#2d3449",
+              "outline-variant": "#424754",
+              "tertiary-fixed": "#ffddb8",
+              "surface-container-high": "#222a3d",
+              "on-surface-variant": "#c2c6d6",
+              "surface-tint": "#adc6ff",
+              "on-surface": "#dae2fd",
+              "on-error": "#690005",
+              "primary-fixed": "#d8e2ff",
+              "tertiary": "#ffb95f",
+              "tertiary-container": "#ca8100",
+              "tertiary-fixed-dim": "#ffb95f",
+              "secondary-container": "#00a572",
+              "primary-fixed-dim": "#adc6ff",
+              "on-tertiary-fixed-variant": "#653e00",
+              "on-tertiary-container": "#3e2400",
+              "background": "#0b1326"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tree-line-v { width: 2px; background-color: #4d8eff; opacity: 0.3; }
+        .tree-line-h { height: 2px; background-color: #4d8eff; opacity: 0.3; }
+        .vault-glass { background: rgba(45, 52, 73, 0.4); backdrop-filter: blur(12px); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body overflow-hidden">
+<!-- Sidebar Navigation -->
+<nav class="fixed left-0 top-0 h-full overflow-y-auto px-4 py-6 h-screen w-64 flex flex-col border-r border-transparent bg-[#0b1326] z-50">
+<div class="mb-10 px-2">
+<h1 class="text-xl font-bold tracking-tighter text-[#dae2fd]">Togba Legacy</h1>
+<p class="text-xs font-['Inter'] font-medium tracking-tight text-[#adc6ff] opacity-70">The Sovereign Vault</p>
+</div>
+<div class="flex flex-col gap-1 flex-grow">
+<a class="flex items-center gap-3 px-4 py-3 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#adc6ff] font-semibold bg-[#1a2337] rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Family Registry</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Contributions &amp; Finance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Investment Allocation</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="how_to_vote">how_to_vote</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Governance / Voting</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Messaging</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Timeline</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="emergency">emergency</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">SOS / Emergency</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Settings</span>
+</a>
+</div>
+<div class="mt-auto pt-6 border-t border-outline-variant/10">
+<a class="flex items-center gap-3 px-4 py-3 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#1a2337]/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Inter'] font-medium tracking-tight text-sm">Profile</span>
+</a>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="ml-64 min-h-screen relative flex flex-col">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 bg-transparent backdrop-blur-md">
+<div class="flex items-center gap-4">
+<nav class="flex text-xs font-['Inter'] tracking-wide text-[#c2c6d6]">
+<span>Registry</span>
+<span class="mx-2 opacity-30">/</span>
+<span class="text-[#adc6ff] font-bold">Interactive Lineage</span>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center bg-surface-container-highest px-4 py-1.5 rounded-full border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant text-lg mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none text-xs focus:ring-0 placeholder-on-surface-variant/50 w-48 text-on-surface" placeholder="Search lineage..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-[#c2c6d6]">
+<button class="opacity-80 hover:opacity-100 hover:text-[#dae2fd] transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="bg-error-container text-on-error-container px-4 py-1.5 rounded-full text-xs font-bold tracking-tight">SOS</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-primary/20">
+<img alt="User Profile" data-alt="close up professional portrait of a distinguished elder man in a dark suit with soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2-4T-A51hMqnE5pjyWq-oXPmJ4EcXt7HfQuI6LQcjwNfmq5sPDHp2uFnjnut61kasXL1ajQaFwWq6QaUr1dSYzAAqwnwUWevU0DzS-8ytGeVqJ4i2_u2rO-wJdrSSAEdDieom0PLAsQomJx2iIAPn5JXlC4ozdIGJUIMMx7Ls3EE7ifN2yrkm4W5hFVhjJY8mmiEwnVXEUEJ60dQVp4yebbDxSKtvF-IMYuCxX7PkM-iafL3ozdrLB-JmujZxoGL6z1YCf25wOY0_"/>
+</div>
+</div>
+</div>
+</header>
+<!-- View Controls Floating Container -->
+<div class="absolute top-24 right-8 z-30 flex flex-col gap-3">
+<div class="vault-glass p-1.5 rounded-xl flex flex-col shadow-2xl border border-outline-variant/10">
+<button class="p-2.5 bg-primary-container text-on-primary-container rounded-lg mb-1 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined block" data-icon="account_tree">account_tree</span>
+</button>
+<button class="p-2.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all">
+<span class="material-symbols-outlined block" data-icon="view_list">view_list</span>
+</button>
+</div>
+<div class="vault-glass p-1.5 rounded-xl flex flex-col shadow-2xl border border-outline-variant/10">
+<button class="p-2.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all">
+<span class="material-symbols-outlined block" data-icon="add">add</span>
+</button>
+<button class="p-2.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all">
+<span class="material-symbols-outlined block" data-icon="remove">remove</span>
+</button>
+<button class="p-2.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all">
+<span class="material-symbols-outlined block" data-icon="center_focus_strong">center_focus_strong</span>
+</button>
+</div>
+</div>
+<!-- Tree Workspace -->
+<div class="flex-grow flex items-center justify-center p-20 bg-[radial-gradient(circle_at_center,_#131b2e_0%,_#0b1326_100%)] overflow-auto">
+<!-- Nodes Container -->
+<div class="relative flex flex-col items-center gap-24">
+<!-- Level 0: Patriarch/Matriarch -->
+<div class="relative group">
+<div class="w-64 bg-surface-variant p-4 rounded-xl border border-primary/10 hover:border-primary/40 transition-all cursor-pointer shadow-xl">
+<div class="flex items-center gap-4">
+<div class="h-14 w-14 rounded-full border-2 border-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="portrait of a dignified older man with white hair and sharp facial features in a charcoal grey suit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDo1G6nV-vCwZ2UyZnm5B4l3KjPj5ecX5zypRXj3xASj1oz7C7xaNsUuD0hmnpc-6usqc5ZaNilbeZmGPIfGufXS_tm-nSH4hP0S0MV4ot4ersiRKSvhYByh3FRdzDrQ8uvgSR0M2NnUfGBissXijT4-1pCARJ9IhiCK0j-UzotCk-GQLMQZoD-6UfVXC_BNB6IIzcR3X1kBRTw89Cgz_eAEQUAE2mEN4lu1dK0hPOQjVDQ1zjXZJOjQznShZZP28YAqGKo8lzFxmwF"/>
+</div>
+<div>
+<h3 class="text-sm font-bold text-on-surface">Thomas Togba Sr.</h3>
+<p class="text-[10px] uppercase tracking-widest text-secondary font-semibold">Founder</p>
+<p class="text-[11px] text-on-surface-variant mt-0.5">1945 — Present</p>
+</div>
+</div>
+</div>
+<!-- Connecting Line Down -->
+<div class="absolute top-full left-1/2 -translate-x-1/2 h-24 tree-line-v"></div>
+</div>
+<!-- Level 1: Heirs -->
+<div class="relative flex gap-32">
+<!-- Horizontal Span Line -->
+<div class="absolute -top-12 left-[15%] right-[15%] tree-line-h"></div>
+<!-- Heir 1 -->
+<div class="relative flex flex-col items-center">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 h-12 tree-line-v"></div>
+<div class="w-64 bg-surface-variant p-4 rounded-xl border border-outline-variant/20 hover:border-primary/40 transition-all cursor-pointer shadow-xl">
+<div class="flex items-center gap-4">
+<div class="h-14 w-14 rounded-full border border-primary/30 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="professional woman in her 40s with elegant posture and sophisticated business attire against a dark blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALgkFH4w0kdWZ7B1wPyG5gkuryJqV1QE_3K2KNunIRXpPenyl3OVyGh2IghQQcRjR_iWSdihhaH2aaRpf9_4X_Zca0GiozrUXKVvNaxCxpXspDz3VbcXfONfW1QK_GTJHKO6rE7WawGe2qBI0TJXtH4pJA6d7231gQLMt8uGLO9vu2zfCOGXL73bhORjVc2olkCcniNI1zBCt1l59git2YyYSQh2C-7keUW9LEwQ93xyIRH3d90w3mQ6BNnpU3vf1cvyaIzuM4P9Gh"/>
+</div>
+<div>
+<h3 class="text-sm font-bold text-on-surface">Julianne Togba</h3>
+<p class="text-[10px] uppercase tracking-widest text-primary font-semibold">Director</p>
+<p class="text-[11px] text-on-surface-variant mt-0.5">1972 — Present</p>
+</div>
+</div>
+</div>
+<!-- Connecting Line Down -->
+<div class="absolute top-full left-1/2 -translate-x-1/2 h-24 tree-line-v"></div>
+<!-- Level 2: Children -->
+<div class="mt-24 relative flex gap-12">
+<div class="absolute -top-12 left-[20%] right-[20%] tree-line-h"></div>
+<!-- Sub Node 1 -->
+<div class="relative flex flex-col items-center">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 h-12 tree-line-v"></div>
+<div class="w-56 bg-surface-container-high p-3 rounded-xl border border-outline-variant/10 hover:border-primary/30 transition-all cursor-pointer shadow-lg">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-surface-bright flex items-center justify-center border border-outline-variant/30">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="person">person</span>
+</div>
+<div>
+<h4 class="text-xs font-bold text-on-surface">Marcus Togba</h4>
+<p class="text-[10px] text-on-surface-variant mt-0.5">Associate</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Sub Node 2 -->
+<div class="relative flex flex-col items-center">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 h-12 tree-line-v"></div>
+<div class="w-56 bg-surface-container-high p-3 rounded-xl border border-outline-variant/10 hover:border-primary/30 transition-all cursor-pointer shadow-lg">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-surface-bright flex items-center justify-center border border-outline-variant/30">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="person">person</span>
+</div>
+<div>
+<h4 class="text-xs font-bold text-on-surface">Elena Togba</h4>
+<p class="text-[10px] text-on-surface-variant mt-0.5">Heir Apparent</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Heir 2 -->
+<div class="relative flex flex-col items-center">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 h-12 tree-line-v"></div>
+<div class="w-64 bg-surface-variant p-4 rounded-xl border border-outline-variant/20 hover:border-primary/40 transition-all cursor-pointer shadow-xl">
+<div class="flex items-center gap-4">
+<div class="h-14 w-14 rounded-full border border-primary/30 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="middle aged man with a sharp beard and glasses in high-end leisure wear looking towards camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfIHc8DARbMLotHIyZXLsRD2DO-nMs75piNiqBPbZEgrB5aWBopumlBtNe32vIabdZh8qib-anza947p-CgeF_dI2lb4z6ZsYEJfZpqXKEb9qOZFmJs8qskB8ltCpSnXTlCuWakWfRNOoQggQwPN48nLtRaJm4vZW3Et8TL_J1KNIP-FWhFcq3IUyPVhTDyRwYVti5K-vVda-1BNtypSkfklCto4dEV1iCDR-0oFX_h3Jl9JDSyOR3mF4JFyx8tlR0unDHtMr0pMx7"/>
+</div>
+<div>
+<h3 class="text-sm font-bold text-on-surface">Robert Togba</h3>
+<p class="text-[10px] uppercase tracking-widest text-primary font-semibold">Trustee</p>
+<p class="text-[11px] text-on-surface-variant mt-0.5">1975 — Present</p>
+</div>
+</div>
+</div>
+<!-- Connecting Line Down -->
+<div class="absolute top-full left-1/2 -translate-x-1/2 h-24 tree-line-v"></div>
+<!-- Level 2: Children -->
+<div class="mt-24 relative flex gap-12">
+<div class="absolute -top-12 left-0 right-0 tree-line-h"></div>
+<div class="relative flex flex-col items-center">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 h-12 tree-line-v"></div>
+<div class="w-56 bg-surface-container-high p-3 rounded-xl border border-outline-variant/10 hover:border-primary/30 transition-all cursor-pointer shadow-lg">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-surface-bright flex items-center justify-center border border-outline-variant/30">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="person">person</span>
+</div>
+<div>
+<h4 class="text-xs font-bold text-on-surface">Sara Togba</h4>
+<p class="text-[10px] text-on-surface-variant mt-0.5">Associate</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Detail Sidebar (Contextual) -->
+<aside class="absolute right-0 top-16 bottom-0 w-80 bg-surface-container-lowest border-l border-outline-variant/10 p-8 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.3)] z-20">
+<div class="mb-8">
+<div class="h-32 w-32 rounded-2xl mx-auto border border-primary/20 overflow-hidden mb-6">
+<img class="w-full h-full object-cover" data-alt="high resolution studio portrait of an elder gentleman with wise expression and tailored suit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvCToC0Q_qF_sWh6_Mz_VJ5WgjD0E1ENKww10Ho3qkmrWSjUJ8oanyeEkpEj3V8OK2PmDFigRqi25AIspANZZBUFqkviCcxPtiLYhVDJZ8vlMavzOakjkpZXIm-97BGpHG9e73JzBl_Qv1uPLSUgmQL8C5RXgy1gLFZdafOMhJIiHNU05D_5mmFrCPfQsQ73uAQrlJLbjeodQTHqLc27OhLCiLqrUU4HtKyE9yF9PTlUyPIrsaj_8rtHY7KzJP_oyZC_3Kix3wlRtj"/>
+</div>
+<h2 class="text-xl font-bold text-center text-on-surface">Thomas Togba Sr.</h2>
+<p class="text-center text-secondary text-sm font-semibold tracking-widest mt-1">FOUNDER &amp; PATRIARCH</p>
+</div>
+<div class="space-y-6">
+<div>
+<label class="text-[10px] uppercase tracking-widest text-on-surface-variant/60 font-bold">Biometric ID</label>
+<p class="text-sm font-mono text-on-surface mt-1">#TL-001-P</p>
+</div>
+<div>
+<label class="text-[10px] uppercase tracking-widest text-on-surface-variant/60 font-bold">Allocation Weight</label>
+<div class="mt-2 h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[45%]"></div>
+</div>
+<p class="text-[10px] text-right mt-1 text-primary">45.0% Voting Power</p>
+</div>
+<div>
+<label class="text-[10px] uppercase tracking-widest text-on-surface-variant/60 font-bold">Active Projects</label>
+<ul class="mt-2 space-y-2">
+<li class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                            Azure Trust Estate
+                        </li>
+<li class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                            Legacy Philanthropy Hub
+                        </li>
+</ul>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary-container rounded-xl font-bold text-sm shadow-lg shadow-primary/10 hover:scale-[0.98] transition-all">View Full Dossier</button>
+</div>
+<div class="mt-auto p-4 bg-surface-container rounded-xl border border-outline-variant/5">
+<div class="flex items-center justify-between mb-3">
+<span class="text-[10px] font-bold text-on-surface-variant/60">GOVERNANCE TOKEN</span>
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="verified">verified</span>
+</div>
+<p class="text-lg font-bold text-on-surface tracking-tight">1,240,000 <span class="text-xs font-normal text-on-surface-variant">VOTE</span></p>
+</div>
+</aside>
+<!-- Legend / Info Ribbon -->
+<div class="absolute bottom-8 left-8 p-4 vault-glass border border-outline-variant/10 rounded-xl max-w-xs">
+<h4 class="text-[10px] font-bold text-on-surface-variant mb-3 tracking-widest uppercase">Registry Legend</h4>
+<div class="grid grid-cols-2 gap-3">
+<div class="flex items-center gap-2 text-[10px] text-on-surface-variant">
+<span class="w-2.5 h-2.5 rounded bg-secondary border border-secondary/30"></span>
+                    Founder Tier
+                </div>
+<div class="flex items-center gap-2 text-[10px] text-on-surface-variant">
+<span class="w-2.5 h-2.5 rounded bg-primary border border-primary/30"></span>
+                    Director Tier
+                </div>
+<div class="flex items-center gap-2 text-[10px] text-on-surface-variant">
+<span class="w-2.5 h-2.5 rounded bg-tertiary border border-tertiary/30"></span>
+                    Associate Tier
+                </div>
+<div class="flex items-center gap-2 text-[10px] text-on-surface-variant">
+<span class="w-2.5 h-2.5 rounded bg-surface-bright border border-outline-variant/30"></span>
+                    Minor / Protected
+                </div>
+</div>
+</div>
+</main>
+</body></html>
