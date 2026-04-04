@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed": "#001a41",
+              "background": "#f9f9fe",
+              "on-error": "#ffffff",
+              "primary-fixed-dim": "#adc6ff",
+              "surface-container": "#ededf2",
+              "tertiary-fixed": "#e2dfff",
+              "surface-tint": "#005bc1",
+              "secondary": "#006e28",
+              "surface": "#f9f9fe",
+              "surface-container-low": "#f3f3f8",
+              "surface-bright": "#f9f9fe",
+              "on-surface-variant": "#414755",
+              "on-surface": "#1a1c1f",
+              "on-tertiary-container": "#fffbff",
+              "on-primary-container": "#fefcff",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e2e2e7",
+              "on-background": "#1a1c1f",
+              "inverse-on-surface": "#f0f0f5",
+              "surface-dim": "#d9dade",
+              "outline": "#717786",
+              "on-tertiary-fixed": "#0c006a",
+              "on-secondary-container": "#00732a",
+              "outline-variant": "#c1c6d7",
+              "secondary-fixed-dim": "#53e16f",
+              "secondary-fixed": "#72fe88",
+              "primary-container": "#0070eb",
+              "tertiary": "#4c4aca",
+              "on-secondary-fixed": "#002107",
+              "on-primary-fixed-variant": "#004493",
+              "inverse-surface": "#2e3034",
+              "tertiary-fixed-dim": "#c2c1ff",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-highest": "#e2e2e7",
+              "on-secondary": "#ffffff",
+              "tertiary-container": "#6664e4",
+              "secondary-container": "#6ffb85",
+              "on-tertiary-fixed-variant": "#3631b4",
+              "error-container": "#ffdad6",
+              "inverse-primary": "#adc6ff",
+              "surface-container-high": "#e8e8ed",
+              "primary-fixed": "#d8e2ff",
+              "primary": "#0058bc",
+              "on-secondary-fixed-variant": "#00531c",
+              "on-primary": "#ffffff",
+              "error": "#ba1a1a"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .antique-bg {
+            background-color: #fdfaf5; /* Soft Antique Beige Custom Override for Background Canvas */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antique-bg font-body text-on-surface selection:bg-primary-fixed-dim">
+<!-- TopAppBar -->
+<header class="bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md docked full-width top-0 sticky z-50 shadow-none">
+<div class="flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="account_balance">account_balance</span>
+<span class="text-xl font-extrabold tracking-tighter text-blue-800 dark:text-blue-400 font-['Inter']">Togba Legacy</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<nav class="flex gap-6">
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-3 py-1 rounded-lg" href="#">Dashboard</a>
+<a class="text-blue-700 dark:text-blue-400 font-bold px-3 py-1 rounded-lg" href="#">Registry</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-3 py-1 rounded-lg" href="#">Messaging</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-3 py-1 rounded-lg" href="#">More</a>
+</nav>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-bold text-on-surface-variant overflow-hidden ring-2 ring-white">
+<img alt="Family Crest" data-alt="close-up of a classic wax seal with a detailed family crest on textured cream parchment paper" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBB2IfTNVV27YVwvVFWbBmjeapYFCV2-e_OQx8s9IyYbmRkDuy77Fbhw9SfKuItikvr-39ifEGWf5v0blu0CHQUtO2DjJ4du3y-tFUdsD3TPLM3Loio_CW0H7yeTJS6uPLBxu73Jd5nHMpNynhYoUDMDanpAOyHzIApq-y8UdfyteoDESdf7cSDFjR9fVZIS6n1PxJpEnR90CrKQ2Q5_Eav65FuwnNObkLEaneXEcq4SfK_vC4kqgDe5sB8GvFve9gEnfWp3T5Y1_Ab"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-6 pt-12 pb-32">
+<!-- Page Header -->
+<div class="mb-16 text-center">
+<p class="label-md uppercase tracking-[0.2em] text-on-surface-variant font-medium mb-4">Historical Archives</p>
+<h1 class="text-5xl font-extrabold tracking-tight text-on-surface mb-4">Family Archive</h1>
+<div class="h-1 w-24 bg-primary mx-auto rounded-full opacity-20"></div>
+</div>
+<!-- Vertical Timeline Container -->
+<div class="relative">
+<!-- Timeline Line -->
+<div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-outline-variant/30 transform md:-translate-x-1/2"></div>
+<!-- Milestone 1: Foundational Era -->
+<div class="relative mb-24 flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="md:w-[45%] order-2 md:order-1">
+<div class="bg-surface-container-low p-6 rounded-xl shadow-sm border border-outline-variant/10">
+<div class="overflow-hidden rounded-lg mb-6 aspect-video bg-white">
+<img class="w-full h-full object-cover" data-alt="vintage sepia-toned photograph of an old European manor house with classical architecture surrounded by ancient oak trees" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCt_s3wUufun5ME_Js978KFZmU3gzKBqRv9v8NoJbaHfRIBSUi5-kTV0G0SIYUCZPolf3lcpWZDTASsIFrncXzPREuakjMe3-GO8wnl4u-1lAbchKZIfR4yvyXKgvDa4Rqrrpv60A0X-sNuv6AFgcj8yXgFP96Nt8dgXnj_5JRciqgkR3ccjW4aW6AQbv_1Qi1TKVpyuNqBRC4PnIuNb5Lglg4ffflGU1jHu-V1uDyQPKYvvEUcXjEcHJIySMQ4gdptt9-6tR8qtEGh"/>
+</div>
+<span class="inline-block px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-bold tracking-widest uppercase rounded-full mb-3">1892 — 1920</span>
+<h3 class="text-2xl font-bold text-on-surface mb-3">Foundational Era</h3>
+<p class="text-on-surface-variant leading-relaxed">The roots of the Togba lineage were firmly planted in the fertile valleys of the northern provinces. Established as a center for trade and agricultural innovation, the estate became a beacon of regional stability.</p>
+</div>
+</div>
+<!-- Timeline Node -->
+<div class="absolute left-4 md:left-1/2 w-3 h-3 bg-primary rounded-full transform -translate-x-1/2 border-4 border-background ring-4 ring-primary/10 z-10"></div>
+<div class="md:w-[45%] order-1 md:order-2">
+<div class="md:text-left text-left pl-12 md:pl-0">
+<span class="text-6xl font-black text-on-surface/5 select-none">CHAPTER I</span>
+</div>
+</div>
+</div>
+<!-- Milestone 2: Modernization -->
+<div class="relative mb-24 flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="md:w-[45%] order-2">
+<div class="bg-primary-fixed/30 p-6 rounded-xl shadow-sm border border-outline-variant/10">
+<div class="overflow-hidden rounded-lg mb-6 aspect-video bg-white">
+<img class="w-full h-full object-cover" data-alt="architectural sketch of a modern mid-century glass and steel office building overlooking a clean city plaza at sunset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVFYT3UvdXSv705KmsR-xht6HMX9oGRT0vmB1TfPvLD2cibxoxWv5AJdfWUSqJzibVDW8M4Dseis9rwp-ujQsA79pRg1RfMZo3fE5kMcKCHo4f1D5glwAhVPGW5mr0q7vKqOMWnioDD3i48MF7MdbTSJCEOBC_T_8FKpMFakqCOHUDfvQpDOL2oWO4OXyZwE4ZWCyniX1twtcSqPPBNPL1nWgTvCfgvfr-qwtXsenxbNhiNEUAZH_qA1QzYWs2NDIbZco8hjrW5p3h"/>
+</div>
+<span class="inline-block px-3 py-1 bg-primary-container/20 text-on-primary-fixed-variant text-[10px] font-bold tracking-widest uppercase rounded-full mb-3">1921 — 1985</span>
+<h3 class="text-2xl font-bold text-on-surface mb-3">Modernization</h3>
+<p class="text-on-surface-variant leading-relaxed">Transitioning from land-based wealth to industrial leadership, the family moved the headquarters to the capital. This era saw the first automation of the legacy archives and global expansion of maritime interests.</p>
+</div>
+</div>
+<!-- Timeline Node -->
+<div class="absolute left-4 md:left-1/2 w-3 h-3 bg-primary rounded-full transform -translate-x-1/2 border-4 border-background ring-4 ring-primary/10 z-10"></div>
+<div class="md:w-[45%] order-1">
+<div class="md:text-right text-left pl-12 md:pl-0">
+<span class="text-6xl font-black text-on-surface/5 select-none">CHAPTER II</span>
+</div>
+</div>
+</div>
+<!-- Milestone 3: Expansion -->
+<div class="relative mb-24 flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="md:w-[45%] order-2 md:order-1">
+<div class="bg-secondary-container/20 p-6 rounded-xl shadow-sm border border-outline-variant/10">
+<div class="overflow-hidden rounded-lg mb-6 aspect-video bg-white">
+<img class="w-full h-full object-cover" data-alt="digital visualization of a global network of glowing blue lines connecting major cities across a dark earth globe from space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhcaVhyV-sMwSCIzk-LRLEoUojhPArkMdCpTz7zRVosdYCRn_SHTEtsSIl0IbZfVh5Nnqy7Pt-JBiDZpI1iIyZ_QVpbcRe46ouCIIH0rwMe75NlEpWVe8JtUQm0yYMfPiIvevatD5Cmoh4I8KME1-448GaEaWIrAhgi8RPz2tLdcGo-R7pjWyG2ZSscaQp3Nr3Tl9XfDkwTUvTsIKDSilt--wsvM86ZxKq0CkOo2vdXbkV-iOjlDM4Cf6YNDs1-qjzsNXhnFd1UGYl"/>
+</div>
+<span class="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold tracking-widest uppercase rounded-full mb-3">1986 — PRESENT</span>
+<h3 class="text-2xl font-bold text-on-surface mb-3">Expansion</h3>
+<p class="text-on-surface-variant leading-relaxed">The digital leap. Today, Togba Legacy manages assets across six continents. Our Registry is a testament to the intersection of ancient record-keeping and cutting-edge secure data technologies.</p>
+</div>
+</div>
+<!-- Timeline Node -->
+<div class="absolute left-4 md:left-1/2 w-3 h-3 bg-primary rounded-full transform -translate-x-1/2 border-4 border-background ring-4 ring-primary/10 z-10"></div>
+<div class="md:w-[45%] order-1 md:order-2">
+<div class="md:text-left text-left pl-12 md:pl-0">
+<span class="text-6xl font-black text-on-surface/5 select-none">CHAPTER III</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Call to Action -->
+<div class="mt-20 p-10 rounded-3xl bg-surface-container-lowest border border-outline-variant/20 text-center">
+<h2 class="text-3xl font-bold text-on-surface mb-4">Preserving the Future</h2>
+<p class="text-on-surface-variant max-w-xl mx-auto mb-8 leading-relaxed">Each entry in our registry is protected by institutional-grade encryption, ensuring the Togba legacy remains inviolable for generations to come.</p>
+<button class="bg-primary hover:bg-primary-container text-on-primary font-bold px-8 py-3 rounded-lg transition-all active:scale-95">
+                Access Full Registry
+            </button>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 pb-safe bg-[#f3f3f8] dark:bg-[#1a1c1f] border-t border-slate-200/30 dark:border-slate-800/30 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+<div class="flex justify-around items-center px-4 py-3 w-full">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 hover:text-blue-600 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-white dark:bg-slate-800 text-[#0058bc] dark:text-blue-400 rounded-xl px-4 py-2 shadow-sm transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Registry</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 hover:text-blue-600 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Messaging</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 hover:text-blue-600 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">More</span>
+</a>
+</div>
+</nav>
+</body></html>

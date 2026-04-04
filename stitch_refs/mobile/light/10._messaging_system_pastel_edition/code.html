@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Togba Legacy Messaging</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed": "#001a41",
+              "background": "#f9f9fe",
+              "on-error": "#ffffff",
+              "primary-fixed-dim": "#adc6ff",
+              "surface-container": "#ededf2",
+              "tertiary-fixed": "#e2dfff",
+              "surface-tint": "#005bc1",
+              "secondary": "#006e28",
+              "surface": "#f9f9fe",
+              "surface-container-low": "#f3f3f8",
+              "surface-bright": "#f9f9fe",
+              "on-surface-variant": "#414755",
+              "on-surface": "#1a1c1f",
+              "on-tertiary-container": "#fffbff",
+              "on-primary-container": "#fefcff",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e2e2e7",
+              "on-background": "#1a1c1f",
+              "inverse-on-surface": "#f0f0f5",
+              "surface-dim": "#d9dade",
+              "outline": "#717786",
+              "on-tertiary-fixed": "#0c006a",
+              "on-secondary-container": "#00732a",
+              "outline-variant": "#c1c6d7",
+              "secondary-fixed-dim": "#53e16f",
+              "secondary-fixed": "#72fe88",
+              "primary-container": "#0070eb",
+              "tertiary": "#4c4aca",
+              "on-secondary-fixed": "#002107",
+              "on-primary-fixed-variant": "#004493",
+              "inverse-surface": "#2e3034",
+              "tertiary-fixed-dim": "#c2c1ff",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-highest": "#e2e2e7",
+              "on-secondary": "#ffffff",
+              "tertiary-container": "#6664e4",
+              "secondary-container": "#6ffb85",
+              "on-tertiary-fixed-variant": "#3631b4",
+              "error-container": "#ffdad6",
+              "inverse-primary": "#adc6ff",
+              "surface-container-high": "#e8e8ed",
+              "primary-fixed": "#d8e2ff",
+              "primary": "#0058bc",
+              "on-secondary-fixed-variant": "#00531c",
+              "on-primary": "#ffffff",
+              "error": "#ba1a1a"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface">
+<!-- TopAppBar -->
+<header class="bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md docked full-width top-0 sticky z-50 shadow-none">
+<div class="flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="account_balance">account_balance</span>
+<h1 class="text-xl font-extrabold tracking-tighter text-blue-800 dark:text-blue-400 font-['Inter']">Togba Legacy</h1>
+</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-3 py-1 rounded-lg" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-3 py-1 rounded-lg" href="#">Registry</a>
+<a class="text-blue-700 dark:text-blue-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-3 py-1 rounded-lg" href="#">Messaging</a>
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-3 py-1 rounded-lg" href="#">More</a>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-sm font-medium text-slate-900 dark:text-slate-100 font-['Inter']">Family Crest</span>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container text-xs font-bold ring-2 ring-white">TL</div>
+</div>
+</div>
+</header>
+<main class="flex h-[calc(100vh-140px)] md:h-[calc(100vh-72px)] overflow-hidden">
+<!-- Channels Sidebar (Desktop Only) -->
+<aside class="hidden md:flex flex-col w-72 bg-surface-container-low border-r border-outline-variant/10 shrink-0">
+<div class="p-6">
+<h2 class="text-label-md uppercase tracking-widest text-on-surface-variant font-bold text-xs mb-6">Channels</h2>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-surface-container-high rounded-xl text-primary font-semibold" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="tag">tag</span>
+<span>General</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="tag">tag</span>
+<span>Archives</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="tag">tag</span>
+<span>Announcements</span>
+</a>
+</nav>
+<h2 class="text-label-md uppercase tracking-widest text-on-surface-variant font-bold text-xs mt-10 mb-6">Direct Messages</h2>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-xl" href="#">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span>Marcus Togba</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-xl" href="#">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<span>Elena Smith</span>
+</a>
+</nav>
+</div>
+</aside>
+<!-- Chat Canvas -->
+<section class="flex flex-col flex-1 bg-surface-container relative">
+<!-- Chat Header -->
+<header class="flex items-center justify-between px-6 py-4 bg-surface-container-lowest/50 backdrop-blur-sm sticky top-0 z-10 border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="md:hidden material-symbols-outlined text-on-surface-variant" data-icon="menu">menu</span>
+<div class="flex flex-col">
+<h3 class="font-bold text-on-surface text-lg">#General</h3>
+<p class="text-xs text-on-surface-variant">24 members • Legacy planning and general discussion</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="search">search</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="info">info</span>
+</div>
+</header>
+<!-- Messages Area -->
+<div class="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar">
+<!-- Date Divider -->
+<div class="flex items-center gap-4">
+<div class="h-px flex-1 bg-outline-variant/20"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant bg-surface-container px-3 py-1 rounded-full border border-outline-variant/10">Tuesday, October 24</span>
+<div class="h-px flex-1 bg-outline-variant/20"></div>
+</div>
+<!-- Message Received -->
+<div class="flex items-start gap-4 max-w-2xl">
+<img class="w-10 h-10 rounded-xl object-cover shrink-0 ring-1 ring-outline-variant/20" data-alt="portrait of a middle aged man with graying hair and a kind expression in a studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDs7Sw2vcyYE-dLMFbc407NQqMGD_dW-WOIUQ19aAZnXJf8pZ4-YIgdiIWpDfO3hOai55winnv7CemqmANnIp3PfpHbJuWsGo3V06buLzYe91biuNOAHSffCNqLArsYww2M8pEVmVvlx9ypKgJqqh7aBC9Tpcw2XaecQ7sSPiJptELC9wtD4hktJuOL__dpErBVrF23ghIOSXB56hzRCGy7gsYPZU74Et3hSBt0k5zzXAh6GCHvm9iiwZNnqvbKG9sS_zMSXPcRp9P8"/>
+<div>
+<div class="flex items-baseline gap-2 mb-1">
+<span class="font-bold text-sm text-on-surface">Marcus Togba</span>
+<span class="text-[10px] text-on-surface-variant">10:42 AM</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl shadow-sm text-sm text-on-surface leading-relaxed">
+                            Good morning everyone. I've updated the digital asset registry for the upcoming quarterly review. Please take a look at the "Estate Holdings" folder when you have a moment.
+                        </div>
+</div>
+</div>
+<!-- Message Sent -->
+<div class="flex flex-row-reverse items-start gap-4 max-w-2xl ml-auto">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary text-xs font-bold shrink-0">ME</div>
+<div class="flex flex-col items-end">
+<div class="flex items-baseline gap-2 mb-1 flex-row-reverse">
+<span class="font-bold text-sm text-on-surface">You</span>
+<span class="text-[10px] text-on-surface-variant">11:05 AM</span>
+</div>
+<div class="bg-primary-container/10 p-4 rounded-tl-2xl rounded-bl-2xl rounded-br-2xl border border-primary/20 text-sm text-on-surface leading-relaxed">
+                            Thanks Marcus! I'll review it this afternoon. Are there any specific sections you need me to prioritize?
+                        </div>
+</div>
+</div>
+<!-- Message Received (Threaded Style) -->
+<div class="flex items-start gap-4 max-w-2xl">
+<img class="w-10 h-10 rounded-xl object-cover shrink-0 ring-1 ring-outline-variant/20" data-alt="portrait of a professional woman with glasses smiling warmly against a soft office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1nd-33JkxdMYN-CkVuNJHVQPQ6h-f0Ek_0vjXu-mewYsNyoRbuoPTp_DBtJI9yp9TnssYI3mmFecsczoLT6hPePzsYTIe04U1nHmPYaG07zZykYdjLVYfSin7UfWF2zUTY0o-bcV1YiXqlOcOe5ZszG7GxT9nGooY9825wud6zhHnGhJ534uRVRNwY0Ryk9EF9EEQC6vBjJhB16kA38HFukPYJEyb0dHAra4ebsysLDRSuJdKKTWVwkgwUnG2kmQpRH7A-_Y9zGXZ"/>
+<div>
+<div class="flex items-baseline gap-2 mb-1">
+<span class="font-bold text-sm text-on-surface">Elena Smith</span>
+<span class="text-[10px] text-on-surface-variant">11:12 AM</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl shadow-sm space-y-4">
+<p class="text-sm text-on-surface leading-relaxed">I already went through the real estate section. Everything looks accurate except for the valuation on the Lagos coastal property—it might need an adjustment based on the new market report.</p>
+<div class="bg-surface-container-low p-3 rounded-lg border border-outline-variant/20 flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="description">description</span>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold truncate">Lagos_Valuation_Report_Q3.pdf</p>
+<p class="text-[10px] text-on-surface-variant">2.4 MB • PDF</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary" data-icon="download">download</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Date Divider -->
+<div class="flex items-center gap-4">
+<div class="h-px flex-1 bg-outline-variant/20"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant bg-surface-container px-3 py-1 rounded-full border border-outline-variant/10">Today</span>
+<div class="h-px flex-1 bg-outline-variant/20"></div>
+</div>
+<!-- New Message Placeholder -->
+<div class="flex items-start gap-4 max-w-2xl">
+<img class="w-10 h-10 rounded-xl object-cover shrink-0 ring-1 ring-outline-variant/20 opacity-80" data-alt="portrait of a middle aged man with graying hair and a kind expression in a studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCW9nFF-60iS8aCk0iidVJ6BGqWYEo4GcPU12U9BNUzZ3UE51D2rToabFfQ3dtIN4lpELPhVcJw_LRSIHUvimR0FEwBnn6J9rp9oSmjSwOO36iTs6akUHpGvsIbcEJpl7tjdq4DUp-3v7LhVU1sPjyyp4J85XXw0SecZmfsOqdLMnv5frAYXXd9MRHWCil5ST84j9HT_FU-CQKoZ6dKyBwkwN7pPCraNdubJ07Yx5cKQJNn9qovwDMvFtOHgWLOiQgW4_DzpfwPquT3"/>
+<div>
+<div class="flex items-baseline gap-2 mb-1">
+<span class="font-bold text-sm text-on-surface">Marcus Togba</span>
+<span class="text-[10px] text-on-surface-variant">09:15 AM</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl shadow-sm text-sm text-on-surface leading-relaxed italic text-on-surface-variant">
+                            Marcus is typing...
+                        </div>
+</div>
+</div>
+</div>
+<!-- Message Input Area -->
+<div class="p-6 bg-surface-container sticky bottom-0">
+<div class="bg-surface-container-lowest rounded-2xl p-2 shadow-lg ring-1 ring-outline-variant/10 flex flex-col">
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-sm text-on-surface p-4 min-h-[44px] max-h-32 no-scrollbar resize-none" placeholder="Message #General..."></textarea>
+<div class="flex items-center justify-between border-t border-outline-variant/5 px-3 py-2">
+<div class="flex items-center gap-1">
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="add">add</span>
+</button>
+<div class="w-px h-6 bg-outline-variant/20 mx-1"></div>
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="format_bold">format_bold</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="format_italic">format_italic</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="link">link</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="mood">mood</span>
+</button>
+<button class="bg-primary text-on-primary px-4 py-1.5 rounded-lg text-sm font-bold shadow-md active:scale-95 transition-transform">
+                                Send
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 pb-safe bg-[#f3f3f8] dark:bg-[#1a1c1f] border-t border-slate-200/30 dark:border-slate-800/30 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+<div class="flex justify-around items-center px-4 py-3 w-full">
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 transition-all duration-300 ease-in-out hover:text-blue-600">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 transition-all duration-300 ease-in-out hover:text-blue-600">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Registry</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-white dark:bg-slate-800 text-[#0058bc] dark:text-blue-400 rounded-xl px-4 py-2 transition-all duration-300 ease-in-out">
+<span class="material-symbols-outlined" data-icon="forum" style="font-variation-settings: 'FILL' 1;">forum</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Messaging</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 transition-all duration-300 ease-in-out hover:text-blue-600">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">More</span>
+</div>
+</div>
+</nav>
+</body></html>

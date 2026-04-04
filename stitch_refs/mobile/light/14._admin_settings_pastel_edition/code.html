@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed": "#001a41",
+              "background": "#f9f9fe",
+              "on-error": "#ffffff",
+              "primary-fixed-dim": "#adc6ff",
+              "surface-container": "#ededf2",
+              "tertiary-fixed": "#e2dfff",
+              "surface-tint": "#005bc1",
+              "secondary": "#006e28",
+              "surface": "#f9f9fe",
+              "surface-container-low": "#f3f3f8",
+              "surface-bright": "#f9f9fe",
+              "on-surface-variant": "#414755",
+              "on-surface": "#1a1c1f",
+              "on-tertiary-container": "#fffbff",
+              "on-primary-container": "#fefcff",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e2e2e7",
+              "on-background": "#1a1c1f",
+              "inverse-on-surface": "#f0f0f5",
+              "surface-dim": "#d9dade",
+              "outline": "#717786",
+              "on-tertiary-fixed": "#0c006a",
+              "on-secondary-container": "#00732a",
+              "outline-variant": "#c1c6d7",
+              "secondary-fixed-dim": "#53e16f",
+              "secondary-fixed": "#72fe88",
+              "primary-container": "#0070eb",
+              "tertiary": "#4c4aca",
+              "on-secondary-fixed": "#002107",
+              "on-primary-fixed-variant": "#004493",
+              "inverse-surface": "#2e3034",
+              "tertiary-fixed-dim": "#c2c1ff",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-highest": "#e2e2e7",
+              "on-secondary": "#ffffff",
+              "tertiary-container": "#6664e4",
+              "secondary-container": "#6ffb85",
+              "on-tertiary-fixed-variant": "#3631b4",
+              "error-container": "#ffdad6",
+              "inverse-primary": "#adc6ff",
+              "surface-container-high": "#e8e8ed",
+              "primary-fixed": "#d8e2ff",
+              "primary": "#0058bc",
+              "on-secondary-fixed-variant": "#00531c",
+              "on-primary": "#ffffff",
+              "error": "#ba1a1a"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopAppBar -->
+<header class="bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md docked full-width top-0 sticky z-50 shadow-none">
+<div class="flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="text-blue-700 dark:text-blue-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">account_balance</span>
+</div>
+<h1 class="text-xl font-extrabold tracking-tighter text-blue-800 dark:text-blue-400 font-headline">Togba Legacy</h1>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-500 dark:text-slate-400 font-['Inter'] text-sm hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-3 py-1 rounded-lg" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 font-['Inter'] text-sm hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-3 py-1 rounded-lg" href="#">Registry</a>
+<a class="text-slate-500 dark:text-slate-400 font-['Inter'] text-sm hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors px-3 py-1 rounded-lg" href="#">Messaging</a>
+<a class="text-blue-700 dark:text-blue-400 font-bold font-['Inter'] text-sm px-3 py-1 rounded-lg" href="#">More</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden active:scale-95 duration-200">
+<img alt="Family Crest" class="w-full h-full object-cover" data-alt="heraldic family crest icon in gold and deep blue on a clean minimalist white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBw9QtQ21E1TeMUXNoL3m6ADueSLNR2_BpP2VxSbHoeLHIo2gZYw8dwVROvVnmerAxeXpkzd43Ob6EPeVazWx92n7dRGn-W_Ts-sr3IPHu02QTwlpUUkGNxgXfVl7c3qxDwul_ODWHnWgaf3fwixO9c0ZNKrEqOgkr7mipfSlodCLP0Bgq4HrznXgaO8pytJE0kYRNKTmwMxe5rqp7Q5Ny4Rr71e1lFNha059_CpO5QHB9mpiDx4WTNSTAuE5--kfCAoaDtIit-rdQG"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 md:px-8 py-10 pb-32">
+<header class="mb-12">
+<h2 class="text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-2">Admin Settings</h2>
+<p class="text-on-surface-variant text-lg">System-wide configurations and governance protocols.</p>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- User Permissions Section (Pastel Blue Tint) -->
+<section class="lg:col-span-8 bg-primary-fixed/30 rounded-3xl p-6 md:p-8">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-primary-container text-on-primary rounded-2xl">
+<span class="material-symbols-outlined">group</span>
+</div>
+<h3 class="text-2xl font-bold tracking-tight">User Permissions</h3>
+</div>
+<button class="bg-primary hover:bg-primary-container text-on-primary px-5 py-2.5 rounded-lg font-semibold transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">person_add</span>
+                        Invite Member
+                    </button>
+</div>
+<div class="overflow-x-auto no-scrollbar">
+<table class="w-full text-left border-separate border-spacing-y-3">
+<thead>
+<tr class="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
+<th class="px-4 py-2">User Identity</th>
+<th class="px-4 py-2">Role Access</th>
+<th class="px-4 py-2">Status</th>
+<th class="px-4 py-2">Last Active</th>
+<th class="px-4 py-2"></th>
+</tr>
+</thead>
+<tbody>
+<!-- Row 1 -->
+<tr class="bg-surface-container-lowest rounded-xl shadow-sm">
+<td class="px-4 py-4 rounded-l-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center overflow-hidden">
+<img alt="John Doe" class="w-full h-full object-cover" data-alt="professional portrait of a male executive in a neutral grey suit with soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChuKXd9tEtjoMnk4W4FtzKy8mw24gNlUrmakuKNQdpYRqErg9B5pCmEo2ugvwVQ2gjehnflwV9GnOrUd9fZDHrq8lCLCa1CRPNabOPQwLZqQG9PyO7nj2K4Cr5jGVJyRTf469Y9izgCGHNjycCBhyNs1wr7k0xEVMiug3cE0io8r5feFz5DUo4fE32D2sGUztpPIK5fMtt2kGSvv1XPZOx-eFez7CMRituvFmTumb4dpcFsq6ch3aulruefAH9MRqLEXjGsuuyIUOu"/>
+</div>
+<div>
+<div class="font-bold text-on-surface">Julian DeForest</div>
+<div class="text-xs text-on-surface-variant">julian@togba.legacy</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4">
+<span class="text-sm font-medium px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed rounded-full">Trustee</span>
+</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-sm">Active</span>
+</div>
+</td>
+<td class="px-4 py-4 text-sm text-on-surface-variant">2 mins ago</td>
+<td class="px-4 py-4 rounded-r-xl text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="bg-surface-container-lowest rounded-xl shadow-sm">
+<td class="px-4 py-4 rounded-l-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center overflow-hidden">
+<img alt="Maria S." class="w-full h-full object-cover" data-alt="headshot of a confident woman in business casual attire with bright natural window light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6oQp2IsX08ZJrAjV8w-9KbNi6uH1ZPqorcYNCLLmOS2ODrtAfI59TotIe_he8hynSvlh5r26AhSHyM4bJ_zBDEAbYoMy_XdUJZ8JHDt8W3U--ILs-40GUj44Usc2LL8EKj6AvHzGdSglb9Ve953_fUSHPwZIFHJpUpUxur_Z3HP9ylluUKEl8ApDH7maIA_IlXHKNw3Ur22yaFmH4YxgE4F7XJ0Z4EPbklhxRDqBNXOkoyl1ZLWwzHFllasvOuYJCfwpFRSKWJ4rh"/>
+</div>
+<div>
+<div class="font-bold text-on-surface">Maria Sterling</div>
+<div class="text-xs text-on-surface-variant">m.sterling@togba.legacy</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4">
+<span class="text-sm font-medium px-3 py-1 bg-primary-fixed-dim text-on-primary-fixed rounded-full">Editor</span>
+</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-sm">Active</span>
+</div>
+</td>
+<td class="px-4 py-4 text-sm text-on-surface-variant">Yesterday</td>
+<td class="px-4 py-4 rounded-r-xl text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="bg-surface-container-lowest rounded-xl shadow-sm">
+<td class="px-4 py-4 rounded-l-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center overflow-hidden text-on-surface-variant text-xs">A</div>
+<div>
+<div class="font-bold text-on-surface">Archive Bot</div>
+<div class="text-xs text-on-surface-variant">system@togba.legacy</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4">
+<span class="text-sm font-medium px-3 py-1 bg-surface-container text-on-surface-variant rounded-full">Observer</span>
+</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="text-sm text-on-surface-variant">Idle</span>
+</div>
+</td>
+<td class="px-4 py-4 text-sm text-on-surface-variant">3 days ago</td>
+<td class="px-4 py-4 rounded-r-xl text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- System Controls Section (Pastel Green Tint) -->
+<aside class="lg:col-span-4 space-y-8">
+<section class="bg-secondary-container/30 rounded-3xl p-6 md:p-8">
+<div class="flex items-center gap-4 mb-6">
+<div class="p-3 bg-secondary text-on-secondary rounded-2xl">
+<span class="material-symbols-outlined">settings_suggest</span>
+</div>
+<h3 class="text-2xl font-bold tracking-tight">System Controls</h3>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl border border-secondary-container/20">
+<div>
+<h4 class="font-bold text-on-surface">Multi-Sig Approval</h4>
+<p class="text-xs text-on-surface-variant">Require 2/3 trustees for transactions</p>
+</div>
+<button class="w-12 h-6 bg-secondary rounded-full relative flex items-center transition-colors">
+<span class="absolute right-1 w-4 h-4 bg-white rounded-full"></span>
+</button>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl border border-secondary-container/20">
+<div>
+<h4 class="font-bold text-on-surface">Auto-Archiving</h4>
+<p class="text-xs text-on-surface-variant">Sweep logs every 30 days</p>
+</div>
+<button class="w-12 h-6 bg-secondary rounded-full relative flex items-center transition-colors">
+<span class="absolute right-1 w-4 h-4 bg-white rounded-full"></span>
+</button>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl border border-secondary-container/20 opacity-60">
+<div>
+<h4 class="font-bold text-on-surface">Shadow Governance</h4>
+<p class="text-xs text-on-surface-variant">Internal preview of all changes</p>
+</div>
+<button class="w-12 h-6 bg-surface-container rounded-full relative flex items-center transition-colors">
+<span class="absolute left-1 w-4 h-4 bg-white rounded-full shadow-sm"></span>
+</button>
+</div>
+<div class="pt-2">
+<button class="w-full py-3 bg-secondary-fixed text-on-secondary-fixed font-bold rounded-xl hover:bg-secondary-container transition-colors active:scale-95 duration-150">
+                                Apply Global Configurations
+                            </button>
+</div>
+</div>
+</section>
+<!-- Small Analytics Inset -->
+<div class="bg-surface-container rounded-3xl p-6 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-7xl" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<div class="relative z-10">
+<div class="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-1">Security Score</div>
+<div class="text-4xl font-extrabold text-on-surface">98<span class="text-xl font-medium text-secondary">/100</span></div>
+<div class="mt-4 flex items-center gap-2">
+<span class="text-xs font-bold text-secondary-container bg-secondary px-2 py-0.5 rounded">EXCELLENT</span>
+<span class="text-xs text-on-surface-variant">Last scan 4h ago</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Audit Log Section (Pastel Lavender/Purple Tint) -->
+<section class="lg:col-span-12 bg-tertiary-container/10 rounded-3xl p-6 md:p-8">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-tertiary text-on-tertiary rounded-2xl">
+<span class="material-symbols-outlined">history</span>
+</div>
+<h3 class="text-2xl font-bold tracking-tight">Audit Log</h3>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 rounded-lg bg-surface-container-lowest text-on-surface-variant font-medium text-sm hover:bg-surface-container transition-colors">Export CSV</button>
+<button class="px-4 py-2 rounded-lg bg-tertiary text-on-tertiary font-medium text-sm shadow-lg shadow-tertiary/20">Full History</button>
+</div>
+</div>
+<div class="space-y-3">
+<!-- Log Item 1 -->
+<div class="grid grid-cols-1 md:grid-cols-4 items-center bg-surface-container-lowest p-5 rounded-2xl border border-tertiary-container/10 hover:border-tertiary/30 transition-all cursor-default">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="font-bold text-on-surface text-sm">Julian DeForest</span>
+</div>
+<div class="text-on-surface-variant text-sm py-2 md:py-0">Modified user permissions for "Maria S."</div>
+<div class="md:text-center">
+<span class="text-[10px] font-bold uppercase tracking-widest px-2 py-1 bg-surface-container-low text-on-surface-variant rounded">Permission_Edit</span>
+</div>
+<div class="text-right text-xs text-on-surface-variant font-medium">14:23:01 · Oct 24, 2023</div>
+</div>
+<!-- Log Item 2 -->
+<div class="grid grid-cols-1 md:grid-cols-4 items-center bg-surface-container-lowest p-5 rounded-2xl border border-tertiary-container/10 hover:border-tertiary/30 transition-all cursor-default">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<span class="font-bold text-on-surface text-sm">System Bot</span>
+</div>
+<div class="text-on-surface-variant text-sm py-2 md:py-0">Automated daily ledger backup completed</div>
+<div class="md:text-center">
+<span class="text-[10px] font-bold uppercase tracking-widest px-2 py-1 bg-surface-container-low text-on-surface-variant rounded">Sys_Backup</span>
+</div>
+<div class="text-right text-xs text-on-surface-variant font-medium">04:00:15 · Oct 24, 2023</div>
+</div>
+<!-- Log Item 3 -->
+<div class="grid grid-cols-1 md:grid-cols-4 items-center bg-surface-container-lowest p-5 rounded-2xl border border-tertiary-container/10 hover:border-tertiary/30 transition-all cursor-default">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<span class="font-bold text-on-surface text-sm">Unknown User</span>
+</div>
+<div class="text-on-surface-variant text-sm py-2 md:py-0">Failed login attempt from IP: 192.168.1.1</div>
+<div class="md:text-center">
+<span class="text-[10px] font-bold uppercase tracking-widest px-2 py-1 bg-error-container text-on-error-container rounded">Auth_Fail</span>
+</div>
+<div class="text-right text-xs text-on-surface-variant font-medium">23:11:42 · Oct 23, 2023</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 pb-safe bg-[#f3f3f8] dark:bg-[#1a1c1f] border-t border-slate-200/30 dark:border-slate-800/30 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+<div class="flex justify-around items-center px-4 py-3 w-full">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 transition-all duration-300 ease-in-out hover:text-blue-600" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 transition-all duration-300 ease-in-out hover:text-blue-600" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Registry</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-2 transition-all duration-300 ease-in-out hover:text-blue-600" href="#">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">Messaging</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-white dark:bg-slate-800 text-[#0058bc] dark:text-blue-400 rounded-xl px-4 py-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="font-['Inter'] text-[11px] font-medium uppercase tracking-wider mt-1">More</span>
+</a>
+</div>
+</nav>
+</body></html>
