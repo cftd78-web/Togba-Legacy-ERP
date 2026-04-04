@@ -157,7 +157,7 @@ type="email"
 placeholder="Email"
 class="w-full p-4 bg-slate-100 rounded-xl mb-4">
 
-<button onclick="handleOTP()"
+<button id="btn-get-code" onclick="handleOTP()"
 class="w-full bg-black text-white p-4 rounded-xl font-bold">
 
 Get Code
@@ -165,6 +165,8 @@ Get Code
 </button>
 
 </div>
+
+<div id="login-status" class="hidden text-sm rounded-lg px-3 py-2 mb-3"></div>
 
 <div id="step-2" class="hidden">
 
@@ -897,17 +899,54 @@ function formatPercent(value){
 return `${Number(value || 0).toFixed(2)}%`
 }
 
+function setLoginStatus(message,type){
+const el = document.getElementById("login-status")
+if(!el) return
+if(!message){
+el.className = "hidden text-sm rounded-lg px-3 py-2 mb-3"
+el.innerText = ""
+return
+}
+const palette = type === "error"
+? "text-red-700 bg-red-50 border border-red-200"
+: "text-blue-700 bg-blue-50 border border-blue-200"
+el.className = `text-sm rounded-lg px-3 py-2 mb-3 ${palette}`
+el.innerText = message
+}
+
 function handleOTP(){
+const btn = document.getElementById("btn-get-code")
+const email = String(document.getElementById("email").value || "").trim()
+if(!email){
+setLoginStatus("Enter your email to receive a code.","error")
+return
+}
+if(typeof google === "undefined" || !google.script || !google.script.run){
+setLoginStatus("Unable to reach the server. Reload and try again.","error")
+return
+}
+btn.disabled = true
+btn.classList.add("opacity-60")
+setLoginStatus("Generating code...", "info")
 google.script.run
 .withSuccessHandler(res=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
 document.getElementById("step-1").classList.add("hidden")
 document.getElementById("step-2").classList.remove("hidden")
 if(res && res.deliveredByEmail===false){
-alert("OTP generated. Email delivery failed in this environment; you can still use the generated OTP from Access sheet as fallback.")
+setLoginStatus("Code generated. Email delivery is unavailable in this environment; use Access sheet fallback.","info")
+return
 }
+setLoginStatus("Code sent. Check your email and enter the OTP.","info")
 })
-.withFailureHandler(onServerFailure)
-.loginStepOne(document.getElementById("email").value)
+.withFailureHandler(err=>{
+btn.disabled = false
+btn.classList.remove("opacity-60")
+setLoginStatus((err && err.message) || "Unable to generate code.","error")
+onServerFailure(err)
+})
+.loginStepOne(email)
 }
 
 function handleVerify(){

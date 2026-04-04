@@ -55,8 +55,7 @@ function loginStepOne(email) {
 
     const access = _readSheet('Access', {
       EmailOptional: ['EmailOptional', 'Email'],
-      OneTimeCode: ['OneTimeCode', 'OTP', 'OneTimePasscode'],
-      FullName: ['FullName', 'Name']
+      OneTimeCode: ['OneTimeCode', 'OTP', 'OneTimePasscode']
     });
 
     const rowIndex = access.rows.findIndex(r => _norm(r[access.idx.EmailOptional]) === normalizedEmail);
@@ -73,7 +72,10 @@ function loginStepOne(email) {
     let deliveredByEmail = false;
     let deliveryError = '';
     try {
-      const fullName = String(access.rows[rowIndex][access.idx.FullName] || '').trim() || 'Member';
+      const fullNameIndex = _optionalHeaderIndex(access, ['FullName', 'Name']);
+      const fullName = fullNameIndex === -1
+        ? 'Member'
+        : (String(access.rows[rowIndex][fullNameIndex] || '').trim() || 'Member');
       MailApp.sendEmail({
         to: normalizedEmail,
         subject: 'Your Togba Legacy ERP login code',
