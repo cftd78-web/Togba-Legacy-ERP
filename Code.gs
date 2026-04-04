@@ -14,6 +14,14 @@ const SS_ID = "104VsCf8xhIFymyai9fG84RMbM6iirVcQxgTfqO4LkH4"; // Replace if need
 const SESSION_TTL = 21600; // 6 hours
 const CHANNEL_TYPES = ['private', 'family broadcast', 'project'];
 const ADMIN_CACHE_TTL_SECONDS = 120;
+// TEMP DEV-ONLY TOGGLE (Phase 1.5):
+// Keep OFF in normal/prod usage. Turn ON only for local UI debugging.
+const DEV_BYPASS_MODE = false;
+const DEV_BYPASS_IDENTITY = {
+  email: 'dev.ui.debug@togba.local',
+  role: 'Admin',
+  name: 'UI Debug Developer'
+};
 
 let _SS_CACHE = null;
 let _SHEET_CACHE = {};
@@ -152,6 +160,49 @@ function verifyStepTwo(email, code) {
     return { token: token };
   } catch (e) {
     throw new Error(_errMsg('verifyStepTwo', e));
+  }
+}
+
+function getAuthModeConfig() {
+  try {
+    return {
+      developerBypassEnabled: DEV_BYPASS_MODE
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getAuthModeConfig', e));
+  }
+}
+
+function startDeveloperBypassSession() {
+  try {
+    if (!DEV_BYPASS_MODE) {
+      throw new Error('Developer bypass mode is disabled.');
+    }
+
+    const token = 'DEV-BYPASS-' + Utilities.getUuid();
+    CacheService
+      .getScriptCache()
+      .put(
+        token,
+        JSON.stringify({
+          email: DEV_BYPASS_IDENTITY.email,
+          role: DEV_BYPASS_IDENTITY.role,
+          name: DEV_BYPASS_IDENTITY.name,
+          devBypass: true
+        }),
+        SESSION_TTL
+      );
+
+    return {
+      token: token,
+      profile: {
+        email: DEV_BYPASS_IDENTITY.email,
+        role: DEV_BYPASS_IDENTITY.role,
+        name: DEV_BYPASS_IDENTITY.name
+      }
+    };
+  } catch (e) {
+    throw new Error(_errMsg('startDeveloperBypassSession', e));
   }
 }
 
