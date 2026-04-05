@@ -12,10 +12,186 @@
 <title>Togba Legacy ERP</title>
 
 <?!= include('Index_Styles'); ?>
+<style>
+.phase-priority .dashboard-tile,
+.phase-priority .mail-panel,
+.phase-priority #page-admin .bg-white,
+.phase-priority #page-finance .bg-white{
+  border-radius: 1rem;
+  border-color: color-mix(in srgb, var(--line) 82%, white);
+  box-shadow: 0 8px 20px rgba(15,23,42,.05);
+}
+
+.phase-priority #page-home .dashboard-tile{
+  padding: 1rem;
+  background: linear-gradient(180deg,#fff 0%,#f8fbff 100%);
+}
+
+.phase-priority #page-finance .chart-shell,
+.phase-priority #page-home .chart-shell{
+  max-width: 420px;
+}
+
+.phase-priority .module-stat{
+  display:flex;align-items:center;justify-content:space-between;
+  border:1px solid var(--line);border-radius:.8rem;padding:.6rem .8rem;
+  background:var(--panel-alt);
+  font-size:.78rem;
+}
+
+.phase-priority .module-stat strong{
+  color:var(--ink);font-size:.9rem;
+}
+</style>
 
 </head>
+<body class="phase-priority">
 <?!= include('Index_Body'); ?>
 
 <?!= include('Index_Scripts'); ?>
+<script>
+(function(){
+  function guardedServerCall(builder, onSuccess, onFailure){
+    try{
+      return builder()
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(function(err){
+        if(typeof onFailure === "function"){ onFailure(err); return; }
+        if(typeof onServerFailure === "function"){ onServerFailure(err); return; }
+        alert((err && err.message) || "Request failed.");
+      });
+    }catch(err){
+      if(typeof onFailure === "function"){ onFailure(err); return; }
+      if(typeof onServerFailure === "function"){ onServerFailure(err); return; }
+      alert((err && err.message) || "Request failed.");
+      return null;
+    }
+  }
+
+  function renderMessageModuleStats(stats){
+    const panel = document.querySelector("#page-messages .mail-panel .mail-section-title");
+    if(!panel) return;
+    const hostId = "messages-module-stats";
+    let host = document.getElementById(hostId);
+    if(!host){
+      host = document.createElement("div");
+      host.id = hostId;
+      host.className = "grid gap-2 mb-3";
+      panel.parentElement.insertBefore(host, panel.nextSibling);
+    }
+    host.innerHTML = [
+      `<div class="module-stat"><span>Joined Channels</span><strong>${Number(stats.joinedChannels || 0)}</strong></div>`,
+      `<div class="module-stat"><span>Recent Messages</span><strong>${Number(stats.recentMessageCount || 0)}</strong></div>`
+    ].join("");
+  }
+
+  window.loadHomeEssentials = function(forceReload){
+    if(window.homeLoaded && !forceReload){ return; }
+    window.homeLoaded = true;
+    setHomeError("");
+    setHomeStatus("Loading priority modules...");
+    document.getElementById("home-system-status").innerText = "Syncing dashboard modules...";
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(bundle){
+        const data = bundle && bundle.home ? bundle.home : {};
+        renderHomeFinanceSummary(data.finance || {});
+        renderHomeProjectSnapshot(data.projects || {});
+        renderHomeVoteSnapshot(data.voting || {});
+        renderHomeTimelineSnapshot(data.timeline || {});
+        document.getElementById("home-system-status").innerText = "Connected and current as of this session.";
+        setHomeStatus("Dashboard loaded.");
+      },
+      function(err){
+        window.homeLoaded = false;
+        setHomeError((err && err.message) || "Unable to load home dashboard.");
+        setHomeStatus("Dashboard unavailable. Retry from Home.");
+      }
+    ).getPriorityModuleBundle(token);
+  };
+
+  window.loadFinanceDashboard = function(){
+    setFinanceError("");
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(bundle){
+        const payload = bundle && bundle.finance ? bundle.finance : {};
+        financeLoaded = true;
+        renderFinanceDashboard(payload);
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        financeLoaded = false;
+        setFinanceError((err && err.message) || "Unable to load finance dashboard.");
+      }
+    ).getPriorityModuleBundle(token);
+  };
+
+  window.loadAdmin = function(){
+    adminLoaded = false;
+    setAdminError("");
+    setAdminStatus("Loading admin dashboard...");
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(bundle){
+        const admin = bundle && bundle.admin ? bundle.admin : null;
+        if(!admin){
+          setAdminError("Admin dashboard is available for Admin role only.");
+          setAdminStatus("");
+          return;
+        }
+        renderAdminUserList([]);
+        document.getElementById("admin-stat-users").innerText = Number(admin.dashboard && admin.dashboard.userOverview ? admin.dashboard.userOverview.totalUsers : 0);
+        document.getElementById("admin-stat-admins").innerText = Number(admin.dashboard && admin.dashboard.userOverview ? admin.dashboard.userOverview.adminUsers : 0);
+        document.getElementById("admin-stat-settings").innerText = Number(admin.dashboard && admin.dashboard.settingsOverview ? admin.dashboard.settingsOverview.totalEntries : 0);
+        document.getElementById("admin-stat-issues").innerText = Number(admin.health && admin.health.issueCount ? admin.health.issueCount : 0);
+        renderSettingsSummary(admin.settings || {entries:[]});
+        renderInstitutionSettingsSummary(admin.institution || {entries:[]});
+        renderSystemHealth(admin.health || {healthy:false, issueCount:0, issues:[]});
+        adminLoaded = true;
+        setAdminStatus("Admin dashboard loaded.");
+        google.script.run.withSuccessHandler(function(users){ renderAdminUserList(Array.isArray(users) ? users : []); }).withFailureHandler(function(err){ setAdminError((err&&err.message)||"Unable to load Access registry."); }).adminGetAllUsers(token);
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        adminLoaded = false;
+        setAdminError((err && err.message) || "Unable to load admin dashboard summary.");
+        setAdminStatus("");
+      }
+    ).getPriorityModuleBundle(token);
+  };
+
+  window.loadUserChannels = function(){
+    setMessageError("");
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(bundle){
+        const messages = bundle && bundle.messages ? bundle.messages : {};
+        userChannels = Array.isArray(messages.channels) ? messages.channels : [];
+        channelDirectory = messages.directory && Array.isArray(messages.directory.channels) ? messages.directory.channels : [];
+        renderChannelDirectory();
+        renderMessageModuleStats(messages.stats || {});
+        renderChannelList();
+        if(!userChannels.length){
+          selectedChannelID = "";
+          renderMessageHistory([]);
+          document.getElementById("message-channel-title").innerText = "No channels available";
+          setMessageError("You are not a member of any active channel.");
+        }else{
+          if(!selectedChannelID || !userChannels.some(c=>c.ChannelID===selectedChannelID)){
+            selectedChannelID = userChannels[0].ChannelID;
+          }
+          refreshMessages();
+        }
+        loadMessagingRecipients();
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        setMessageError((err && err.message) || "Unable to load channels.");
+      }
+    ).getPriorityModuleBundle(token);
+  };
+})();
+</script>
 </body>
 </html>
