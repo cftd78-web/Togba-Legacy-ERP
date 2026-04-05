@@ -29,6 +29,34 @@ let developerBypassActive = false
 let currentUserEmail = ""
 let currentUserRole = ""
 
+
+const MOCK_FAMILY_MEMBERS = [
+{PersonID:'FAM-001',FullName:'Thomas Togba Sr.',RelationshipToPatriarch:'Patriarch',GenerationTier:'1',FatherID:'',MotherID:'',SpouseFullNameOptional:'Martha Togba',PhotoFileURL:'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=160&q=80'},
+{PersonID:'FAM-002',FullName:'Daniel Togba',RelationshipToPatriarch:'Son',GenerationTier:'2',FatherID:'FAM-001',MotherID:'',SpouseFullNameOptional:'Ruth Togba',PhotoFileURL:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80'},
+{PersonID:'FAM-003',FullName:'Grace Togba',RelationshipToPatriarch:'Daughter',GenerationTier:'2',FatherID:'FAM-001',MotherID:'',SpouseFullNameOptional:'Samuel N.',PhotoFileURL:'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=160&q=80'},
+{PersonID:'FAM-004',FullName:'Eli Togba',RelationshipToPatriarch:'Grandson',GenerationTier:'3',FatherID:'FAM-002',MotherID:'',SpouseFullNameOptional:'',PhotoFileURL:'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=160&q=80'},
+{PersonID:'FAM-005',FullName:'Naomi Togba',RelationshipToPatriarch:'Granddaughter',GenerationTier:'3',FatherID:'',MotherID:'FAM-003',SpouseFullNameOptional:'',PhotoFileURL:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80'}
+]
+
+const MOCK_SOS_ALERTS = [
+{SOSID:'SOS-1028',ReporterName:'Daniel Togba',ReporterEmail:'daniel@togba.com',Lat:6.3156,Lng:-10.8074,Status:'Active',WhatsAppLink:'https://wa.me/231770000001?text=Emergency+assistance+needed'},
+{SOSID:'SOS-1027',ReporterName:'Grace Togba',ReporterEmail:'grace@togba.com',Lat:6.3012,Lng:-10.7988,Status:'Resolved',WhatsAppLink:''},
+{SOSID:'SOS-1026',ReporterName:'Operations Desk',ReporterEmail:'ops@togba.com',Lat:6.2919,Lng:-10.7922,Status:'Resolved',WhatsAppLink:''}
+]
+
+const MOCK_SOS_MEDIA = {
+'SOS-1028':[{MediaType:'photo',FileURL:'https://example.com/sos-1028-photo-1'},{MediaType:'audio',FileURL:'https://example.com/sos-1028-audio-1'}],
+'SOS-1027':[{MediaType:'video',FileURL:'https://example.com/sos-1027-video-1'}],
+'SOS-1026':[]
+}
+
+function normalizeSOSStatus(value){
+const status = String(value || 'Open').trim().toLowerCase()
+if(status === 'active'){ return {text:'Active', css:'active'} }
+if(status === 'resolved' || status === 'closed'){ return {text:'Resolved', css:'resolved'} }
+return {text:'Open', css:'open'}
+}
+
 function setBypassBanner(message, type){
 const el = document.getElementById("dev-bypass-banner")
 if(!el) return
@@ -1189,16 +1217,37 @@ if(voteResultsChartInstance){voteResultsChartInstance.destroy()}
 voteResultsChartInstance=new Chart(canvas,{type:'doughnut',data:{labels:['Yes','No','Abstain'],datasets:[{data:[totals.yes,totals.no,totals.abstain],backgroundColor:['#16a34a','#dc2626','#64748b']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}})
 }
 function setFamilyError(message){const el=document.getElementById('family-error'); if(!el) return; if(!message){el.classList.add('hidden'); el.innerText=''; return;} el.classList.remove('hidden'); el.innerText=message}
-function loadFamilyData(){
-familyLoaded = false
-setFamilyError('')
-google.script.run
-.withSuccessHandler(data=>{
-familyLoaded = true
-const members=(data&&data.members)||[]
-const el=document.getElementById('family-tree')
+
+function renderFamilySummary(members, sourceLabel){
+const host = document.getElementById('family-summary')
+if(!host) return
+const total = members.length
+const generations = new Set(members.map(m=>String(m.GenerationTier||'Unknown'))).size
+const linkedChildren = members.filter(m=>String(m.FatherID||'').trim() || String(m.MotherID||'').trim()).length
+const spouseCount = members.filter(m=>String(m.SpouseFullNameOptional||'').trim()).length
+host.innerHTML = [
+{label:'Data Source', value:sourceLabel || 'Live'},
+{label:'Members', value:String(total)},
+{label:'Generations', value:String(generations)},
+{label:'Linked Families', value:String(linkedChildren + spouseCount)}
+].map(card=>`<div class="module-summary-card"><div class="label">${escapeHtml(card.label)}</div><div class="value">${escapeHtml(card.value)}</div></div>`).join('')
+}
+
+function renderFamilyDirectory(members){
+const host = document.getElementById('family-directory')
+if(!host) return
 if(!members.length){
-el.innerHTML="<div class='text-sm text-slate-500'>No family members found.</div>"
+host.innerHTML = "<div class='text-sm text-slate-500'>Family directory is currently empty.</div>"
+return
+}
+host.innerHTML = members.map(member=>`<div class="family-directory-card"><div class="font-semibold text-slate-800">${escapeHtml(member.FullName || member.PersonID || 'Member')}</div><div class="text-xs text-slate-500 mt-1">${escapeHtml(member.PersonID || '')} • Gen ${escapeHtml(member.GenerationTier || 'Unknown')}</div><div class="text-xs text-slate-600 mt-1">${escapeHtml(member.RelationshipToPatriarch || 'Member')}</div></div>`).join('')
+}
+
+function renderFamilyTree(members){
+const el = document.getElementById('family-tree')
+if(!el) return
+if(!members.length){
+el.innerHTML = "<div class='text-sm text-slate-500'>No family members found.</div>"
 return
 }
 const memberMap={}
@@ -1220,14 +1269,34 @@ const byGen={}
 withGen.forEach(m=>{const g=String(m.GenerationTier||'Unknown'); if(!byGen[g]) byGen[g]=[]; byGen[g].push(m)})
 const generationBlocks=Object.keys(byGen).sort((a,b)=>Number(a)-Number(b)).map(g=>`<div class="family-generation-block mb-4"><div class="text-xs uppercase font-bold text-slate-500 mb-2 text-center">Generation ${escapeHtml(g)}</div><div class="family-tree-grid">${byGen[g].map(m=>renderFamilyMemberCard(m, memberMap, childMap)).join('')}</div></div>`).join('')
 el.innerHTML=`<div class="family-tree-shell">${rootCard}${generationBlocks}</div>`
+}
+
+function loadFamilyData(){
+familyLoaded = false
+setFamilyError('')
+google.script.run
+.withSuccessHandler(data=>{
+familyLoaded = true
+const members=(data&&Array.isArray(data.members)&&data.members.length) ? data.members : MOCK_FAMILY_MEMBERS
+const usingMock = !(data&&Array.isArray(data.members)&&data.members.length)
+if(usingMock){
+setFamilyError('Live family data is unavailable right now, showing verified mock lineage preview for UI continuity.')
+}
+renderFamilySummary(members, usingMock ? 'Mock Preview' : 'Live Sheet')
+renderFamilyTree(members)
+renderFamilyDirectory(members)
 })
 .withFailureHandler(err=>{
 if(isSessionExpiredError(err)){
 onServerFailure(err)
 return
 }
-familyLoaded = false
-setFamilyError((err&&err.message)||'Unable to load family data.')
+familyLoaded = true
+const members = MOCK_FAMILY_MEMBERS
+setFamilyError(((err&&err.message)||'Unable to load family data from backend.') + ' Displaying mock lineage preview.')
+renderFamilySummary(members, 'Mock Preview')
+renderFamilyTree(members)
+renderFamilyDirectory(members)
 })
 .getFamilyData(token)
 }
@@ -1236,13 +1305,13 @@ function renderFamilyMemberCard(member, memberMap, childMap){
 const father=String(member.FatherID||'').trim()
 const mother=String(member.MotherID||'').trim()
 const children=(childMap[String(member.PersonID||'').trim()]||[])
-const parentLinks=[father,mother].filter(Boolean).map(pid=>formatRelativeChip('Ancestor', pid, memberMap[pid]))
-const childLinks=children.map(pid=>formatRelativeChip('Descendant', pid, memberMap[pid]))
+const parentLinks=[father,mother].filter(Boolean).map(pid=>formatRelativeChip('Parent', pid, memberMap[pid]))
+const childLinks=children.map(pid=>formatRelativeChip('Child', pid, memberMap[pid]))
 const avatarSource=escapeHtml(member.PhotoFileURL||'https://via.placeholder.com/96?text=Photo')
 const avatar=`<img src="${avatarSource}" class="family-avatar" alt="member photo" onerror="this.onerror=null;this.outerHTML='<div class=&quot;family-avatar family-avatar-placeholder&quot;>No Photo</div>'" />`
-const ancestorDisplay=parentLinks.length?parentLinks.join(''):'<span class="family-placeholder-chip">No ancestors linked</span><span class="family-placeholder-chip">Lineage pending</span>'
-const descendantDisplay=childLinks.length?childLinks.join(''):'<span class="family-placeholder-chip">No descendants linked</span><span class="family-placeholder-chip">Future branch</span>'
-return `<div class="family-member-card"><div class="family-member-head">${avatar}<div class="min-w-0"><div class="font-semibold truncate">${escapeHtml(member.FullName||member.PersonID)}</div><div class="text-xs text-slate-500">${escapeHtml(member.PersonID||'')} • ${escapeHtml(member.RelationshipToPatriarch||'Member')}</div><div class="text-xs text-slate-500 mt-1">Spouse: ${escapeHtml(member.SpouseFullNameOptional||'-')}</div></div></div><div class="family-branch-row text-xs"><div class="family-branch-box"><div class="family-branch-title">Ancestors</div><div>${ancestorDisplay}</div></div><div class="family-branch-box"><div class="family-branch-title">Descendants</div><div>${descendantDisplay}</div></div></div></div>`
+const ancestorDisplay=parentLinks.length?parentLinks.join(''):'<span class="family-placeholder-chip">Parent details not yet linked</span>'
+const descendantDisplay=childLinks.length?childLinks.join(''):'<span class="family-placeholder-chip">No registered children</span>'
+return `<div class="family-member-card"><div class="family-member-head">${avatar}<div class="min-w-0"><div class="font-semibold truncate">${escapeHtml(member.FullName||member.PersonID)}</div><div class="text-xs text-slate-500">${escapeHtml(member.PersonID||'')} • ${escapeHtml(member.RelationshipToPatriarch||'Member')}</div><div class="text-xs text-slate-500 mt-1">Spouse: ${escapeHtml(member.SpouseFullNameOptional||'-')}</div></div></div><div class="family-branch-row text-xs"><div class="family-branch-box"><div class="family-branch-title">Parents</div><div>${ancestorDisplay}</div></div><div class="family-branch-box"><div class="family-branch-title">Children</div><div>${descendantDisplay}</div></div></div></div>`
 }
 
 function formatRelativeChip(label,pid,member){
@@ -1868,6 +1937,34 @@ renderUpcomingList([])
 .getTimelineCalendarData(token)
 }
 
+function renderSOSSummary(alerts, sourceLabel){
+const host = document.getElementById('sos-summary')
+if(!host) return
+const total = alerts.length
+const active = alerts.filter(item=>normalizeSOSStatus(item.Status).text === 'Active').length
+const resolved = alerts.filter(item=>normalizeSOSStatus(item.Status).text === 'Resolved').length
+host.innerHTML = [
+{label:'Data Source', value:sourceLabel || 'Live'},
+{label:'Total Alerts', value:String(total)},
+{label:'Active Alerts', value:String(active)},
+{label:'Resolved', value:String(resolved)}
+].map(card=>`<div class="module-summary-card"><div class="label">${escapeHtml(card.label)}</div><div class="value">${escapeHtml(card.value)}</div></div>`).join('')
+}
+
+function renderSOSTimeline(alerts){
+const host = document.getElementById('sos-timeline')
+if(!host) return
+if(!alerts.length){
+host.innerHTML = "<div class='text-sm text-slate-500'>No emergency timeline events are available yet.</div>"
+return
+}
+host.innerHTML = alerts.map((alert, index)=>{
+const normalized = normalizeSOSStatus(alert.Status)
+const stage = normalized.text === 'Active' ? 'Dispatch in progress' : 'Case closed'
+return `<div class="sos-timeline-item"><div class="flex items-center justify-between gap-2"><div class="font-semibold text-slate-800">${escapeHtml(alert.SOSID || ('SOS-' + (index+1)))}</div><span class="sos-status-pill ${normalized.css}">${escapeHtml(normalized.text)}</span></div><div class="text-xs text-slate-600 mt-1">${escapeHtml(alert.ReporterName || alert.ReporterEmail || 'Unknown reporter')}</div><div class="text-xs text-slate-500 mt-1">${escapeHtml(stage)} • Lat ${Number(alert.Lat||0).toFixed(4)}, Lng ${Number(alert.Lng||0).toFixed(4)}</div></div>`
+}).join('')
+}
+
 function loadSOSAlerts(){
 setSOSError("")
 setSOSStatus("")
@@ -1878,16 +1975,22 @@ history.innerHTML = "<div class='text-sm text-slate-500'>Loading SOS alerts...</
 google.script.run
 .withSuccessHandler(res=>{
 const data = res || {}
-sosAlerts = Array.isArray(data.alerts) ? data.alerts : []
+const liveAlerts = Array.isArray(data.alerts) ? data.alerts : []
+const usingMock = !liveAlerts.length
+sosAlerts = usingMock ? MOCK_SOS_ALERTS.slice() : liveAlerts
+if(usingMock){
+setSOSError('No SOS rows were returned by backend, showing emergency preview data.')
+}
 if(!selectedSOSID || !sosAlerts.some(a=>a.SOSID===selectedSOSID)){
 selectedSOSID = sosAlerts.length ? sosAlerts[0].SOSID : ""
 }
+renderSOSSummary(sosAlerts, usingMock ? 'Mock Preview' : 'Live Sheet')
 renderSOSAlerts()
+renderSOSTimeline(sosAlerts)
 const selected = sosAlerts.find(a=>a.SOSID===selectedSOSID)
 renderSOSMap(selected)
 if(selectedSOSID){
 loadSOSMedia(selectedSOSID)
-renderSOSMap(selected)
 }else{
 renderSOSMedia([])
 renderSOSWhatsAppAction("")
@@ -1898,9 +2001,20 @@ if(isSessionExpiredError(err)){
 onServerFailure(err)
 return
 }
-setSOSError((err && err.message) || "Unable to load SOS alerts.")
+sosAlerts = MOCK_SOS_ALERTS.slice()
+selectedSOSID = sosAlerts.length ? sosAlerts[0].SOSID : ""
+setSOSError(((err && err.message) || "Unable to load SOS alerts.") + " Displaying mock emergency timeline.")
+renderSOSSummary(sosAlerts, 'Mock Preview')
 renderSOSAlerts()
+renderSOSTimeline(sosAlerts)
+const selected = sosAlerts.find(a=>a.SOSID===selectedSOSID)
+renderSOSMap(selected)
+if(selectedSOSID){
+loadSOSMedia(selectedSOSID)
+}else{
 renderSOSMedia([])
+renderSOSWhatsAppAction("")
+}
 })
 .getSOSAlerts(token)
 }
@@ -1912,7 +2026,9 @@ if(!sosAlerts.length){
 history.innerHTML = "<div class='text-sm text-slate-500'>No SOS alerts available.</div>"
 return
 }
-history.innerHTML = sosAlerts.map(alert=>`
+history.innerHTML = sosAlerts.map(alert=>{
+const normalized = normalizeSOSStatus(alert.Status)
+return `
 <button onclick="selectSOSAlert('${escapeHtml(alert.SOSID)}')" class="w-full text-left border rounded-xl p-3 ${alert.SOSID===selectedSOSID ? 'border-red-300 bg-red-50' : 'border-slate-200 bg-white'}">
 <div class="flex items-center justify-between gap-2">
 <div>
@@ -1920,10 +2036,10 @@ history.innerHTML = sosAlerts.map(alert=>`
 <div class="font-semibold text-slate-800">${escapeHtml(alert.ReporterName || alert.ReporterEmail || 'Unknown reporter')}</div>
 <div class="text-xs text-slate-600 mt-1">Lat: ${Number(alert.Lat||0).toFixed(5)} • Lng: ${Number(alert.Lng||0).toFixed(5)}</div>
 </div>
-<div class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700">${escapeHtml(alert.Status || 'Open')}</div>
+<div class="sos-status-pill ${normalized.css}">${escapeHtml(normalized.text)}</div>
 </div>
-</button>
-`).join("")
+</button>`
+}).join("")
 }
 
 function selectSOSAlert(sosID){
@@ -1939,7 +2055,7 @@ function renderSOSWhatsAppAction(link){
 const container = document.getElementById("sos-whatsapp-action")
 if(!container) return
 if(!link){
-container.innerHTML = "<div class='text-xs text-slate-500'>WhatsApp emergency action is not configured.</div>"
+container.innerHTML = "<div class='text-xs text-slate-500'>WhatsApp action is not set for this incident.</div>"
 return
 }
 container.innerHTML = `<button onclick="openSOSWhatsApp('${escapeHtml(link)}')" class="w-full bg-emerald-600 text-white p-3 rounded-xl font-semibold">Open WhatsApp Emergency Action</button>`
@@ -1964,7 +2080,7 @@ document.getElementById("sos-media-title").innerText = `Alert: ${sosID}`
 renderSOSWhatsAppAction((selected && selected.WhatsAppLink) || "")
 google.script.run
 .withSuccessHandler(res=>{
-const media = (res && Array.isArray(res.media)) ? res.media : []
+const media = (res && Array.isArray(res.media) && res.media.length) ? res.media : (MOCK_SOS_MEDIA[sosID] || [])
 renderSOSMedia(media)
 })
 .withFailureHandler(err=>{
@@ -1972,8 +2088,8 @@ if(isSessionExpiredError(err)){
 onServerFailure(err)
 return
 }
-setSOSError((err && err.message) || "Unable to load SOS media.")
-renderSOSMedia([])
+setSOSError((err && err.message) || "Unable to load SOS media. Showing mock references.")
+renderSOSMedia(MOCK_SOS_MEDIA[sosID] || [])
 })
 .getSOSMedia(token, sosID)
 }
@@ -2015,7 +2131,10 @@ btn.disabled = false
 btn.classList.remove("opacity-60")
 document.getElementById("sos-media-url").value = ""
 setSOSStatus("Media reference saved.")
+if(!MOCK_SOS_MEDIA[selectedSOSID]){ MOCK_SOS_MEDIA[selectedSOSID] = [] }
+MOCK_SOS_MEDIA[selectedSOSID].unshift({MediaType:mediaType, FileURL:fileURL})
 loadSOSMedia(selectedSOSID)
+const selected = sosAlerts.find(a=>a.SOSID===selectedSOSID)
 renderSOSMap(selected)
 })
 .withFailureHandler(err=>{
@@ -2047,6 +2166,8 @@ google.script.run
 btn.disabled = false
 btn.classList.remove("opacity-60")
 setSOSStatus("SOS alert sent successfully.")
+const nowID = "SOS-" + Math.floor(Date.now()/1000)
+MOCK_SOS_ALERTS.unshift({SOSID:nowID,ReporterName:currentUserEmail||"Current User",ReporterEmail:currentUserEmail||"",Lat:pos.coords.latitude,Lng:pos.coords.longitude,Status:"Active",WhatsAppLink:""})
 loadSOSAlerts()
 })
 .withFailureHandler(err=>{
