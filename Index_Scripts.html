@@ -26,6 +26,8 @@ let financeLoaded = false
 let adminLoaded = false
 let familyLoaded = false
 let developerBypassActive = false
+let currentUserEmail = ""
+let currentUserRole = ""
 
 function setBypassBanner(message, type){
 const el = document.getElementById("dev-bypass-banner")
@@ -91,6 +93,8 @@ homeLoaded = false
 financeLoaded = false
 adminLoaded = false
 familyLoaded = false
+currentUserEmail = ""
+currentUserRole = ""
 resetToStepOne()
 document.getElementById("view-app").classList.add("hidden")
 document.getElementById("view-login").classList.remove("hidden")
@@ -355,14 +359,17 @@ document.getElementById("btn-nav-admin").classList.add("hidden")
 
 google.script.run
 .withSuccessHandler(data=>{
-document.getElementById("welcome-name").innerText = "Hello " + ((data && data.profile && data.profile.name) || "")
+const profile = (data && data.profile) || {}
+document.getElementById("welcome-name").innerText = "Hello " + (profile.name || "")
+currentUserEmail = String(profile.email || "").toLowerCase()
+currentUserRole = String(profile.role || "")
 
-if(data && data.profile && data.profile.role === "Admin"){
+if(currentUserRole === "Admin"){
 document.getElementById("btn-nav-admin").classList.remove("hidden")
 }
 
 showPage("home")
-loadHomeEssentials()
+loadHomeEssentials(true)
 })
 .withFailureHandler(onServerFailure)
 .getStartupBootstrap(token)
@@ -370,54 +377,65 @@ loadHomeEssentials()
 
 document.addEventListener("DOMContentLoaded", initializeAuthView)
 
-function loadHomeEssentials(){
-if(homeLoaded) return
+function loadHomeEssentials(forceReload){
+if(homeLoaded && !forceReload) return
 homeLoaded = true
 setHomeError("")
-setHomeStatus("Loading finance distribution and summary cards...")
+setHomeStatus("Loading finance, projects, governance, and timeline...")
 document.getElementById("home-system-status").innerText = "Syncing dashboard modules..."
 document.getElementById("home-chart-empty").classList.add("hidden")
+document.getElementById("home-activity-list").innerHTML = "<div class='text-sm text-slate-500'>Loading timeline highlights...</div>"
 
 google.script.run
-.withSuccessHandler(data=>{
-if(financeChartInstance){
-financeChartInstance.destroy()
-}
+.withSuccessHandler(financeData=>{
+renderHomeFinanceSummary(financeData || {})
 
-financeChartInstance = new Chart(
-document.getElementById("financeChart"),
-{
-type:"doughnut",
-data:{
-labels:data.labels,
-datasets:[{
-data:data.values,
-backgroundColor:[
-"#2563eb",
-"#9333ea",
-"#06b6d4",
-"#f59e0b"
-]
-}]
-},
-options:{
-maintainAspectRatio:false,
-responsive:true,
-plugins:{
-legend:{position:"bottom"}
-}
-}
-}
-)
-const points = Array.isArray(data && data.values) ? data.values.filter(v=>Number(v)>0) : []
-if(!points.length){
-document.getElementById("home-chart-empty").classList.remove("hidden")
-document.getElementById("home-system-status").innerText = "Connected. No contribution data available yet."
-setHomeStatus("Dashboard loaded with empty data state.")
-return
-}
+google.script.run
+.withSuccessHandler(projectData=>{
+renderHomeProjectSnapshot(projectData || {})
+
+google.script.run
+.withSuccessHandler(voteData=>{
+renderHomeVoteSnapshot(voteData || {})
+
+google.script.run
+.withSuccessHandler(timelineData=>{
+renderHomeTimelineSnapshot(timelineData || {})
 document.getElementById("home-system-status").innerText = "Connected and current as of this session."
 setHomeStatus("Dashboard loaded.")
+})
+.withFailureHandler(err=>{
+renderHomeTimelineSnapshot({})
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setHomeError((err && err.message) || "Timeline snapshot unavailable.")
+setHomeStatus("Dashboard partially loaded. Timeline snapshot unavailable.")
+})
+.getTimelineData(token)
+})
+.withFailureHandler(err=>{
+renderHomeVoteSnapshot({})
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setHomeError((err && err.message) || "Governance snapshot unavailable.")
+setHomeStatus("Dashboard partially loaded. Governance snapshot unavailable.")
+})
+.getVotingDashboard(token)
+})
+.withFailureHandler(err=>{
+renderHomeProjectSnapshot({})
+if(isSessionExpiredError(err)){
+onServerFailure(err)
+return
+}
+setHomeError((err && err.message) || "Projects snapshot unavailable.")
+setHomeStatus("Dashboard partially loaded. Projects snapshot unavailable.")
+})
+.getProjectBoard(token)
 })
 .withFailureHandler(err=>{
 if(isSessionExpiredError(err)){
@@ -429,7 +447,73 @@ setHomeError((err && err.message) || "Unable to load home dashboard.")
 setHomeStatus("Unable to sync dashboard summary. You can retry by revisiting Home.")
 document.getElementById("home-system-status").innerText = "Summary unavailable."
 })
-.getFinanceData(token)
+.getFinanceDashboardData(token)
+}
+
+function renderHomeFinanceSummary(data){
+const totals = (data && data.totals) || {}
+const allocation = (data && data.allocation) || {}
+const contributionCategories = totals.contributionCategories || {}
+const categoryLabels = Object.keys(contributionCategories)
+const categoryValues = Object.values(contributionCategories)
+if(financeChartInstance){
+financeChartInstance.destroy()
+}
+financeChartInstance = new Chart(document.getElementById("financeChart"), {
+type:"doughnut",
+data:{labels:categoryLabels,datasets:[{data:categoryValues,backgroundColor:["#2563eb","#9333ea","#06b6d4","#f59e0b","#0f766e"]}]},
+options:{maintainAspectRatio:false,responsive:true,plugins:{legend:{position:"bottom"}}}
+})
+const points = categoryValues.filter(v=>Number(v)>0)
+if(!points.length){
+document.getElementById("home-chart-empty").classList.remove("hidden")
+}
+const totalContributions = Number(totals.totalContributions || 0)
+const projected = (allocation.breakdown || []).reduce((sum,item)=>sum + (Number(item.projectedAmount)||0), 0)
+document.getElementById("home-finance-snapshot").innerText = `${formatCurrency(totalContributions)} total • ${formatCurrency(projected)} projected`
+}
+
+function renderHomeProjectSnapshot(res){
+const projects = (res && Array.isArray(res.projects)) ? res.projects : []
+if(!projects.length){
+document.getElementById("home-project-snapshot").innerText = "No active projects found yet."
+return
+}
+const active = projects.filter(p=>String(p.Status||"").toLowerCase()!=="completed")
+const avgProgress = active.length ? (active.reduce((sum,p)=>sum + (Number(p.ProgressPercent)||0),0)/active.length) : 0
+document.getElementById("home-project-snapshot").innerText = `${active.length} active projects • ${formatPercent(avgProgress)} avg progress`
+}
+
+function renderHomeVoteSnapshot(res){
+const votes = (res && Array.isArray(res.votes)) ? res.votes : []
+if(!votes.length){
+document.getElementById("home-vote-snapshot").innerText = "No governance proposals yet."
+return
+}
+const open = votes.filter(v=>String(v.Status||"").toLowerCase()==="open").length
+const ballots = votes.reduce((sum,v)=>sum + (Number(v.totalBallots)||0),0)
+document.getElementById("home-vote-snapshot").innerText = `${open} open vote(s) • ${ballots} ballots recorded`
+}
+
+function renderHomeTimelineSnapshot(res){
+const upcoming = (res && Array.isArray(res.upcoming)) ? res.upcoming : []
+const historical = (res && Array.isArray(res.historical)) ? res.historical : []
+document.getElementById("home-timeline-snapshot").innerText = `${upcoming.length} upcoming • ${historical.length} historical records`
+const host = document.getElementById("home-activity-list")
+const activities = upcoming.slice(0,2).map(item=>({
+kind:"Upcoming",
+title:item.Title || "Event",
+date:item.NextOccurrence || item.EventDate
+})).concat(historical.slice(0,3).map(item=>({
+kind:"History",
+title:item.Title || "Record",
+date:item.EventDate
+})))
+if(!activities.length){
+host.innerHTML = "<div class='text-sm text-slate-500'>No timeline records available yet.</div>"
+return
+}
+host.innerHTML = activities.map(item=>`<div class='border border-slate-200 rounded-xl p-3 bg-slate-50'><div class='text-[11px] uppercase font-bold tracking-wide text-slate-500'>${escapeHtml(item.kind)}</div><div class='text-sm font-semibold text-slate-800 mt-1'>${escapeHtml(item.title)}</div><div class='text-xs text-slate-500 mt-1'>${escapeHtml(formatDate(item.date))}</div></div>`).join("")
 }
 
 function showPage(page){
@@ -938,6 +1022,15 @@ document.getElementById("finance-founder-lock-summary").innerHTML = `
 <div><span class="text-slate-500">Released:</span> <strong>${formatCurrency(founderLocks.totalReleased)}</strong></div>
 <div><span class="text-slate-500">Lock Records:</span> <strong>${Number(founderLocks.totalRecords || 0)}</strong></div>
 `
+
+const categoryHost = document.getElementById("finance-category-summary")
+const categories = totals.contributionCategories || {}
+const categoryKeys = Object.keys(categories)
+if(!categoryKeys.length){
+categoryHost.innerHTML = "<div class='text-sm text-slate-500'>No contribution category totals found.</div>"
+}else{
+categoryHost.innerHTML = categoryKeys.map(key=>`<div class='flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 bg-slate-50'><div class='text-xs font-semibold uppercase text-slate-500'>${escapeHtml(key)}</div><div class='text-sm font-semibold text-slate-800'>${formatCurrency(categories[key])}</div></div>`).join("")
+}
 
 const founderLockRows = founderLocks.locks || []
 if(!founderLockRows.length){
@@ -1454,16 +1547,22 @@ refreshMessages()
 
 function renderMessageHistory(messages){
 const container = document.getElementById("message-history")
+const outbox = document.getElementById("message-sent-list")
 if(!messages || !messages.length){
 container.innerHTML = "<div class='text-sm text-slate-500'>No messages yet.</div>"
+outbox.innerHTML = "<div class='text-sm text-slate-500'>No sent messages in this channel yet.</div>"
 return
 }
-container.innerHTML = messages.map(msg=>`
-<div class="bg-white border border-slate-100 rounded-xl p-3">
-<div class="text-xs text-slate-500 mb-1">${escapeHtml(msg.SenderEmail)} • ${escapeHtml(new Date(msg.SentAt).toLocaleString())}</div>
-<div class="text-sm text-slate-800 whitespace-pre-wrap">${escapeHtml(msg.Body)}</div>
-</div>
-`).join("")
+const sent = []
+container.innerHTML = messages.map(msg=>{
+const sender = String(msg.SenderEmail || "").toLowerCase()
+const outgoing = currentUserEmail && sender === currentUserEmail
+if(outgoing){
+sent.push(msg)
+}
+return `<div class="message-item ${outgoing ? 'outgoing' : ''}"><div class="meta">${escapeHtml(msg.SenderEmail)} • ${escapeHtml(new Date(msg.SentAt).toLocaleString())}</div><div class="body">${escapeHtml(msg.Body)}</div></div>`
+}).join("")
+outbox.innerHTML = sent.length ? sent.slice(-12).reverse().map(msg=>`<div class="message-item outgoing"><div class="meta">${escapeHtml(new Date(msg.SentAt).toLocaleString())}</div><div class="body">${escapeHtml(msg.Body)}</div></div>`).join("") : "<div class='text-sm text-slate-500'>No sent messages in this channel yet.</div>"
 container.scrollTop = container.scrollHeight
 }
 

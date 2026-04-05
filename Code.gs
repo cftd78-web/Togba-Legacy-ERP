@@ -16,7 +16,7 @@ const CHANNEL_TYPES = ['private', 'family broadcast', 'project'];
 const ADMIN_CACHE_TTL_SECONDS = 120;
 // TEMP DEV-ONLY TOGGLE (Phase 1.5):
 // Keep OFF in normal/prod usage. Turn ON only for local UI debugging.
-const DEV_BYPASS_MODE = false;
+const DEV_BYPASS_MODE = true;
 const DEV_BYPASS_IDENTITY = {
   email: 'dev.ui.debug@togba.local',
   role: 'Admin',
@@ -226,6 +226,7 @@ function getDashboardData(token) {
 
     return {
       profile: {
+        email: _norm(session.email),
         name: row[access.idx.FullName],
         role: row[access.idx.Role]
       }
