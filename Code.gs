@@ -3262,6 +3262,98 @@ function getTimelineCalendarData(token) {
   } catch (e) { throw new Error(_errMsg('getTimelineCalendarData', e)); }
 }
 
+function getProjectsVotingTimelineBundle(token, scope) {
+  try {
+    _auth(token);
+
+    const normalizedScope = _norm(scope || 'all');
+    const includeProjects = normalizedScope === 'all' || normalizedScope === 'projects';
+    const includeVoting = normalizedScope === 'all' || normalizedScope === 'voting';
+    const includeTimeline = normalizedScope === 'all' || normalizedScope === 'timeline';
+
+    const payload = {
+      success: true,
+      scope: normalizedScope || 'all',
+      generatedAt: new Date().toISOString()
+    };
+
+    if (includeProjects) {
+      const projectBoard = getProjectBoard(token);
+      const projects = (projectBoard && Array.isArray(projectBoard.projects)) ? projectBoard.projects : [];
+      const summary = projects.reduce((acc, project) => {
+        const status = _norm(project.Status || 'planning');
+        if (!acc.statusBreakdown[status]) {
+          acc.statusBreakdown[status] = 0;
+        }
+        acc.statusBreakdown[status] += 1;
+        acc.totalTasks += Array.isArray(project.tasks) ? project.tasks.length : 0;
+        acc.assignedTasks += Number(project.AssignedTaskCount || 0);
+        return acc;
+      }, {
+        projectCount: projects.length,
+        totalTasks: 0,
+        assignedTasks: 0,
+        statusBreakdown: {}
+      });
+
+      payload.projects = Object.assign({}, projectBoard, {
+        summary: summary
+      });
+    }
+
+    if (includeVoting) {
+      const voting = getVotingDashboard(token);
+      const votes = (voting && Array.isArray(voting.votes)) ? voting.votes : [];
+      const summary = votes.reduce((acc, vote) => {
+        const status = _norm(vote.Status || 'open');
+        if (status === 'open') {
+          acc.open += 1;
+        } else if (status === 'closed') {
+          acc.closed += 1;
+        } else {
+          acc.other += 1;
+        }
+        acc.totalBallots += Number(vote.totalBallots || 0);
+        if (vote.thresholdPassed) {
+          acc.passed += 1;
+        }
+        return acc;
+      }, {
+        totalVotes: votes.length,
+        open: 0,
+        closed: 0,
+        other: 0,
+        passed: 0,
+        totalBallots: 0
+      });
+
+      payload.voting = Object.assign({}, voting, {
+        summary: summary
+      });
+    }
+
+    if (includeTimeline) {
+      const timeline = getTimelineCalendarData(token);
+      const historical = (timeline && Array.isArray(timeline.historical)) ? timeline.historical : [];
+      const upcoming = (timeline && Array.isArray(timeline.upcoming)) ? timeline.upcoming : [];
+      const summary = {
+        historicalCount: historical.length,
+        upcomingCount: upcoming.length,
+        latestHistoricalDate: historical.length ? historical[0].EventDate : '',
+        nextUpcomingDate: upcoming.length ? upcoming[0].NextOccurrence : ''
+      };
+
+      payload.timeline = Object.assign({}, timeline, {
+        summary: summary
+      });
+    }
+
+    return payload;
+  } catch (e) {
+    throw new Error(_errMsg('getProjectsVotingTimelineBundle', e));
+  }
+}
+
 function getSOSAdminGuide(token) {
   try {
     const session = _auth(token); _assertAdminSession(session);
