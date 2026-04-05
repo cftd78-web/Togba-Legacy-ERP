@@ -323,10 +323,12 @@
 <div id="sos-error" class="hidden text-sm text-red-600 mb-3"></div>
 <div id="sos-status" class="hidden text-sm text-blue-700 mb-3"></div>
 
+<div id="sos-summary" class="grid gap-3 md:grid-cols-3 mb-4"></div>
+
 <div class="grid gap-4 lg:grid-cols-3">
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
-<button id="btn-trigger-sos" onclick="triggerSOS()" class="bg-red-600 text-white p-4 rounded-xl font-bold w-full">Send SOS Alert</button>
-<p class="text-xs text-slate-500 mt-3">This captures your current location and creates an emergency record.</p>
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1 sos-trigger-panel">
+<button id="btn-trigger-sos" onclick="triggerSOS()" class="sos-trigger-btn bg-red-600 text-white p-4 rounded-xl font-bold w-full">Send SOS Alert</button>
+<p class="text-xs text-slate-500 mt-3">This captures your current location and creates an emergency record for triage and response.</p>
 <div id="sos-whatsapp-action" class="mt-3"></div>
 </div>
 
@@ -351,6 +353,11 @@
 <button id="btn-save-sos-media" onclick="saveSOSMediaRef()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Save Media Link</button>
 </div>
 <div id="sos-media-list" class="space-y-2"></div>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Emergency Timeline</h3>
+<div id="sos-timeline" class="space-y-2"></div>
 </div>
 </div>
 
@@ -434,6 +441,7 @@
 <button onclick="loadFamilyData()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
 </div>
 <div id="family-error" class="hidden text-sm text-red-600 mb-3"></div>
+<div id="family-summary" class="grid gap-3 md:grid-cols-4 mb-4"></div>
 <div class="grid gap-4 lg:grid-cols-3">
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Add / Update Member</h3>
@@ -461,9 +469,14 @@
 </div>
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Family Tree View</h3>
-<div class="text-xs text-slate-500 mb-3">Patriarch/root is highlighted at the top. Ancestor and descendant placeholders keep lineage lanes visually clear even when links are missing.</div>
+<div class="text-xs text-slate-500 mb-3">Patriarch/root is highlighted at the top. Parent and child links show lineage structure in every generation.</div>
 <div id="family-tree" class="space-y-2"></div>
 </div>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 mt-4">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Family Directory</h3>
+<div id="family-directory" class="grid gap-3 md:grid-cols-2 xl:grid-cols-3"></div>
 </div>
 </div>
 
