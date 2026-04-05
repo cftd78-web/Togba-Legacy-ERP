@@ -42,6 +42,34 @@
 .phase-priority .module-stat strong{
   color:var(--ink);font-size:.9rem;
 }
+
+.phase-priority .phase-module-summary{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:.5rem;
+  margin:.5rem 0 1rem;
+}
+
+.phase-priority .phase-summary-card{
+  border:1px solid var(--line);
+  border-radius:.8rem;
+  padding:.55rem .7rem;
+  background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+}
+
+.phase-priority .phase-summary-card .label{
+  font-size:.65rem;
+  text-transform:uppercase;
+  color:#64748b;
+  font-weight:700;
+  letter-spacing:.04em;
+}
+
+.phase-priority .phase-summary-card .value{
+  font-size:1rem;
+  font-weight:700;
+  color:#0f172a;
+}
 </style>
 
 </head>
@@ -83,6 +111,27 @@
       `<div class="module-stat"><span>Joined Channels</span><strong>${Number(stats.joinedChannels || 0)}</strong></div>`,
       `<div class="module-stat"><span>Recent Messages</span><strong>${Number(stats.recentMessageCount || 0)}</strong></div>`
     ].join("");
+  }
+
+  function renderPhaseSummary(pageId, cards){
+    const page = document.getElementById(pageId);
+    if(!page){ return; }
+    const hostId = pageId + "-summary";
+    let host = document.getElementById(hostId);
+    if(!host){
+      host = document.createElement("div");
+      host.id = hostId;
+      host.className = "phase-module-summary";
+      const header = page.querySelector(".flex.items-center.justify-between");
+      if(header && header.parentElement){
+        header.parentElement.insertBefore(host, header.nextSibling);
+      }else{
+        page.prepend(host);
+      }
+    }
+    host.innerHTML = (cards || []).map(function(card){
+      return `<div class="phase-summary-card"><div class="label">${card.label || ""}</div><div class="value">${card.value || "0"}</div></div>`;
+    }).join("");
   }
 
   window.loadHomeEssentials = function(forceReload){
@@ -190,6 +239,120 @@
         setMessageError((err && err.message) || "Unable to load channels.");
       }
     ).getPriorityModuleBundle(token);
+  };
+
+  window.loadProjects = function(){
+    setProjectError("");
+    setProjectStatus("");
+    const list = document.getElementById("project-list");
+    if(!projectsLoaded && list){
+      list.innerHTML = "<div class='text-sm text-slate-500'>Loading projects...</div>";
+    }
+
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(res){
+        const projects = res && res.projects ? res.projects : {};
+        const summary = projects.summary || {};
+        projectsLoaded = true;
+        projectPermissions = {
+          canCreateProject: !!(projects.permissions && projects.permissions.canCreateProject),
+          canEditTask: !!(projects.permissions && projects.permissions.canEditTask)
+        };
+        projectsCache = Array.isArray(projects.projects) ? projects.projects : [];
+        if(!selectedProjectID || !projectsCache.some(function(p){ return p.ProjectID===selectedProjectID; })){
+          selectedProjectID = projectsCache.length ? projectsCache[0].ProjectID : "";
+        }
+        renderPhaseSummary("page-projects", [
+          {label:"Projects", value:String(Number(summary.projectCount || projectsCache.length || 0))},
+          {label:"Tasks", value:String(Number(summary.totalTasks || 0))},
+          {label:"Assigned", value:String(Number(summary.assignedTasks || 0))},
+          {label:"In Progress", value:String(Number((summary.statusBreakdown && summary.statusBreakdown["in progress"]) || 0))}
+        ]);
+        renderProjects();
+        if(selectedProjectID){
+          loadProjectTasks(selectedProjectID);
+          loadProjectUpdates(selectedProjectID);
+        }else{
+          renderProjectDetail(null);
+          renderProjectTasks([]);
+          renderProjectUpdates([]);
+        }
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        setProjectError((err && err.message) || "Unable to load projects.");
+        renderProjects();
+      }
+    ).getProjectsVotingTimelineBundle(token, "projects");
+  };
+
+  window.loadVotes = function(){
+    setVoteError("");
+    const list = document.getElementById("vote-list");
+    if(!voteDataLoaded && list){
+      list.innerHTML = "<div class='text-sm text-slate-500'>Loading votes...</div>";
+    }
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(res){
+        const voting = res && res.voting ? res.voting : {};
+        const summary = voting.summary || {};
+        voteDataLoaded = true;
+        votePermissions = {
+          canCreateVote: !!voting.canCreateVote,
+          canCastBallot: !!voting.canCastBallot
+        };
+        renderPhaseSummary("page-voting", [
+          {label:"Total Proposals", value:String(Number(summary.totalVotes || 0))},
+          {label:"Open", value:String(Number(summary.open || 0))},
+          {label:"Passed", value:String(Number(summary.passed || 0))},
+          {label:"Ballots", value:String(Number(summary.totalBallots || 0))}
+        ]);
+        renderVotes(Array.isArray(voting.votes) ? voting.votes : []);
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        setVoteError((err && err.message) || "Unable to load votes.");
+        if(!voteDataLoaded){ renderVotes([]); }
+      }
+    ).getProjectsVotingTimelineBundle(token, "voting");
+  };
+
+  window.loadTimelineData = function(){
+    setTimelineError("");
+    if(!timelineLoaded){
+      document.getElementById("timeline-list").innerHTML = "<div class='text-sm text-slate-500'>Loading timeline...</div>";
+      document.getElementById("timeline-history").innerHTML = "<div class='text-sm text-slate-500'>Loading history...</div>";
+      document.getElementById("timeline-upcoming").innerHTML = "<div class='text-sm text-slate-500'>Loading upcoming events...</div>";
+    }
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(res){
+        const timeline = res && res.timeline ? res.timeline : {};
+        const summary = timeline.summary || {};
+        timelineLoaded = true;
+        renderPhaseSummary("page-timeline", [
+          {label:"Historical", value:String(Number(summary.historicalCount || 0))},
+          {label:"Upcoming", value:String(Number(summary.upcomingCount || 0))},
+          {label:"Latest History", value:formatDate(summary.latestHistoricalDate)},
+          {label:"Next Event", value:formatDate(summary.nextUpcomingDate)}
+        ]);
+        renderTimelineList(timeline.timeline || []);
+        renderHistoryList(timeline.historical || []);
+        renderUpcomingList(timeline.upcoming || []);
+        renderTimelineCalendar(timeline.calendar || {});
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        setTimelineError((err && err.message) || "Unable to load timeline data.");
+        if(!timelineLoaded){
+          renderTimelineList([]);
+          renderHistoryList([]);
+          renderUpcomingList([]);
+        }
+      }
+    ).getProjectsVotingTimelineBundle(token, "timeline");
   };
 })();
 </script>
