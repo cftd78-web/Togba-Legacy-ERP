@@ -54,10 +54,16 @@
 <div id="home-status" class="state-box mb-4 hidden"></div>
 
 <div class="grid gap-4 lg:grid-cols-3 mb-4">
-<div class="bg-white p-6 rounded-3xl shadow border border-slate-100 lg:col-span-2">
+<div class="bg-white p-6 rounded-3xl shadow border border-slate-100 lg:col-span-2 home-hero-card">
 <div class="text-xs uppercase text-slate-500 font-bold">Institutional Summary</div>
 <div class="text-2xl md:text-3xl font-extrabold text-slate-800 mt-2">Executive dashboard and strategic controls</div>
 <p class="text-slate-600 mt-2 max-w-2xl">Monitor capital movement, projects, governance participation, and timeline milestones from a single overview.</p>
+<div class="mt-4 flex flex-wrap gap-2 text-xs">
+<span class="chip-soft">Live Finance</span>
+<span class="chip-soft">Project Delivery</span>
+<span class="chip-soft">Governance Pulse</span>
+<span class="chip-soft">Timeline Watch</span>
+</div>
 </div>
 <div class="bg-white p-5 rounded-3xl shadow border border-slate-100">
 <div class="text-xs uppercase text-slate-500 font-bold mb-1">System Status</div>
@@ -68,33 +74,37 @@
 <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-5">
 <button onclick="showPage('finance')" class="dashboard-tile text-left">
 <div class="text-xs uppercase text-slate-500 font-bold">Finance Snapshot</div>
-<div class="text-sm text-slate-700 mt-1">View capital, locks, and allocation trends.</div>
+<div id="home-finance-snapshot" class="text-sm text-slate-700 mt-1">View capital, locks, and allocation trends.</div>
 </button>
 <button onclick="showPage('projects')" class="dashboard-tile text-left">
 <div class="text-xs uppercase text-slate-500 font-bold">Projects Snapshot</div>
-<div class="text-sm text-slate-700 mt-1">Track active projects and delivery status.</div>
+<div id="home-project-snapshot" class="text-sm text-slate-700 mt-1">Track active projects and delivery status.</div>
 </button>
 <button onclick="showPage('voting')" class="dashboard-tile text-left">
 <div class="text-xs uppercase text-slate-500 font-bold">Governance Snapshot</div>
-<div class="text-sm text-slate-700 mt-1">Review proposal outcomes and participation.</div>
+<div id="home-vote-snapshot" class="text-sm text-slate-700 mt-1">Review proposal outcomes and participation.</div>
 </button>
 <button onclick="showPage('timeline')" class="dashboard-tile text-left">
 <div class="text-xs uppercase text-slate-500 font-bold">Timeline Snapshot</div>
-<div class="text-sm text-slate-700 mt-1">Browse family history and upcoming milestones.</div>
+<div id="home-timeline-snapshot" class="text-sm text-slate-700 mt-1">Browse family history and upcoming milestones.</div>
 </button>
 </div>
 
-<div class="bg-white p-6 rounded-3xl shadow border border-slate-100">
-
-<h3 class="text-xs font-bold text-slate-400 uppercase mb-4">
-Financial Distribution
-</h3>
-
+<div class="grid gap-4 xl:grid-cols-5">
+<div class="bg-white p-6 rounded-3xl shadow border border-slate-100 xl:col-span-3">
+<h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Financial Distribution</h3>
 <div class="chart-shell">
 <canvas id="financeChart"></canvas>
 </div>
 <div id="home-chart-empty" class="hidden mt-3 text-xs text-slate-500">No chart data yet. Contributions and locks will appear here once records are available.</div>
-
+</div>
+<div class="bg-white p-5 rounded-3xl shadow border border-slate-100 xl:col-span-2">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-xs font-bold text-slate-400 uppercase">Recent Timeline Highlights</h3>
+<button onclick="loadHomeEssentials(true)" class="text-xs px-2 py-1 rounded-lg bg-slate-100 text-slate-600">Refresh</button>
+</div>
+<div id="home-activity-list" class="space-y-2"></div>
+</div>
 </div>
 
 </div>
@@ -103,7 +113,10 @@ Financial Distribution
 
 <div id="page-finance" class="page">
 
-<h2 class="text-2xl font-bold mb-4">Finance</h2>
+<div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+<h2 class="text-2xl font-bold">Finance</h2>
+<button onclick="loadFinanceDashboard()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+</div>
 
 <div id="finance-error" class="hidden text-sm text-red-600 mb-3"></div>
 
@@ -130,6 +143,11 @@ Financial Distribution
 <canvas id="finance-allocation-chart" height="180"></canvas>
 </div>
 <div id="finance-allocation-breakdown" class="grid grid-cols-2 gap-2 mt-4 text-sm"></div>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Contribution Categories</h3>
+<div id="finance-category-summary" class="space-y-2 text-sm"></div>
 </div>
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
@@ -269,15 +287,12 @@ Financial Distribution
 </div>
 <div class="grid gap-3 lg:grid-cols-5">
 <div class="lg:col-span-3">
-<div class="mail-section-title mb-2">Inbox</div>
+<div class="mail-section-title mb-2">Conversation</div>
 <div id="message-history" class="mail-pane space-y-2"></div>
 </div>
 <div class="lg:col-span-2">
 <div class="mail-section-title mb-2">Sent / Outbox</div>
-<div class="mail-pane text-sm text-slate-500">
-<p class="mb-2">Use this pane as your delivery overview while composing.</p>
-<p>Messages you send continue to appear in the conversation stream for the selected channel.</p>
-</div>
+<div id="message-sent-list" class="mail-pane space-y-2"></div>
 </div>
 </div>
 <div class="mt-3">
