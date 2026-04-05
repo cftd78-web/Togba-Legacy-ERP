@@ -180,12 +180,63 @@
 
 <div class="grid gap-4 lg:grid-cols-3">
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Project List</h3>
-<div id="project-list" class="space-y-2"></div>
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-sm font-bold text-slate-500 uppercase">Project Portfolio</h3>
+<span class="text-[11px] text-slate-500">Active + Planned</span>
+</div>
+<div id="project-list" class="space-y-3">
+<div class="ptv-shell p-4">
+<div class="flex items-center justify-between gap-2">
+<div>
+<div class="text-xs text-slate-500">PRJ-001</div>
+<div class="font-semibold text-slate-900">Legacy Archive Digitization</div>
+</div>
+<span class="ptv-pill bg-blue-50 text-blue-700 border border-blue-200">In Progress</span>
+</div>
+<div class="mt-3 text-xs text-slate-600">Scanning, metadata tagging, and secure storage indexing are underway.</div>
+<div class="mt-3">
+<div class="flex justify-between text-xs text-slate-500"><span>Progress</span><span>62%</span></div>
+<div class="w-full bg-slate-100 rounded-full h-2 mt-1"><div class="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500" style="width:62%"></div></div>
+</div>
+</div>
+<div class="ptv-shell p-4">
+<div class="flex items-center justify-between gap-2">
+<div>
+<div class="text-xs text-slate-500">PRJ-002</div>
+<div class="font-semibold text-slate-900">Community Learning Center</div>
+</div>
+<span class="ptv-pill bg-amber-50 text-amber-700 border border-amber-200">At Risk</span>
+</div>
+<div class="mt-3 text-xs text-slate-600">Permit review delayed. Vendor bids collected for revised timeline.</div>
+<div class="mt-3">
+<div class="flex justify-between text-xs text-slate-500"><span>Progress</span><span>38%</span></div>
+<div class="w-full bg-slate-100 rounded-full h-2 mt-1"><div class="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500" style="width:38%"></div></div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
-<div id="project-detail" class="space-y-3"></div>
+<div id="project-detail" class="space-y-3">
+<div class="ptv-shell p-4">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div>
+<div class="text-xs text-slate-500 uppercase tracking-wide">Selected Project Overview</div>
+<div class="text-lg font-bold text-slate-900">Legacy Archive Digitization</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="ptv-pill bg-emerald-50 text-emerald-700 border border-emerald-200">On Track</span>
+<span class="ptv-pill bg-slate-50 text-slate-600 border border-slate-200">Budget: $52,000</span>
+</div>
+</div>
+<div class="grid gap-3 md:grid-cols-3 mt-3">
+<div class="ptv-metric"><div class="text-[10px] uppercase text-slate-500">Milestones</div><div class="text-lg font-bold text-slate-800">7 / 12</div></div>
+<div class="ptv-metric"><div class="text-[10px] uppercase text-slate-500">Tasks Complete</div><div class="text-lg font-bold text-slate-800">14 / 22</div></div>
+<div class="ptv-metric"><div class="text-[10px] uppercase text-slate-500">Owners</div><div class="text-lg font-bold text-slate-800">5</div></div>
+</div>
+<p class="text-sm text-slate-600 mt-3">Use project cards to switch context. Full project detail, tasks, and updates will sync automatically when backend data finishes loading.</p>
+</div>
+</div>
 </div>
 
 <div id="project-create-panel" class="hidden bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
@@ -207,8 +258,8 @@
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
 <div class="flex items-center justify-between mb-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase">Task List</h3>
-<span id="project-task-summary" class="text-xs text-slate-500">Select a project</span>
+<h3 class="text-sm font-bold text-slate-500 uppercase">Tasks & Workstream</h3>
+<span id="project-task-summary" class="text-xs text-slate-500">Showing sample tasks until project data loads</span>
 </div>
 <div id="task-create-panel" class="hidden grid gap-3 md:grid-cols-5 mb-4">
 <input id="task-project-id" type="text" readonly class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" />
@@ -229,13 +280,28 @@
 <input id="task-create-assignee" type="text" placeholder="Assignee name/email" class="p-3 rounded-xl border border-slate-200" />
 <button id="btn-create-task" onclick="createTaskRecord()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Add Task</button>
 </div>
-<div id="project-task-list" class="space-y-3"></div>
+<div id="project-task-list" class="space-y-3">
+<div class="ptv-shell p-4">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="font-semibold text-slate-900">Catalog historical scans by branch family</div>
+<div class="flex items-center gap-2"><span class="ptv-pill bg-indigo-50 text-indigo-700 border border-indigo-200">In Progress</span><span class="ptv-pill bg-rose-50 text-rose-700 border border-rose-200">High</span></div>
+</div>
+<div class="text-xs text-slate-600 mt-2">Assignee: Documentation Team • Due: 2026-05-02</div>
+</div>
+<div class="ptv-shell p-4">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="font-semibold text-slate-900">Finalize backup retention policy</div>
+<div class="flex items-center gap-2"><span class="ptv-pill bg-emerald-50 text-emerald-700 border border-emerald-200">Done</span><span class="ptv-pill bg-slate-50 text-slate-700 border border-slate-200">Medium</span></div>
+</div>
+<div class="text-xs text-slate-600 mt-2">Assignee: Records Admin • Completed: 2026-03-20</div>
+</div>
+</div>
 </div>
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
 <div class="flex items-center justify-between mb-3">
 <h3 class="text-sm font-bold text-slate-500 uppercase">Update History</h3>
-<span id="project-update-summary" class="text-xs text-slate-500">Select a project</span>
+<span id="project-update-summary" class="text-xs text-slate-500">Recent updates and checkpoint notes</span>
 </div>
 <div id="project-update-form" class="hidden grid gap-3 md:grid-cols-5 mb-4">
 <input id="project-update-project-id" type="text" readonly class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" />
@@ -243,7 +309,10 @@
 <input id="project-update-text" type="text" placeholder="Update details" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
 <button id="btn-save-project-update" onclick="saveProjectUpdate()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Add Update</button>
 </div>
-<div id="project-update-list" class="space-y-2"></div>
+<div id="project-update-list" class="space-y-2">
+<div class="ptv-shell p-3 text-sm"><span class="font-semibold text-slate-800">2026-03-28:</span> Field scanning sprint completed in 3 regions.</div>
+<div class="ptv-shell p-3 text-sm"><span class="font-semibold text-slate-800">2026-03-15:</span> OCR vendor QA baseline approved by operations lead.</div>
+</div>
 </div>
 </div>
 
@@ -323,25 +392,45 @@
 <div id="sos-error" class="hidden text-sm text-red-600 mb-3"></div>
 <div id="sos-status" class="hidden text-sm text-blue-700 mb-3"></div>
 
-<div id="sos-summary" class="grid gap-3 md:grid-cols-3 mb-4"></div>
+<div id="sos-summary" class="grid gap-3 md:grid-cols-3 mb-4">
+<div class="ptv-shell p-4"><div class="text-xs uppercase text-slate-500">Open Alerts</div><div class="text-2xl font-bold text-rose-600">2</div></div>
+<div class="ptv-shell p-4"><div class="text-xs uppercase text-slate-500">Resolved Today</div><div class="text-2xl font-bold text-emerald-600">6</div></div>
+<div class="ptv-shell p-4"><div class="text-xs uppercase text-slate-500">Avg Response</div><div class="text-2xl font-bold text-slate-800">08m</div></div>
+</div>
 
 <div class="grid gap-4 lg:grid-cols-3">
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1 sos-trigger-panel">
-<button id="btn-trigger-sos" onclick="triggerSOS()" class="sos-trigger-btn bg-red-600 text-white p-4 rounded-xl font-bold w-full">Send SOS Alert</button>
-<p class="text-xs text-slate-500 mt-3">This captures your current location and creates an emergency record for triage and response.</p>
+<div class="ptv-shell p-4 border-rose-200">
+<div class="text-xs uppercase tracking-wide text-rose-600 font-bold mb-2">Emergency Trigger</div>
+<button id="btn-trigger-sos" onclick="triggerSOS()" class="sos-trigger-btn bg-red-600 text-white p-5 rounded-xl font-bold w-full text-lg">Send SOS Alert</button>
+<p class="text-xs text-slate-500 mt-3">Instantly notifies response coordinators with location + latest account context.</p>
+<div class="mt-3 flex gap-2 flex-wrap">
+<span class="ptv-pill bg-emerald-50 text-emerald-700 border border-emerald-200">GPS Ready</span>
+<span class="ptv-pill bg-blue-50 text-blue-700 border border-blue-200">Escalation Active</span>
+</div>
+</div>
 <div id="sos-whatsapp-action" class="mt-3"></div>
 </div>
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Alert History</h3>
-<div id="sos-alert-history" class="space-y-2"></div>
+<div id="sos-alert-history" class="space-y-2">
+<div class="ptv-shell p-3">
+<div class="flex items-center justify-between"><div class="font-semibold text-slate-900">Medical assistance requested</div><span class="ptv-pill bg-amber-50 text-amber-700 border border-amber-200">Dispatching</span></div>
+<div class="text-xs text-slate-600 mt-1">Raised by: Family Branch East • 12 minutes ago</div>
+</div>
+<div class="ptv-shell p-3">
+<div class="flex items-center justify-between"><div class="font-semibold text-slate-900">Road incident near checkpoint</div><span class="ptv-pill bg-emerald-50 text-emerald-700 border border-emerald-200">Resolved</span></div>
+<div class="text-xs text-slate-600 mt-1">Resolved at 2026-04-05 09:18 UTC • Follow-up complete</div>
+</div>
+</div>
 <div id="sos-map" class="mt-3"></div>
 </div>
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
 <div class="flex items-center justify-between mb-3">
 <h3 class="text-sm font-bold text-slate-500 uppercase">SOS Media References</h3>
-<span id="sos-media-title" class="text-xs text-slate-500">Select an alert to view media</span>
+<span id="sos-media-title" class="text-xs text-slate-500">Attach photos/audio/video to selected alert</span>
 </div>
 <div class="grid gap-3 md:grid-cols-4 mb-4">
 <select id="sos-media-type" class="p-3 rounded-xl border border-slate-200">
@@ -352,12 +441,17 @@
 <input id="sos-media-url" type="url" placeholder="https://example.com/media" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
 <button id="btn-save-sos-media" onclick="saveSOSMediaRef()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Save Media Link</button>
 </div>
-<div id="sos-media-list" class="space-y-2"></div>
+<div id="sos-media-list" class="space-y-2">
+<div class="ptv-shell p-3 text-sm text-slate-700">No media selected yet. Choose an alert to view linked evidence and files.</div>
+</div>
 </div>
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Emergency Timeline</h3>
-<div id="sos-timeline" class="space-y-2"></div>
+<div id="sos-timeline" class="space-y-2">
+<div class="ptv-shell p-3 text-sm"><span class="font-semibold">09:30 UTC</span> • Alert received and triage team notified.</div>
+<div class="ptv-shell p-3 text-sm"><span class="font-semibold">09:33 UTC</span> • Nearest responder acknowledged dispatch.</div>
+</div>
 </div>
 </div>
 
@@ -398,7 +492,40 @@
 </div>
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 mb-4"><h3 class="text-sm font-bold text-slate-500 uppercase mb-2">Results Chart</h3><div class="chart-shell chart-shell-sm vote-chart-shell"><canvas id="vote-results-chart"></canvas></div></div>
-<div id="vote-list" class="space-y-3"></div>
+<div id="vote-list" class="space-y-3">
+<div class="ptv-shell p-4">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div>
+<div class="font-semibold text-slate-900">Approve 2026 Education Endowment Allocation</div>
+<div class="text-xs text-slate-600 mt-1">Threshold: TwoThirds • Closes: 2026-04-12</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="ptv-pill bg-emerald-50 text-emerald-700 border border-emerald-200">Open</span>
+<span class="ptv-pill bg-indigo-50 text-indigo-700 border border-indigo-200">74% Participation</span>
+</div>
+</div>
+<div class="grid gap-2 md:grid-cols-3 text-sm mt-3">
+<div class="ptv-metric"><div class="text-xs text-slate-500">Yes</div><div class="font-bold text-emerald-700">48</div></div>
+<div class="ptv-metric"><div class="text-xs text-slate-500">No</div><div class="font-bold text-rose-700">11</div></div>
+<div class="ptv-metric"><div class="text-xs text-slate-500">Abstain</div><div class="font-bold text-slate-700">6</div></div>
+</div>
+<div class="mt-3 flex gap-2 flex-wrap">
+<button class="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold">Vote Yes</button>
+<button class="px-3 py-2 rounded-lg bg-rose-600 text-white text-sm font-semibold">Vote No</button>
+<button class="px-3 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm font-semibold">Abstain</button>
+</div>
+</div>
+<div class="ptv-shell p-4">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div>
+<div class="font-semibold text-slate-900">Ratify Family Charter Amendment #04</div>
+<div class="text-xs text-slate-600 mt-1">Threshold: Majority • Closed: 2026-03-22</div>
+</div>
+<span class="ptv-pill bg-blue-50 text-blue-700 border border-blue-200">Passed</span>
+</div>
+<div class="text-sm text-slate-700 mt-3">Outcome: 61 Yes • 23 No • 3 Abstain</div>
+</div>
+</div>
 
 </div>
 
@@ -415,18 +542,27 @@
 
 <div class="grid gap-4 lg:grid-cols-3">
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Calendar View</h3><div id="timeline-calendar" class="text-sm"></div></div>
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Calendar View</h3><div id="timeline-calendar" class="text-sm"><div class="ptv-shell p-3">April 2026 focus: governance review (Apr 8), youth summit (Apr 14), legacy gala (Apr 26).</div></div></div>
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Unified Timeline</h3>
-<div id="timeline-list" class="space-y-3"></div>
+<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Unified Timeline Feed</h3>
+<div id="timeline-list" class="space-y-3 ptv-timeline-rail">
+<div class="ptv-shell p-4 relative"><span class="ptv-timeline-dot"></span><div class="text-xs text-slate-500">2026-04-04 • Governance</div><div class="font-semibold text-slate-900">Quarterly council agenda published</div><div class="text-sm text-slate-600 mt-1">Members can now submit voting proxies and agenda notes.</div></div>
+<div class="ptv-shell p-4 relative"><span class="ptv-timeline-dot"></span><div class="text-xs text-slate-500">2026-03-29 • Projects</div><div class="font-semibold text-slate-900">Archive metadata milestone achieved</div><div class="text-sm text-slate-600 mt-1">Phase 2 verification reached 80% completion.</div></div>
+</div>
 </div>
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Historical</h3>
-<div id="timeline-history" class="space-y-3"></div>
+<div id="timeline-history" class="space-y-3">
+<div class="ptv-shell p-3 text-sm"><div class="font-semibold">2018</div><div class="text-slate-600">Legacy trust governance framework formalized.</div></div>
+<div class="ptv-shell p-3 text-sm"><div class="font-semibold">2021</div><div class="text-slate-600">Digital migration initiative started.</div></div>
+</div>
 </div>
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Upcoming Events</h3>
-<div id="timeline-upcoming" class="space-y-3"></div>
+<div id="timeline-upcoming" class="space-y-3">
+<div class="ptv-shell p-3"><div class="flex items-center justify-between"><div class="font-semibold text-slate-900">Youth Mentorship Cohort Launch</div><span class="ptv-pill bg-blue-50 text-blue-700 border border-blue-200">In 3 days</span></div><div class="text-xs text-slate-600 mt-1">Apr 8, 2026 • Main Hall + livestream</div></div>
+<div class="ptv-shell p-3"><div class="flex items-center justify-between"><div class="font-semibold text-slate-900">Family Gala and Recognition Night</div><span class="ptv-pill bg-purple-50 text-purple-700 border border-purple-200">In 21 days</span></div><div class="text-xs text-slate-600 mt-1">Apr 26, 2026 • Heritage Center</div></div>
+</div>
 </div>
 </div>
 
@@ -441,7 +577,12 @@
 <button onclick="loadFamilyData()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
 </div>
 <div id="family-error" class="hidden text-sm text-red-600 mb-3"></div>
-<div id="family-summary" class="grid gap-3 md:grid-cols-4 mb-4"></div>
+<div id="family-summary" class="grid gap-3 md:grid-cols-4 mb-4">
+<div class="ptv-shell p-4"><div class="text-xs uppercase text-slate-500">Total Members</div><div class="text-2xl font-bold text-slate-900">142</div></div>
+<div class="ptv-shell p-4"><div class="text-xs uppercase text-slate-500">Households</div><div class="text-2xl font-bold text-slate-900">37</div></div>
+<div class="ptv-shell p-4"><div class="text-xs uppercase text-slate-500">Branches</div><div class="text-2xl font-bold text-slate-900">9</div></div>
+<div class="ptv-shell p-4"><div class="text-xs uppercase text-slate-500">Profiles w/ Photo</div><div class="text-2xl font-bold text-slate-900">108</div></div>
+</div>
 <div class="grid gap-4 lg:grid-cols-3">
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Add / Update Member</h3>
@@ -469,14 +610,27 @@
 </div>
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Family Tree View</h3>
-<div class="text-xs text-slate-500 mb-3">Patriarch/root is highlighted at the top. Parent and child links show lineage structure in every generation.</div>
-<div id="family-tree" class="space-y-2"></div>
+<div class="text-xs text-slate-500 mb-3">Lineage structure with parent-child visibility and branch indicators.</div>
+<div id="family-tree" class="space-y-2">
+<div class="ptv-shell p-3">
+<div class="font-semibold text-slate-900">Patriarch: Chief Togba</div>
+<div class="text-xs text-slate-600 mt-1">Generation 1 • Root</div>
+</div>
+<div class="grid md:grid-cols-2 gap-2 pl-4 border-l-2 border-slate-200">
+<div class="ptv-shell p-3"><div class="font-semibold text-slate-900">Branch A: Emmanuel Line</div><div class="text-xs text-slate-600 mt-1">Generation 2 • 31 members</div></div>
+<div class="ptv-shell p-3"><div class="font-semibold text-slate-900">Branch B: Ruth Line</div><div class="text-xs text-slate-600 mt-1">Generation 2 • 27 members</div></div>
+</div>
+</div>
 </div>
 </div>
 
 <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 mt-4">
 <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Family Directory</h3>
-<div id="family-directory" class="grid gap-3 md:grid-cols-2 xl:grid-cols-3"></div>
+<div id="family-directory" class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+<div class="ptv-shell p-3"><div class="font-semibold text-slate-900">Naomi Togba</div><div class="text-xs text-slate-600 mt-1">Branch A • Generation 4</div><span class="ptv-pill bg-blue-50 text-blue-700 border border-blue-200 mt-2 inline-flex">Mentor</span></div>
+<div class="ptv-shell p-3"><div class="font-semibold text-slate-900">Samuel Togba</div><div class="text-xs text-slate-600 mt-1">Branch C • Generation 3</div><span class="ptv-pill bg-emerald-50 text-emerald-700 border border-emerald-200 mt-2 inline-flex">Active</span></div>
+<div class="ptv-shell p-3"><div class="font-semibold text-slate-900">Martha Togba</div><div class="text-xs text-slate-600 mt-1">Branch B • Generation 2</div><span class="ptv-pill bg-purple-50 text-purple-700 border border-purple-200 mt-2 inline-flex">Council</span></div>
+</div>
 </div>
 </div>
 
