@@ -2941,6 +2941,81 @@ function getMessagingRecipients(token, query) {
   }
 }
 
+function getPriorityModuleBundle(token) {
+  try {
+    const session = _auth(token);
+    const generatedAt = new Date().toISOString();
+
+    const finance = getFinanceDashboardData(token);
+    const projectBoard = getProjectBoard(token);
+    const voting = getVotingDashboard(token);
+    const timeline = getTimelineData(token);
+    const userChannels = getUserChannels(token);
+    const channelDirectory = getChannelDirectory(token);
+
+    const messagingCtx = _getMessagingSheets();
+    const userChannelMap = (userChannels || []).reduce((acc, item) => {
+      const id = String(item.ChannelID || '').trim();
+      if (id) {
+        acc[id] = true;
+      }
+      return acc;
+    }, {});
+
+    const recentMessages = messagingCtx.messages.rows
+      .map(row => ({
+        ChannelID: String(row[messagingCtx.messages.idx.ChannelID] || '').trim(),
+        SenderEmail: _norm(row[messagingCtx.messages.idx.SenderEmail]),
+        SentAt: row[messagingCtx.messages.idx.SentAt]
+      }))
+      .filter(item => !!userChannelMap[item.ChannelID])
+      .sort((a, b) => new Date(b.SentAt).getTime() - new Date(a.SentAt).getTime())
+      .slice(0, 40);
+
+    const uniqueSenders = recentMessages.reduce((acc, item) => {
+      if (item.SenderEmail) {
+        acc[item.SenderEmail] = true;
+      }
+      return acc;
+    }, {});
+
+    let admin = null;
+    if (_norm(session.role) === 'admin') {
+      admin = {
+        dashboard: getAdminDashboardData(token),
+        settings: getSettingsSummary(token),
+        institution: getInstitutionSettingsSummary(token),
+        health: getSystemHealth(token)
+      };
+    }
+
+    return {
+      success: true,
+      generatedAt: generatedAt,
+      home: {
+        finance: finance,
+        projects: projectBoard,
+        voting: voting,
+        timeline: timeline
+      },
+      finance: finance,
+      messages: {
+        channels: userChannels,
+        directory: channelDirectory,
+        stats: {
+          joinedChannels: (userChannels || []).length,
+          directoryChannels: Number(channelDirectory && channelDirectory.channels ? channelDirectory.channels.length : 0),
+          recentMessageCount: recentMessages.length,
+          activeSenderCount: Object.keys(uniqueSenders).length
+        }
+      },
+      admin: admin
+    };
+  } catch (e) {
+    throw new Error(_errMsg('getPriorityModuleBundle', e));
+  }
+}
+
 function getMemberDirectory(token) {
   try {
     _auth(token);
