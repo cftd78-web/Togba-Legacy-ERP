@@ -3280,6 +3280,7 @@ function getProjectsVotingTimelineBundle(token, scope) {
     if (includeProjects) {
       const projectBoard = getProjectBoard(token);
       const projects = (projectBoard && Array.isArray(projectBoard.projects)) ? projectBoard.projects : [];
+      const totalGoalUSD = projects.reduce((sum, project) => sum + (Number(project.GoalUSD) || 0), 0);
       const summary = projects.reduce((acc, project) => {
         const status = _norm(project.Status || 'planning');
         if (!acc.statusBreakdown[status]) {
@@ -3293,8 +3294,17 @@ function getProjectsVotingTimelineBundle(token, scope) {
         projectCount: projects.length,
         totalTasks: 0,
         assignedTasks: 0,
+        atRiskProjects: 0,
         statusBreakdown: {}
       });
+      summary.atRiskProjects = projects.filter(project => {
+        const status = _norm(project.Status || '');
+        return status === 'blocked' || status === 'stalled' || status === 'at risk';
+      }).length;
+      summary.totalGoalUSD = totalGoalUSD;
+      summary.averageProgress = projects.length
+        ? projects.reduce((sum, project) => sum + (Number(project.ProgressPercent) || 0), 0) / projects.length
+        : 0;
 
       payload.projects = Object.assign({}, projectBoard, {
         summary: summary
@@ -3304,6 +3314,7 @@ function getProjectsVotingTimelineBundle(token, scope) {
     if (includeVoting) {
       const voting = getVotingDashboard(token);
       const votes = (voting && Array.isArray(voting.votes)) ? voting.votes : [];
+      const eligibleVoters = _getGovernanceSheets().access.rows.length;
       const summary = votes.reduce((acc, vote) => {
         const status = _norm(vote.Status || 'open');
         if (status === 'open') {
@@ -3324,8 +3335,13 @@ function getProjectsVotingTimelineBundle(token, scope) {
         closed: 0,
         other: 0,
         passed: 0,
-        totalBallots: 0
+        totalBallots: 0,
+        avgParticipationPct: 0
       });
+      summary.avgParticipationPct = (votes.length && eligibleVoters > 0)
+        ? (votes.reduce((sum, vote) => sum + ((Number(vote.totalBallots) || 0) / eligibleVoters), 0) / votes.length) * 100
+        : 0;
+      summary.eligibleVoters = eligibleVoters;
 
       payload.voting = Object.assign({}, voting, {
         summary: summary
@@ -3340,7 +3356,12 @@ function getProjectsVotingTimelineBundle(token, scope) {
         historicalCount: historical.length,
         upcomingCount: upcoming.length,
         latestHistoricalDate: historical.length ? historical[0].EventDate : '',
-        nextUpcomingDate: upcoming.length ? upcoming[0].NextOccurrence : ''
+        nextUpcomingDate: upcoming.length ? upcoming[0].NextOccurrence : '',
+        upcomingNext30Days: upcoming.filter(item => {
+          if (!item.NextOccurrence) return false;
+          const daysAway = Math.floor((new Date(item.NextOccurrence).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+          return daysAway >= 0 && daysAway <= 30;
+        }).length
       };
 
       payload.timeline = Object.assign({}, timeline, {
