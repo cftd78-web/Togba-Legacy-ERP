@@ -65,8 +65,8 @@
   <!-- Theme toggle -->
   <div class="flex justify-center mt-5">
     <button onclick="cycleTheme()" class="flex items-center gap-1.5 text-xs" style="color:var(--muted);background:none;border:none">
-      <span id="topbar-theme-icon" class="material-symbols-outlined" style="font-size:15px">brightness_auto</span>
-      <span id="topbar-theme-label">Auto</span>
+      <span id="login-theme-icon" class="material-symbols-outlined" style="font-size:15px">brightness_auto</span>
+      <span id="login-theme-label">Auto</span>
     </button>
   </div>
 
@@ -99,53 +99,53 @@
 
       <div class="sidebar-section-label">Overview</div>
 
-      <button data-page="home" onclick="showPage('home')" class="sidebar-item">
+      <button data-page="home" data-tooltip="Dashboard" onclick="showPage('home')" class="sidebar-item">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">dashboard</span>
         <span class="sidebar-label">Dashboard</span>
       </button>
 
-      <button data-page="family" onclick="showPage('family')" class="sidebar-item">
+      <button data-page="family" data-tooltip="Family Registry" onclick="showPage('family')" class="sidebar-item">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">groups</span>
         <span class="sidebar-label">Family Registry</span>
       </button>
 
       <div class="sidebar-section-label">Finance</div>
 
-      <button data-page="finance" onclick="showPage('finance')" class="sidebar-item">
+      <button data-page="finance" data-tooltip="Finance" onclick="showPage('finance')" class="sidebar-item">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">account_balance</span>
         <span class="sidebar-label">Finance</span>
       </button>
 
-      <button data-page="investment" onclick="showPage('investment')" class="sidebar-item">
+      <button data-page="investment" data-tooltip="Investment Allocation" onclick="showPage('investment')" class="sidebar-item">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">account_balance_wallet</span>
         <span class="sidebar-label">Investment Allocation</span>
       </button>
 
       <div class="sidebar-section-label">Operations</div>
 
-      <button data-page="projects" onclick="showPage('projects')" class="sidebar-item">
+      <button data-page="projects" data-tooltip="Projects" onclick="showPage('projects')" class="sidebar-item">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">account_tree</span>
         <span class="sidebar-label">Projects</span>
       </button>
 
-      <button data-page="voting" onclick="showPage('voting')" class="sidebar-item">
+      <button data-page="voting" data-tooltip="Governance" onclick="showPage('voting')" class="sidebar-item">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">gavel</span>
         <span class="sidebar-label">Governance</span>
       </button>
 
-      <button data-page="messages" onclick="showPage('messages')" class="sidebar-item">
+      <button data-page="messages" data-tooltip="Messaging" onclick="showPage('messages')" class="sidebar-item">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">chat_bubble</span>
         <span class="sidebar-label">Messaging</span>
       </button>
 
       <div class="sidebar-section-label">Legacy</div>
 
-      <button data-page="timeline" onclick="showPage('timeline')" class="sidebar-item">
+      <button data-page="timeline" data-tooltip="Timeline" onclick="showPage('timeline')" class="sidebar-item">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">history</span>
         <span class="sidebar-label">Timeline</span>
       </button>
 
-      <button data-page="documents" onclick="showPage('documents')" class="sidebar-item">
+      <button data-page="documents" data-tooltip="Document Vault" onclick="showPage('documents')" class="sidebar-item">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">folder_shared</span>
         <span class="sidebar-label">Document Vault</span>
       </button>
@@ -154,22 +154,22 @@
 
     <div class="sidebar-footer">
 
-      <button data-page="sos" onclick="showPage('sos')" class="sidebar-item sidebar-sos">
+      <button data-page="sos" data-tooltip="SOS Emergency" onclick="showPage('sos')" class="sidebar-item sidebar-sos">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">emergency</span>
         <span class="sidebar-label">SOS Emergency</span>
       </button>
 
-      <button id="sidebar-nav-admin" data-page="admin" onclick="showPage('admin')" class="sidebar-item hidden">
+      <button id="sidebar-nav-admin" data-page="admin" data-tooltip="Admin" onclick="showPage('admin')" class="sidebar-item hidden">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">shield</span>
         <span class="sidebar-label">Admin</span>
       </button>
 
-      <button onclick="cycleTheme()" class="sidebar-item">
+      <button data-tooltip="Toggle Theme" onclick="cycleTheme()" class="sidebar-item">
         <span id="sidebar-theme-icon" class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">brightness_auto</span>
         <span class="sidebar-label" id="sidebar-theme-label">Auto</span>
       </button>
 
-      <button onclick="resetToLogin('Logged out.')" class="sidebar-item">
+      <button data-tooltip="Logout" onclick="resetToLogin('Logged out.')" class="sidebar-item">
         <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">logout</span>
         <span class="sidebar-label">Logout</span>
       </button>
@@ -192,7 +192,7 @@
         </div>
         <div class="topbar-actions">
           <button onclick="cycleTheme()" class="theme-toggle-btn" title="Toggle theme">
-            <span class="material-symbols-outlined" style="font-size:17px">brightness_auto</span>
+            <span id="app-topbar-theme-icon" class="material-symbols-outlined" style="font-size:17px">brightness_auto</span>
           </button>
           <button onclick="resetToLogin('Logged out.')"
             class="text-xs px-3 py-2 rounded-lg border"
