@@ -1,1217 +1,705 @@
 <!DOCTYPE html>
-<html>
+<html id="html-root" class="theme-auto">
 <head>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-
 <title>Togba Legacy ERP</title>
-
-<style>
-
-/* ===== BASE APP STYLES (REPLACES Index_Styles) ===== */
-
-:root{
---app-bg:#f3f6fb;
---panel:#ffffff;
---panel-alt:#f8fafc;
---ink:#0f172a;
---muted:#64748b;
---accent:#2563eb;
---accent-soft:#dbeafe;
---line:#e2e8f0;
-}
-
-@media (prefers-color-scheme:dark){
-:root{
---app-bg:#0b1326;
---panel:#111a2d;
---panel-alt:#1a2236;
---ink:#e2e8f0;
---muted:#94a3b8;
---accent:#7aa2ff;
---accent-soft:#22335f;
---line:#28354f;
-}
-body{background:var(--app-bg)!important;color:var(--ink);}
-}
-
-.page{display:none;}
-.page.active{display:block;}
-
-.app-shell{max-width:1280px;margin:0 auto;padding:1rem 1rem 6rem 1rem;}
-
-.topbar{
-position:sticky;
-top:0;
-z-index:40;
-backdrop-filter:blur(12px);
-background:color-mix(in srgb,var(--app-bg) 78%, transparent);
-border-bottom:1px solid var(--line);
-}
-
-.topbar-row{max-width:1280px;margin:0 auto;padding:.85rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;}
-
-.brand-mark{display:flex;align-items:center;gap:.75rem;}
-
-.brand-dot{
-width:2.1rem;height:2.1rem;border-radius:.8rem;
-background:linear-gradient(145deg,var(--accent),#60a5fa);
-box-shadow:0 10px 22px rgba(37,99,235,.22);
-}
-
-nav button{
-display:flex;
-flex-direction:column;
-align-items:center;
-font-size:12px;
-color:var(--muted);
-border-radius:.8rem;
-padding:.4rem .25rem;
-transition:all .2s ease;
-}
-nav button.active{
-color:var(--accent);
-background:var(--accent-soft);
-}
-
-.chart-shell{
-position:relative;
-width:100%;
-max-width:380px;
-height:240px;
-margin:0 auto;
-}
-
-.dashboard-tile{
-border:1px solid var(--line);
-border-radius:1rem;
-padding:0.9rem;
-background:linear-gradient(180deg,var(--panel) 0%,var(--panel-alt) 100%);
-cursor:pointer;
-}
-
-.login-shell{
-min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:1.25rem;
-background:var(--app-bg);
-}
-
-.login-card{
-width:100%;
-max-width:430px;
-background:var(--panel);
-border:1px solid var(--line);
-border-radius:1.5rem;
-padding:1.4rem;
-}
-
-/* ===== KEEP YOUR EXISTING PHASE STYLE ===== */
-
-</style>
-
-<style>
-/* ===== YOUR ORIGINAL PHASE-PRIORITY CSS (UNCHANGED) ===== */
-</style>
-
+<?!= include('Styles') ?>
 </head>
-<body class="phase-priority">
+<body>
 
-<!-- LOGIN VIEW -->
+<!-- ================================================================
+     LOGIN VIEW  — Stitch Sovereign Vault
+     ================================================================ -->
 
 <div id="view-login" class="login-shell">
 <div class="login-card">
-<div class="text-center mb-6">
-<div class="inline-flex items-center justify-center mb-3 h-12 w-12 rounded-2xl bg-blue-50 border border-blue-100">
-<span class="material-icons-round text-blue-600">account_balance</span>
-</div>
-<h1 class="text-2xl font-bold">Togba Legacy</h1>
-<p class="text-sm text-slate-500 mt-1">Secure institutional access</p>
-</div>
-<div id="dev-bypass-banner" class="hidden mb-3 text-xs rounded-xl border px-3 py-2"></div>
-<div id="login-state-message" class="hidden mb-3 text-xs rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-blue-700"></div>
-<div id="step-1">
-<label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Registry Email</label>
-<input id="email" type="email" placeholder="name@family-office.com" class="w-full p-4 bg-slate-100 rounded-xl mb-4 border border-transparent focus:border-blue-200 focus:outline-none">
-<button id="btn-get-code" onclick="handleOTP()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold">Send One-Time Code</button>
-</div>
-<div id="step-2" class="hidden">
-<div class="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">Enter the 6-digit code sent to your email. This code expires quickly for security.</div>
-<input id="otp" type="text" placeholder="000000" maxlength="6" class="otp-code w-full p-4 bg-slate-100 rounded-xl mb-3 border border-transparent focus:border-blue-200 focus:outline-none">
-<div class="grid grid-cols-2 gap-2">
-<button id="btn-verify" onclick="handleVerify()" class="bg-blue-600 text-white p-4 rounded-xl font-bold">Verify</button>
-<button onclick="resetToStepOne()" class="bg-slate-200 text-slate-700 p-4 rounded-xl font-bold">Back</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- APP VIEW -->
-
-<div id="view-app" class="hidden pb-24">
-<header class="topbar">
-<div class="topbar-row">
-<div class="brand-mark">
-<div class="brand-dot"></div>
-<div>
-<div class="text-xs uppercase tracking-[0.15em] text-slate-500">Togba Legacy</div>
-<h2 id="welcome-name" class="text-base sm:text-lg font-bold leading-tight">Welcome</h2>
-</div>
-</div>
-<button onclick="resetToLogin('Logged out.')" class="text-xs px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-600">Logout</button>
-</div>
-</header>
-<div class="app-shell">
-
-<!-- HOME PAGE -->
-
-<div id="page-home" class="page active">
-
-<div id="home-error" class="hidden text-sm text-red-600 mb-3"></div>
-<div id="home-status" class="state-box mb-4 hidden"></div>
-
-<div class="grid gap-4 lg:grid-cols-3 mb-4">
-<div class="bg-white p-6 rounded-3xl shadow border border-slate-100 lg:col-span-2 home-hero-card">
-<div class="text-xs uppercase text-slate-500 font-bold">Institutional Summary</div>
-<div class="text-2xl md:text-3xl font-extrabold text-slate-800 mt-2">Executive dashboard and strategic controls</div>
-<p class="text-slate-600 mt-2 max-w-2xl">Monitor capital movement, projects, governance participation, and timeline milestones from a single overview.</p>
-<div class="mt-4 flex flex-wrap gap-2 text-xs">
-<span class="chip-soft">Live Finance</span>
-<span class="chip-soft">Project Delivery</span>
-<span class="chip-soft">Governance Pulse</span>
-<span class="chip-soft">Timeline Watch</span>
-</div>
-</div>
-<div class="bg-white p-5 rounded-3xl shadow border border-slate-100">
-<div class="text-xs uppercase text-slate-500 font-bold mb-1">System Status</div>
-<div id="home-system-status" class="text-sm text-slate-700">Waiting for dashboard metrics...</div>
-</div>
-</div>
-
-<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-5">
-<button onclick="showPage('finance')" class="dashboard-tile text-left">
-<div class="text-xs uppercase text-slate-500 font-bold">Finance Snapshot</div>
-<div id="home-finance-snapshot" class="text-sm text-slate-700 mt-1">View capital, locks, and allocation trends.</div>
-</button>
-<button onclick="showPage('projects')" class="dashboard-tile text-left">
-<div class="text-xs uppercase text-slate-500 font-bold">Projects Snapshot</div>
-<div id="home-project-snapshot" class="text-sm text-slate-700 mt-1">Track active projects and delivery status.</div>
-</button>
-<button onclick="showPage('voting')" class="dashboard-tile text-left">
-<div class="text-xs uppercase text-slate-500 font-bold">Governance Snapshot</div>
-<div id="home-vote-snapshot" class="text-sm text-slate-700 mt-1">Review proposal outcomes and participation.</div>
-</button>
-<button onclick="showPage('timeline')" class="dashboard-tile text-left">
-<div class="text-xs uppercase text-slate-500 font-bold">Timeline Snapshot</div>
-<div id="home-timeline-snapshot" class="text-sm text-slate-700 mt-1">Browse family history and upcoming milestones.</div>
-</button>
-</div>
-
-<div class="grid gap-4 xl:grid-cols-5">
-<div class="bg-white p-6 rounded-3xl shadow border border-slate-100 xl:col-span-3">
-<h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Financial Distribution</h3>
-<div class="chart-shell">
-<canvas id="financeChart"></canvas>
-</div>
-<div id="home-chart-empty" class="hidden mt-3 text-xs text-slate-500">No chart data yet. Contributions and locks will appear here once records are available.</div>
-</div>
-<div class="bg-white p-5 rounded-3xl shadow border border-slate-100 xl:col-span-2">
-<div class="flex items-center justify-between mb-3">
-<h3 class="text-xs font-bold text-slate-400 uppercase">Recent Timeline Highlights</h3>
-<button onclick="loadHomeEssentials(true)" class="text-xs px-2 py-1 rounded-lg bg-slate-100 text-slate-600">Refresh</button>
-</div>
-<div id="home-activity-list" class="space-y-2"></div>
-</div>
-</div>
-
-</div>
-
-<!-- FINANCE PAGE -->
-
-<div id="page-finance" class="page">
-
-<div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
-<h2 class="text-2xl font-bold">Finance</h2>
-<button onclick="loadFinanceDashboard()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
-</div>
-
-<div id="finance-error" class="hidden text-sm text-red-600 mb-3"></div>
-
-<div class="grid gap-4 lg:grid-cols-3">
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
-<div class="text-xs text-slate-500 uppercase font-bold mb-1">Total Contributions</div>
-<div id="finance-total-contributions" class="text-2xl font-bold text-slate-800">$0.00</div>
-</div>
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
-<div class="text-xs text-slate-500 uppercase font-bold mb-1">Founder Locked Capital</div>
-<div id="finance-total-locked" class="text-2xl font-bold text-slate-800">$0.00</div>
-</div>
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
-<div class="text-xs text-slate-500 uppercase font-bold mb-1">Projected Distribution</div>
-<div id="finance-total-projected" class="text-2xl font-bold text-slate-800">$0.00</div>
-</div>
-
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
-<div class="flex items-center justify-between mb-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase">Investment Allocation</h3>
-<span id="finance-allocation-validation" class="text-xs font-semibold text-slate-500"></span>
-</div>
-<div class="chart-shell chart-shell-sm">
-<canvas id="finance-allocation-chart" height="180"></canvas>
-</div>
-<div id="finance-allocation-breakdown" class="grid grid-cols-2 gap-2 mt-4 text-sm"></div>
-</div>
-
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Contribution Categories</h3>
-<div id="finance-category-summary" class="space-y-2 text-sm"></div>
-</div>
-
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Founder Capital Status</h3>
-<div class="chart-shell chart-shell-sm">
-<canvas id="finance-founder-lock-chart" height="180"></canvas>
-</div>
-<div id="finance-founder-lock-summary" class="mt-3 space-y-2 text-sm text-slate-700"></div>
-</div>
-
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Founder Lock Records</h3>
-<div id="finance-founder-lock-list" class="space-y-3"></div>
-</div>
-</div>
-
-</div>
-
-<!-- PROJECTS PAGE -->
-
-<div id="page-projects" class="page">
-
-<div class="flex items-center justify-between mb-4">
-<h2 class="text-2xl font-bold">Projects</h2>
-<button onclick="loadProjects()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
-</div>
-
-<div id="project-error" class="hidden text-sm text-red-600 mb-3"></div>
-<div id="project-status" class="hidden text-sm text-blue-700 mb-3"></div>
-
-<div class="grid gap-4 lg:grid-cols-3">
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Project List</h3>
-<div id="project-list" class="space-y-2"></div>
-</div>
-
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
-<div id="project-detail" class="space-y-3"></div>
-</div>
-
-<div id="project-create-panel" class="hidden bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Create Project</h3>
-<div class="grid gap-3 md:grid-cols-4">
-<input id="project-create-title" type="text" placeholder="Project title" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
-<input id="project-create-goal" type="number" min="0" step="0.01" placeholder="Goal USD" class="p-3 rounded-xl border border-slate-200" />
-<input id="project-create-description" type="text" placeholder="Project description (optional)" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
-<input id="project-create-image" type="url" placeholder="Project image URL (optional)" class="p-3 rounded-xl border border-slate-200" />
-<select id="project-create-status" class="p-3 rounded-xl border border-slate-200">
-<option value="Planning">Planning</option>
-<option value="In Progress">In Progress</option>
-<option value="On Hold">On Hold</option>
-<option value="Completed">Completed</option>
-</select>
-</div>
-<button id="btn-create-project" onclick="createProjectRecord()" class="mt-3 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Create Project</button>
-</div>
-
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
-<div class="flex items-center justify-between mb-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase">Task List</h3>
-<span id="project-task-summary" class="text-xs text-slate-500">Select a project</span>
-</div>
-<div id="task-create-panel" class="hidden grid gap-3 md:grid-cols-5 mb-4">
-<input id="task-project-id" type="text" readonly class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" />
-<select id="task-create-status" class="p-3 rounded-xl border border-slate-200">
-<option value="Pending">Pending</option>
-<option value="In Progress">In Progress</option>
-<option value="Blocked">Blocked</option>
-<option value="Done">Done</option>
-</select>
-<select id="task-create-priority" class="p-3 rounded-xl border border-slate-200">
-<option value="High">High</option>
-<option value="Medium" selected>Medium</option>
-<option value="Low">Low</option>
-</select>
-<input id="task-create-percent" type="number" min="0" max="100" placeholder="% complete" class="p-3 rounded-xl border border-slate-200" />
-<input id="task-create-title" type="text" placeholder="Task title" class="p-3 rounded-xl border border-slate-200" />
-<select id="task-create-assignee-type" class="p-3 rounded-xl border border-slate-200"><option value="">Assignee Type</option><option value="internal">internal</option><option value="external">external</option></select>
-<input id="task-create-assignee" type="text" placeholder="Assignee name/email" class="p-3 rounded-xl border border-slate-200" />
-<button id="btn-create-task" onclick="createTaskRecord()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Add Task</button>
-</div>
-<div id="project-task-list" class="space-y-3"></div>
-</div>
-
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
-<div class="flex items-center justify-between mb-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase">Update History</h3>
-<span id="project-update-summary" class="text-xs text-slate-500">Select a project</span>
-</div>
-<div id="project-update-form" class="hidden grid gap-3 md:grid-cols-5 mb-4">
-<input id="project-update-project-id" type="text" readonly class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" />
-<input id="project-update-task-id" type="text" placeholder="TaskID (optional)" class="p-3 rounded-xl border border-slate-200" />
-<input id="project-update-text" type="text" placeholder="Update details" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
-<button id="btn-save-project-update" onclick="saveProjectUpdate()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Add Update</button>
-</div>
-<div id="project-update-list" class="space-y-2"></div>
-</div>
-</div>
-
-</div>
-
-<!-- MESSAGES PAGE -->
-
-<div id="page-messages" class="page">
-
-<h2 class="text-2xl font-bold mb-4">Messaging</h2>
-
-<div class="messages-shell">
-
-<div class="mail-panel p-4">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Channels</h3>
-<div class="grid gap-2 mb-3">
-<input id="channel-create-name" class="p-2 rounded-lg border" placeholder="New channel name" />
-<select id="channel-create-type" class="p-2 rounded-lg border"><option value="private">private</option><option value="family broadcast">family broadcast</option><option value="project">project</option></select>
-<button onclick="createChannelUI()" class="bg-blue-600 text-white p-2 rounded-lg text-sm">Create Channel</button>
-<input id="channel-join-id" class="p-2 rounded-lg border" placeholder="ChannelID to join" />
-<button onclick="joinChannelUI()" class="bg-slate-900 text-white p-2 rounded-lg text-sm">Join Channel</button>
-</div>
-<div class="mail-section-title mb-2">Inbox</div>
-<div id="channel-list" class="space-y-2 max-h-[28vh] overflow-y-auto"></div>
-<div class="mt-3 border-t pt-3">
-<div class="mail-section-title mb-2">Sent / Outbox Directory</div>
-<div id="channel-directory" class="space-y-2 max-h-[18vh] overflow-y-auto"></div>
-</div>
-</div>
-
-<div class="mail-panel flex flex-col min-h-[64vh]">
-<div class="mail-panel-head">
-<h3 id="message-channel-title" class="text-sm font-bold text-slate-500 uppercase">Select a channel</h3>
-<button onclick="refreshMessages()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
-</div>
-<div class="p-4">
-<div id="message-error" class="hidden text-sm text-red-600 mb-2"></div>
-<div class="mb-3">
-<input id="message-recipient-input" type="text" placeholder="To: search family member by name" class="w-full p-3 rounded-xl border border-slate-200" oninput="handleRecipientSearchInput()" autocomplete="off" />
-<div id="message-recipient-results" class="mt-2 space-y-1"></div>
-</div>
-<div class="grid gap-3 lg:grid-cols-5">
-<div class="lg:col-span-3">
-<div class="mail-section-title mb-2">Conversation</div>
-<div id="message-history" class="mail-pane space-y-2"></div>
-</div>
-<div class="lg:col-span-2">
-<div class="mail-section-title mb-2">Sent / Outbox</div>
-<div id="message-sent-list" class="mail-pane space-y-2"></div>
-</div>
-</div>
-<div class="mt-3">
-<div class="mail-section-title mb-2">Compose Message</div>
-<div class="flex flex-col gap-2">
-<textarea id="message-input" placeholder="Write your message..." class="w-full p-3 rounded-xl border border-slate-200 mail-compose-box min-h-[220px]"></textarea>
-<div class="flex justify-end">
-<button id="btn-send-message" onclick="sendCurrentMessage()" class="bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Send</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-
-</div>
-
-<!-- SOS PAGE -->
-
-<div id="page-sos" class="page">
-
-<div class="flex items-center justify-between mb-4">
-<h2 class="text-2xl font-bold">Emergency SOS</h2>
-<button onclick="loadSOSAlerts()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
-</div>
-
-<div id="sos-error" class="hidden text-sm text-red-600 mb-3"></div>
-<div id="sos-status" class="hidden text-sm text-blue-700 mb-3"></div>
-
-<div class="grid gap-4 lg:grid-cols-3">
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
-<button id="btn-trigger-sos" onclick="triggerSOS()" class="bg-red-600 text-white p-4 rounded-xl font-bold w-full">Send SOS Alert</button>
-<p class="text-xs text-slate-500 mt-3">This captures your current location and creates an emergency record.</p>
-<div id="sos-whatsapp-action" class="mt-3"></div>
-</div>
-
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Alert History</h3>
-<div id="sos-alert-history" class="space-y-2"></div>
-<div id="sos-map" class="mt-3"></div>
-</div>
-
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
-<div class="flex items-center justify-between mb-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase">SOS Media References</h3>
-<span id="sos-media-title" class="text-xs text-slate-500">Select an alert to view media</span>
-</div>
-<div class="grid gap-3 md:grid-cols-4 mb-4">
-<select id="sos-media-type" class="p-3 rounded-xl border border-slate-200">
-<option value="photo">photo</option>
-<option value="video">video</option>
-<option value="audio">audio</option>
-</select>
-<input id="sos-media-url" type="url" placeholder="https://example.com/media" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
-<button id="btn-save-sos-media" onclick="saveSOSMediaRef()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Save Media Link</button>
-</div>
-<div id="sos-media-list" class="space-y-2"></div>
-</div>
-</div>
-
-</div>
-
-<!-- VOTING PAGE -->
-
-<div id="page-voting" class="page">
-
-<div class="flex items-center justify-between mb-4">
-<h2 class="text-2xl font-bold">Governance Voting</h2>
-<button onclick="loadVotes()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
-</div>
-
-<div id="vote-error" class="hidden text-sm text-red-600 mb-3"></div>
-
-<div id="vote-create-panel" class="hidden bg-white p-4 rounded-2xl border border-slate-100 shadow mb-4">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Create Proposal</h3>
-<div class="grid gap-3 md:grid-cols-4">
-<input id="vote-title" type="text" placeholder="Proposal title" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
-<select id="vote-threshold" class="p-3 rounded-xl border border-slate-200">
-<option value="Majority">Majority</option>
-<option value="TwoThirds">TwoThirds</option>
-<option value="SeventyFive">SeventyFive</option>
-</select>
-<textarea id="vote-description" placeholder="Proposal description (optional)" class="md:col-span-4 p-3 rounded-xl border border-slate-200 min-h-[96px]"></textarea>
-<input id="vote-image" type="url" placeholder="Proposal image URL (optional)" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
-<div class="md:col-span-2 flex flex-col gap-2">
-<input id="vote-image-file" type="file" accept="image/*" class="p-2 rounded-xl border border-slate-200 bg-white text-sm" onchange="handleVoteImageSelected(event)" />
-<div class="text-xs text-slate-500">Optional: select an image file to auto-fill the image URL field (base64 data URL).</div>
-</div>
-<select id="vote-status" class="p-3 rounded-xl border border-slate-200">
-<option value="Open">Open</option>
-<option value="Closed">Closed</option>
-</select>
-</div>
-<button id="btn-create-vote" onclick="createVote()" class="mt-3 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Create Vote</button>
-</div>
-
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 mb-4"><h3 class="text-sm font-bold text-slate-500 uppercase mb-2">Results Chart</h3><div class="chart-shell chart-shell-sm vote-chart-shell"><canvas id="vote-results-chart"></canvas></div></div>
-<div id="vote-list" class="space-y-3"></div>
-
-</div>
-
-<!-- TIMELINE PAGE -->
-
-<div id="page-timeline" class="page">
-
-<div class="flex items-center justify-between mb-4">
-<h2 class="text-2xl font-bold">Family Timeline</h2>
-<button onclick="loadTimelineData()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
-</div>
-
-<div id="timeline-error" class="hidden text-sm text-red-600 mb-3"></div>
-
-<div class="grid gap-4 lg:grid-cols-3">
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Calendar View</h3><div id="timeline-calendar" class="text-sm"></div></div>
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Unified Timeline</h3>
-<div id="timeline-list" class="space-y-3"></div>
-</div>
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Historical</h3>
-<div id="timeline-history" class="space-y-3"></div>
-</div>
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Upcoming Events</h3>
-<div id="timeline-upcoming" class="space-y-3"></div>
-</div>
-</div>
-
-</div>
-
-
-<!-- FAMILY PAGE -->
-
-<div id="page-family" class="page">
-<div class="flex items-center justify-between mb-4">
-<h2 class="text-2xl font-bold">Family Data & Tree</h2>
-<button onclick="loadFamilyData()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
-</div>
-<div id="family-error" class="hidden text-sm text-red-600 mb-3"></div>
-<div class="grid gap-4 lg:grid-cols-3">
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Add / Update Member</h3>
-<div class="grid gap-2">
-<input id="family-person-id" class="p-2 rounded-lg border" placeholder="PersonID (optional for new)" />
-<input id="family-full-name" class="p-2 rounded-lg border" placeholder="Full name" />
-<input id="family-relationship" class="p-2 rounded-lg border" placeholder="RelationshipToPatriarch" />
-<input id="family-generation" class="p-2 rounded-lg border" placeholder="GenerationTier" />
-<input id="family-father" class="p-2 rounded-lg border" placeholder="FatherID" />
-<input id="family-mother" class="p-2 rounded-lg border" placeholder="MotherID" />
-<input id="family-spouse" class="p-2 rounded-lg border" placeholder="SpouseFullNameOptional" />
-<button onclick="saveFamilyMember()" class="bg-blue-600 text-white p-2 rounded-lg">Save</button>
-</div>
-<div class="mt-5 border-t border-slate-200 pt-4">
-<h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Member Photo</h4>
-<div class="grid gap-2">
-<input id="family-photo-person-id" class="p-2 rounded-lg border" placeholder="PersonID (required)" />
-<input id="family-photo-file" type="file" accept="image/*" class="p-2 rounded-lg border" />
-<input id="family-photo-url" class="p-2 rounded-lg border" placeholder="Or paste PhotoFileURL" />
-<input id="family-photo-type" class="p-2 rounded-lg border" placeholder="PhotoType (default: profile)" />
-<button onclick="saveFamilyPhoto()" class="bg-slate-800 text-white p-2 rounded-lg">Save Photo</button>
-</div>
-<p class="text-xs text-slate-500 mt-2">Photos are stored in the existing Photos sheet and displayed on family cards.</p>
-</div>
-</div>
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Family Tree View</h3>
-<div class="text-xs text-slate-500 mb-3">Patriarch/root is highlighted at the top. Ancestor and descendant placeholders keep lineage lanes visually clear even when links are missing.</div>
-<div id="family-tree" class="space-y-2"></div>
-</div>
-</div>
-</div>
-
-<!-- ADMIN PAGE -->
-
-<div id="page-admin" class="page">
-
-<div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
-<h2 class="text-2xl font-bold">Admin & System Controls</h2>
-<button onclick="loadAdmin()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
-</div>
-
-<div id="admin-error" class="hidden text-sm text-red-600 mb-3"></div>
-<div id="admin-status" class="hidden text-sm text-emerald-700 mb-3"></div>
-
-<div class="grid gap-4 lg:grid-cols-4 mb-4">
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
-<div class="text-xs text-slate-500 uppercase">Users</div>
-<div id="admin-stat-users" class="text-2xl font-bold text-slate-800 mt-1">--</div>
-</div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
-<div class="text-xs text-slate-500 uppercase">Admins</div>
-<div id="admin-stat-admins" class="text-2xl font-bold text-slate-800 mt-1">--</div>
-</div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
-<div class="text-xs text-slate-500 uppercase">Settings Entries</div>
-<div id="admin-stat-settings" class="text-2xl font-bold text-slate-800 mt-1">--</div>
-</div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
-<div class="text-xs text-slate-500 uppercase">Health Issues</div>
-<div id="admin-stat-issues" class="text-2xl font-bold text-slate-800 mt-1">--</div>
-</div>
-</div>
-
-<div class="grid gap-4 lg:grid-cols-3">
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Settings Summary</h3>
-<div id="admin-settings-summary" class="space-y-2 text-sm"></div>
-</div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Institution Settings</h3>
-<div id="admin-inst-settings-summary" class="space-y-2 text-sm"></div>
-</div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">System Health</h3>
-<div id="admin-health-summary" class="space-y-2 text-sm"></div>
-</div>
-</div>
-
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow mt-4">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Member Management</h3>
-<div class="grid gap-2 md:grid-cols-5 mb-3">
-<input id="admin-member-email" class="p-2 rounded-lg border" placeholder="email"/>
-<input id="admin-member-name" class="p-2 rounded-lg border" placeholder="full name"/>
-<input id="admin-member-role" class="p-2 rounded-lg border" placeholder="role"/>
-<button onclick="adminAddMember()" class="bg-blue-600 text-white p-2 rounded-lg">Add</button>
-<button onclick="adminDeactivateMember()" class="bg-red-600 text-white p-2 rounded-lg">Deactivate</button>
-</div>
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Access Registry</h3>
-<div id="user-list" class="space-y-2"></div>
-</div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow mt-4">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Emergency Configuration Guide</h3>
-<div id="admin-guide" class="text-sm text-slate-700 space-y-2"></div>
-</div>
-
-</div>
-
-</div>
 
-<!-- NAVIGATION -->
-
-<nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t p-2 sm:p-3 flex justify-around gap-1 overflow-x-auto">
-
-<button onclick="showPage('home')">
-<span class="material-icons-round text-blue-600">home</span>
-Home
-</button>
-
-<button onclick="showPage('finance')">
-<span class="material-icons-round">account_balance</span>
-Finance
-</button>
-
-<button onclick="showPage('projects')">
-<span class="material-icons-round">construction</span>
-Projects
-</button>
-
-<button onclick="showPage('messages')">
-<span class="material-icons-round">chat</span>
-Messages
-</button>
-
-<button onclick="showPage('sos')">
-<span class="material-icons-round text-red-600">warning</span>
-SOS
-</button>
-
-<button onclick="showPage('voting')">
-<span class="material-icons-round">how_to_vote</span>
-Voting
-</button>
-
-<button onclick="showPage('timeline')">
-<span class="material-icons-round">history</span>
-Timeline
-</button>
-
-<button onclick="showPage('family')">
-<span class="material-icons-round">account_tree</span>
-Family
-</button>
-
-<button id="btn-nav-admin"
-onclick="showPage('admin')"
-class="hidden">
-
-<span class="material-icons-round">security</span>
-Admin
-
-</button>
-
-</nav>
-
-<script>
-(function(){
-  function guardedServerCall(builder, onSuccess, onFailure){
-    try{
-      return builder()
-      .withSuccessHandler(onSuccess)
-      .withFailureHandler(function(err){
-        if(typeof onFailure === "function"){ onFailure(err); return; }
-        if(typeof onServerFailure === "function"){ onServerFailure(err); return; }
-        alert((err && err.message) || "Request failed.");
-      });
-    }catch(err){
-      if(typeof onFailure === "function"){ onFailure(err); return; }
-      if(typeof onServerFailure === "function"){ onServerFailure(err); return; }
-      alert((err && err.message) || "Request failed.");
-      return null;
-    }
-  }
-
-  function renderMessageModuleStats(stats){
-    const panel = document.querySelector("#page-messages .mail-panel .mail-section-title");
-    if(!panel) return;
-    const hostId = "messages-module-stats";
-    let host = document.getElementById(hostId);
-    if(!host){
-      host = document.createElement("div");
-      host.id = hostId;
-      host.className = "grid gap-2 mb-3";
-      panel.parentElement.insertBefore(host, panel.nextSibling);
-    }
-    host.innerHTML = [
-      `<div class="module-stat"><span>Joined Channels</span><strong>${Number(stats.joinedChannels || 0)}</strong></div>`,
-      `<div class="module-stat"><span>Recent Messages</span><strong>${Number(stats.recentMessageCount || 0)}</strong></div>`
-    ].join("");
-  }
-
-  function renderPhaseSummary(pageId, cards){
-    const page = document.getElementById(pageId);
-    if(!page){ return; }
-    const hostId = pageId + "-summary";
-    let host = document.getElementById(hostId);
-    if(!host){
-      host = document.createElement("div");
-      host.id = hostId;
-      host.className = "phase-module-summary";
-      const header = page.querySelector(".flex.items-center.justify-between");
-      if(header && header.parentElement){
-        header.parentElement.insertBefore(host, header.nextSibling);
-      }else{
-        page.prepend(host);
-      }
-    }
-    host.innerHTML = (cards || []).map(function(card){
-      return `<div class="phase-summary-card"><div class="label">${card.label || ""}</div><div class="value">${card.value || "0"}</div></div>`;
-    }).join("");
-  }
-
-  window.loadHomeEssentials = function(forceReload){
-    if(window.homeLoaded && !forceReload){ return; }
-    window.homeLoaded = true;
-    setHomeError("");
-    setHomeStatus("Loading priority modules...");
-    document.getElementById("home-system-status").innerText = "Syncing dashboard modules...";
-    guardedServerCall(
-      function(){ return google.script.run; },
-      function(bundle){
-        const data = bundle && bundle.home ? bundle.home : {};
-        renderHomeFinanceSummary(data.finance || {});
-        renderHomeProjectSnapshot(data.projects || {});
-        renderHomeVoteSnapshot(data.voting || {});
-        renderHomeTimelineSnapshot(data.timeline || {});
-        document.getElementById("home-system-status").innerText = "Connected and current as of this session.";
-        setHomeStatus("Dashboard loaded.");
-      },
-      function(err){
-        window.homeLoaded = false;
-        setHomeError((err && err.message) || "Unable to load home dashboard.");
-        setHomeStatus("Dashboard unavailable. Retry from Home.");
-      }
-    ).getPriorityModuleBundle(token);
-  };
-
-  window.loadFinanceDashboard = function(){
-    setFinanceError("");
-    guardedServerCall(
-      function(){ return google.script.run; },
-      function(bundle){
-        const payload = bundle && bundle.finance ? bundle.finance : {};
-        financeLoaded = true;
-        renderFinanceDashboard(payload);
-      },
-      function(err){
-        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
-        financeLoaded = false;
-        setFinanceError((err && err.message) || "Unable to load finance dashboard.");
-      }
-    ).getPriorityModuleBundle(token);
-  };
-
-  window.loadAdmin = function(){
-    adminLoaded = false;
-    setAdminError("");
-    setAdminStatus("Loading admin dashboard...");
-    guardedServerCall(
-      function(){ return google.script.run; },
-      function(bundle){
-        const admin = bundle && bundle.admin ? bundle.admin : null;
-        if(!admin){
-          setAdminError("Admin dashboard is available for Admin role only.");
-          setAdminStatus("");
-          return;
-        }
-        renderAdminUserList([]);
-        document.getElementById("admin-stat-users").innerText = Number(admin.dashboard && admin.dashboard.userOverview ? admin.dashboard.userOverview.totalUsers : 0);
-        document.getElementById("admin-stat-admins").innerText = Number(admin.dashboard && admin.dashboard.userOverview ? admin.dashboard.userOverview.adminUsers : 0);
-        document.getElementById("admin-stat-settings").innerText = Number(admin.dashboard && admin.dashboard.settingsOverview ? admin.dashboard.settingsOverview.totalEntries : 0);
-        document.getElementById("admin-stat-issues").innerText = Number(admin.health && admin.health.issueCount ? admin.health.issueCount : 0);
-        renderSettingsSummary(admin.settings || {entries:[]});
-        renderInstitutionSettingsSummary(admin.institution || {entries:[]});
-        renderSystemHealth(admin.health || {healthy:false, issueCount:0, issues:[]});
-        adminLoaded = true;
-        setAdminStatus("Admin dashboard loaded.");
-        google.script.run.withSuccessHandler(function(users){ renderAdminUserList(Array.isArray(users) ? users : []); }).withFailureHandler(function(err){ setAdminError((err&&err.message)||"Unable to load Access registry."); }).adminGetAllUsers(token);
-      },
-      function(err){
-        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
-        adminLoaded = false;
-        setAdminError((err && err.message) || "Unable to load admin dashboard summary.");
-        setAdminStatus("");
-      }
-    ).getPriorityModuleBundle(token);
-  };
-
-  window.loadUserChannels = function(){
-    setMessageError("");
-    guardedServerCall(
-      function(){ return google.script.run; },
-      function(bundle){
-        const messages = bundle && bundle.messages ? bundle.messages : {};
-        userChannels = Array.isArray(messages.channels) ? messages.channels : [];
-        channelDirectory = messages.directory && Array.isArray(messages.directory.channels) ? messages.directory.channels : [];
-        renderChannelDirectory();
-        renderMessageModuleStats(messages.stats || {});
-        renderChannelList();
-        if(!userChannels.length){
-          selectedChannelID = "";
-          renderMessageHistory([]);
-          document.getElementById("message-channel-title").innerText = "No channels available";
-          setMessageError("You are not a member of any active channel.");
-        }else{
-          if(!selectedChannelID || !userChannels.some(c=>c.ChannelID===selectedChannelID)){
-            selectedChannelID = userChannels[0].ChannelID;
-          }
-          refreshMessages();
-        }
-        loadMessagingRecipients();
-      },
-      function(err){
-        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
-        setMessageError((err && err.message) || "Unable to load channels.");
-      }
-    ).getPriorityModuleBundle(token);
-  };
-
-  window.loadProjects = function(){
-    setProjectError("");
-    setProjectStatus("");
-    const list = document.getElementById("project-list");
-    if(!projectsLoaded && list){
-      list.innerHTML = "<div class='text-sm text-slate-500'>Loading projects...</div>";
-    }
-
-    guardedServerCall(
-      function(){ return google.script.run; },
-      function(res){
-        const projects = res && res.projects ? res.projects : {};
-        const summary = projects.summary || {};
-        projectsLoaded = true;
-        projectPermissions = {
-          canCreateProject: !!(projects.permissions && projects.permissions.canCreateProject),
-          canEditTask: !!(projects.permissions && projects.permissions.canEditTask)
-        };
-        projectsCache = Array.isArray(projects.projects) ? projects.projects : [];
-        if(!selectedProjectID || !projectsCache.some(function(p){ return p.ProjectID===selectedProjectID; })){
-          selectedProjectID = projectsCache.length ? projectsCache[0].ProjectID : "";
-        }
-        renderPhaseSummary("page-projects", [
-          {label:"Projects", value:String(Number(summary.projectCount || projectsCache.length || 0))},
-          {label:"Tasks", value:String(Number(summary.totalTasks || 0))},
-          {label:"Assigned", value:String(Number(summary.assignedTasks || 0))},
-          {label:"Avg Progress", value:formatPercent(summary.averageProgress || 0)},
-          {label:"At Risk", value:String(Number(summary.atRiskProjects || 0))},
-          {label:"Goal Budget", value:formatCurrency(summary.totalGoalUSD || 0)}
-        ]);
-        renderProjects();
-        if(selectedProjectID){
-          loadProjectTasks(selectedProjectID);
-          loadProjectUpdates(selectedProjectID);
-        }else{
-          renderProjectDetail(null);
-          renderProjectTasks([]);
-          renderProjectUpdates([]);
-        }
-      },
-      function(err){
-        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
-        setProjectError((err && err.message) || "Unable to load projects.");
-        renderProjects();
-      }
-    ).getProjectsVotingTimelineBundle(token, "projects");
-  };
-
-  window.loadVotes = function(){
-    setVoteError("");
-    const list = document.getElementById("vote-list");
-    if(!voteDataLoaded && list){
-      list.innerHTML = "<div class='text-sm text-slate-500'>Loading votes...</div>";
-    }
-    guardedServerCall(
-      function(){ return google.script.run; },
-      function(res){
-        const voting = res && res.voting ? res.voting : {};
-        const summary = voting.summary || {};
-        voteDataLoaded = true;
-        votePermissions = {
-          canCreateVote: !!voting.canCreateVote,
-          canCastBallot: !!voting.canCastBallot
-        };
-        renderPhaseSummary("page-voting", [
-          {label:"Total Proposals", value:String(Number(summary.totalVotes || 0))},
-          {label:"Open", value:String(Number(summary.open || 0))},
-          {label:"Passed", value:String(Number(summary.passed || 0))},
-          {label:"Ballots", value:String(Number(summary.totalBallots || 0))},
-          {label:"Eligible Voters", value:String(Number(summary.eligibleVoters || 0))},
-          {label:"Avg Participation", value:formatPercent(summary.avgParticipationPct || 0)}
-        ]);
-        renderVotes(Array.isArray(voting.votes) ? voting.votes : []);
-      },
-      function(err){
-        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
-        setVoteError((err && err.message) || "Unable to load votes.");
-        if(!voteDataLoaded){ renderVotes([]); }
-      }
-    ).getProjectsVotingTimelineBundle(token, "voting");
-  };
-
-  window.loadTimelineData = function(){
-    setTimelineError("");
-    if(!timelineLoaded){
-      document.getElementById("timeline-list").innerHTML = "<div class='text-sm text-slate-500'>Loading timeline...</div>";
-      document.getElementById("timeline-history").innerHTML = "<div class='text-sm text-slate-500'>Loading history...</div>";
-      document.getElementById("timeline-upcoming").innerHTML = "<div class='text-sm text-slate-500'>Loading upcoming events...</div>";
-    }
-    guardedServerCall(
-      function(){ return google.script.run; },
-      function(res){
-        const timeline = res && res.timeline ? res.timeline : {};
-        const summary = timeline.summary || {};
-        timelineLoaded = true;
-        renderPhaseSummary("page-timeline", [
-          {label:"Historical", value:String(Number(summary.historicalCount || 0))},
-          {label:"Upcoming", value:String(Number(summary.upcomingCount || 0))},
-          {label:"Latest History", value:formatDate(summary.latestHistoricalDate)},
-          {label:"Next Event", value:formatDate(summary.nextUpcomingDate)},
-          {label:"Next 30 Days", value:String(Number(summary.upcomingNext30Days || 0))}
-        ]);
-        renderTimelineList(timeline.timeline || []);
-        renderHistoryList(timeline.historical || []);
-        renderUpcomingList(timeline.upcoming || []);
-        renderTimelineCalendar(timeline.calendar || {});
-      },
-      function(err){
-        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
-        setTimelineError((err && err.message) || "Unable to load timeline data.");
-        if(!timelineLoaded){
-          renderTimelineList([]);
-          renderHistoryList([]);
-          renderUpcomingList([]);
-        }
-      }
-    ).getProjectsVotingTimelineBundle(token, "timeline");
-  };
-})();
-</script>
-<script>
-(function(){
-  function pct(value){
-    return Math.max(0, Math.min(100, Number(value || 0)));
-  }
-
-  window.renderProjects = function(){
-    const list = document.getElementById("project-list");
-    const createPanel = document.getElementById("project-create-panel");
-    if(!list || !createPanel){ return; }
-    (projectPermissions.canCreateProject ? createPanel.classList.remove("hidden") : createPanel.classList.add("hidden"));
-
-    if(!projectsCache.length){
-      list.innerHTML = "<div class='ptv-shell p-4 text-sm text-slate-500'>No projects found.</div>";
-      renderProjectDetail(null);
-      return;
-    }
-
-    list.innerHTML = projectsCache.map(function(project){
-      const selected = project.ProjectID===selectedProjectID;
-      const progress = pct(project.ProgressPercent);
-      const status = String(project.Status || "Planning");
-      const statusTone = /blocked|stalled|risk/i.test(status) ? "bg-rose-50 text-rose-700 border border-rose-200" : /done|completed/i.test(status) ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-blue-50 text-blue-700 border border-blue-200";
-      return `
-      <button onclick="selectProject('${escapeHtml(project.ProjectID)}')" class="w-full text-left ptv-shell p-4 transition ${selected ? "ring-2 ring-blue-300" : "hover:shadow-lg"}">
-        <div class="flex items-start gap-3">
-          <div class="h-16 w-16 shrink-0 rounded-xl border border-slate-200 bg-slate-100 overflow-hidden">
-            ${project.ImageURL ? `<img src="${escapeHtml(project.ImageURL)}" alt="Project thumbnail" class="h-full w-full object-cover"/>` : `<div class="h-full w-full flex items-center justify-center text-[10px] text-slate-500 px-1 text-center">No Image</div>`}
-          </div>
-          <div class="min-w-0 flex-1">
-            <div class="flex items-center justify-between gap-2">
-              <div class="text-xs text-slate-500">${escapeHtml(project.ProjectID || "")}</div>
-              <div class="ptv-pill ${statusTone}">${escapeHtml(status)}</div>
-            </div>
-            <div class="font-semibold text-slate-900 mt-1 truncate">${escapeHtml(project.Title || "Untitled project")}</div>
-            <div class="text-xs text-slate-600 mt-1 line-clamp-2">${escapeHtml(project.Description || "No description provided.")}</div>
-          </div>
-        </div>
-        <div class="mt-4">
-          <div class="flex justify-between text-xs text-slate-500 mb-1"><span>Progress</span><span>${formatPercent(progress)}</span></div>
-          <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="h-full bg-gradient-to-r from-blue-500 to-indigo-600" style="width:${progress}%"></div></div>
-        </div>
-        <div class="grid grid-cols-3 gap-2 mt-3">
-          <div class="ptv-metric"><div class="text-[10px] uppercase text-slate-500">Tasks</div><div class="font-bold text-slate-800">${Number(project.TaskCount || 0)}</div></div>
-          <div class="ptv-metric"><div class="text-[10px] uppercase text-slate-500">Assigned</div><div class="font-bold text-slate-800">${Number(project.AssignedTaskCount || 0)}</div></div>
-          <div class="ptv-metric"><div class="text-[10px] uppercase text-slate-500">Goal</div><div class="font-bold text-slate-800 text-xs">${formatCurrency(project.GoalUSD || 0)}</div></div>
-        </div>
-      </button>`;
-    }).join("");
-
-    const selected = projectsCache.find(function(p){ return p.ProjectID===selectedProjectID; });
-    renderProjectDetail(selected || null);
-  };
-
-  window.renderVotes = function(votes){
-    const list = document.getElementById("vote-list");
-    const createPanel = document.getElementById("vote-create-panel");
-    if(!list || !createPanel){ return; }
-    (votePermissions.canCreateVote ? createPanel.classList.remove("hidden") : createPanel.classList.add("hidden"));
-    if(!votes || !votes.length){
-      list.innerHTML = "<div class='ptv-shell p-4 text-sm text-slate-500'>No votes found.</div>";
-      return;
-    }
-    renderVoteChart(votes);
-    list.innerHTML = votes.map(function(v){
-      const isOpen = String(v.Status || "").toLowerCase() === "open";
-      const canCast = votePermissions.canCastBallot && isOpen && !v.hasUserVoted;
-      const total = Number(v.totalBallots||0) || 1;
-      const yesPct = Math.round((Number(v.yesCount||0) / total) * 100);
-      const noPct = Math.round((Number(v.noCount||0) / total) * 100);
-      const abstainPct = Math.max(0, 100 - yesPct - noPct);
-      return `<div class="ptv-shell p-4">
-        <div class="flex items-start justify-between gap-3">
+  <div class="text-center mb-6">
+    <div class="inline-flex items-center justify-center mb-4" style="width:3.5rem;height:3.5rem;border-radius:1rem;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 8px 24px rgba(0,88,188,.3)">
+      <span class="material-symbols-outlined" style="color:#fff;font-size:1.5rem">account_balance</span>
+    </div>
+    <h1 class="text-2xl font-extrabold tracking-tight" style="color:var(--ink)">Togba Legacy</h1>
+    <p class="text-xs font-bold uppercase tracking-[0.16em] mt-1" style="color:var(--muted)">The Sovereign Vault</p>
+  </div>
+
+  <div id="dev-bypass-banner" class="hidden mb-3 text-xs rounded-xl border px-3 py-2"></div>
+  <div id="login-state-message" class="hidden mb-3 text-xs rounded-xl border px-3 py-2" style="border-color:var(--line);background:var(--panel-alt);color:var(--muted)"></div>
+
+  <!-- Step 1: Email -->
+  <div id="step-1">
+    <label class="block text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--muted)">Registry Email</label>
+    <input id="email" type="email" placeholder="name@family-office.com"
+      class="w-full p-4 rounded-xl mb-4"
+      style="background:var(--panel-alt);border:1px solid var(--line);color:var(--ink)">
+    <button id="btn-get-code" onclick="handleOTP()"
+      class="w-full py-4 rounded-xl font-bold text-sm vault-gradient"
+      style="color:#fff;border:none;letter-spacing:.02em">
+      Send One-Time Code
+    </button>
+  </div>
+
+  <!-- Step 2: OTP -->
+  <div id="step-2" class="hidden">
+    <div class="mb-3 rounded-xl border px-3 py-2 text-xs" style="border-color:var(--line);background:var(--panel-alt);color:var(--muted)">
+      Enter the 6-digit code sent to your email. Expires quickly for security.
+    </div>
+    <label class="block text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--muted)">One-Time Vault Key</label>
+    <input id="otp" type="text" placeholder="000000" maxlength="6"
+      class="otp-code w-full p-4 rounded-xl mb-3"
+      style="background:var(--panel-alt);border:1px solid var(--line);color:var(--accent)">
+    <div class="grid grid-cols-2 gap-2">
+      <button id="btn-verify" onclick="handleVerify()"
+        class="py-4 rounded-xl font-bold text-sm vault-gradient"
+        style="color:#fff;border:none">Verify</button>
+      <button onclick="resetToStepOne()"
+        class="py-4 rounded-xl font-bold text-sm"
+        style="background:var(--panel-alt);color:var(--muted);border:1px solid var(--line)">Back</button>
+    </div>
+  </div>
+
+  <!-- Theme toggle -->
+  <div class="flex justify-center mt-5">
+    <button onclick="cycleTheme()" class="flex items-center gap-1.5 text-xs" style="color:var(--muted);background:none;border:none">
+      <span id="topbar-theme-icon" class="material-symbols-outlined" style="font-size:15px">brightness_auto</span>
+      <span id="topbar-theme-label">Auto</span>
+    </button>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================
+     APP VIEW
+     ================================================================ -->
+
+<div id="view-app" class="hidden">
+
+  <!-- ── SIDEBAR (desktop) ── -->
+  <aside id="sidebar">
+
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <span class="material-symbols-outlined" style="font-size:1.2rem">account_balance</span>
+      </div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">Togba Legacy</div>
+        <div class="sidebar-brand-sub">Institutional Archive</div>
+      </div>
+      <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+        <span id="sidebar-toggle-icon" class="material-symbols-outlined" style="font-size:15px">chevron_left</span>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <div class="sidebar-section-label">Overview</div>
+
+      <button data-page="home" onclick="showPage('home')" class="sidebar-item">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">dashboard</span>
+        <span class="sidebar-label">Dashboard</span>
+      </button>
+
+      <button data-page="family" onclick="showPage('family')" class="sidebar-item">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">groups</span>
+        <span class="sidebar-label">Family Registry</span>
+      </button>
+
+      <div class="sidebar-section-label">Finance</div>
+
+      <button data-page="finance" onclick="showPage('finance')" class="sidebar-item">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">account_balance</span>
+        <span class="sidebar-label">Finance</span>
+      </button>
+
+      <button data-page="investment" onclick="showPage('investment')" class="sidebar-item">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">account_balance_wallet</span>
+        <span class="sidebar-label">Investment Allocation</span>
+      </button>
+
+      <div class="sidebar-section-label">Operations</div>
+
+      <button data-page="projects" onclick="showPage('projects')" class="sidebar-item">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">account_tree</span>
+        <span class="sidebar-label">Projects</span>
+      </button>
+
+      <button data-page="voting" onclick="showPage('voting')" class="sidebar-item">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">gavel</span>
+        <span class="sidebar-label">Governance</span>
+      </button>
+
+      <button data-page="messages" onclick="showPage('messages')" class="sidebar-item">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">chat_bubble</span>
+        <span class="sidebar-label">Messaging</span>
+      </button>
+
+      <div class="sidebar-section-label">Legacy</div>
+
+      <button data-page="timeline" onclick="showPage('timeline')" class="sidebar-item">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">history</span>
+        <span class="sidebar-label">Timeline</span>
+      </button>
+
+      <button data-page="documents" onclick="showPage('documents')" class="sidebar-item">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">folder_shared</span>
+        <span class="sidebar-label">Document Vault</span>
+      </button>
+
+    </nav>
+
+    <div class="sidebar-footer">
+
+      <button data-page="sos" onclick="showPage('sos')" class="sidebar-item sidebar-sos">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">emergency</span>
+        <span class="sidebar-label">SOS Emergency</span>
+      </button>
+
+      <button id="sidebar-nav-admin" data-page="admin" onclick="showPage('admin')" class="sidebar-item hidden">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">shield</span>
+        <span class="sidebar-label">Admin</span>
+      </button>
+
+      <button onclick="cycleTheme()" class="sidebar-item">
+        <span id="sidebar-theme-icon" class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">brightness_auto</span>
+        <span class="sidebar-label" id="sidebar-theme-label">Auto</span>
+      </button>
+
+      <button onclick="resetToLogin('Logged out.')" class="sidebar-item">
+        <span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">logout</span>
+        <span class="sidebar-label">Logout</span>
+      </button>
+
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div id="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-row">
+        <div class="brand-mark">
+          <div class="brand-dot"></div>
           <div>
-            <div class="text-xs text-slate-500 uppercase">${escapeHtml(v.VoteID || "")}</div>
-            <div class="font-semibold text-slate-900">${escapeHtml(v.Title || "Untitled vote")}</div>
-            ${v.Description ? `<div class="text-sm text-slate-700 mt-2 whitespace-pre-wrap">${escapeHtml(v.Description)}</div>` : ""}
-          </div>
-          <div class="ptv-pill ${v.thresholdPassed ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200"}">${v.thresholdPassed ? "Passed" : "Pending"}</div>
-        </div>
-        ${v.ImageURL ? `<img src="${escapeHtml(v.ImageURL)}" class="mt-3 h-32 w-full object-cover rounded-xl border border-slate-200"/>` : ""}
-        <div class="mt-3">
-          <div class="h-2 rounded-full overflow-hidden bg-slate-100 flex">
-            <div class="bg-emerald-500" style="width:${yesPct}%"></div>
-            <div class="bg-rose-500" style="width:${noPct}%"></div>
-            <div class="bg-slate-400" style="width:${abstainPct}%"></div>
-          </div>
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs mt-2">
-            <div class="ptv-metric"><div class="text-slate-500">Ballots</div><div class="font-bold">${Number(v.totalBallots||0)}</div></div>
-            <div class="ptv-metric"><div class="text-slate-500">Yes</div><div class="font-bold">${Number(v.yesCount||0)}</div></div>
-            <div class="ptv-metric"><div class="text-slate-500">No</div><div class="font-bold">${Number(v.noCount||0)}</div></div>
-            <div class="ptv-metric"><div class="text-slate-500">Abstain</div><div class="font-bold">${Number(v.abstainCount||0)}</div></div>
-            <div class="ptv-metric"><div class="text-slate-500">Your ballot</div><div class="font-bold">${v.hasUserVoted ? "Submitted" : "Pending"}</div></div>
+            <div class="text-xs uppercase tracking-[0.15em]" style="color:var(--muted)">Togba Legacy</div>
+            <h2 id="welcome-name" class="text-base sm:text-lg font-bold leading-tight" style="color:var(--ink)">Welcome</h2>
           </div>
         </div>
-        <div class="mt-3 flex flex-wrap gap-2 items-center">
-          <select id="choice-${escapeHtml(v.VoteID)}" class="p-2 rounded-lg border border-slate-200 text-sm bg-white" ${canCast ? "" : "disabled"}>
-            <option value="Yes">Yes</option><option value="No">No</option><option value="Abstain">Abstain</option>
-          </select>
-          <button onclick="castBallot('${escapeHtml(v.VoteID)}')" class="px-3 py-2 rounded-lg text-sm font-semibold ${canCast ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-500 cursor-not-allowed"}" ${canCast ? "" : "disabled"}>Cast Ballot</button>
+        <div class="topbar-actions">
+          <button onclick="cycleTheme()" class="theme-toggle-btn" title="Toggle theme">
+            <span class="material-symbols-outlined" style="font-size:17px">brightness_auto</span>
+          </button>
+          <button onclick="resetToLogin('Logged out.')"
+            class="text-xs px-3 py-2 rounded-lg border"
+            style="border-color:var(--line);background:var(--panel);color:var(--muted)">
+            Logout
+          </button>
         </div>
-      </div>`;
-    }).join("");
-  };
+      </div>
+    </header>
 
-  window.renderTimelineList = function(items){
-    const container = document.getElementById("timeline-list");
-    if(!container){ return; }
-    if(!items || !items.length){
-      container.innerHTML = "<div class='ptv-shell p-4 text-sm text-slate-500'>No timeline items.</div>";
-      return;
-    }
-    container.innerHTML = items.map(function(item){
-      const isUpcoming = String(item.category||"").toLowerCase()==="upcoming";
-      return `<div class="ptv-shell p-4 ptv-timeline-rail">
-        <span class="ptv-timeline-dot"></span>
-        <div class="flex items-center justify-between gap-2 mb-1">
-          <div class="text-xs text-slate-500">${escapeHtml(formatDate(item.date))}</div>
-          <div class="ptv-pill ${isUpcoming ? "bg-indigo-50 text-indigo-700 border border-indigo-200" : "bg-slate-100 text-slate-700 border border-slate-200"}">${escapeHtml(item.category || "entry")}</div>
+    <!-- PAGES -->
+    <div class="app-shell">
+
+      <!-- HOME -->
+      <div id="page-home" class="page active">
+        <div id="home-error" class="hidden text-sm mb-3" style="color:var(--red)"></div>
+        <div id="home-status" class="state-box mb-4 hidden"></div>
+        <div class="grid gap-4 lg:grid-cols-3 mb-4">
+          <div class="bg-white p-6 rounded-3xl shadow border border-slate-100 lg:col-span-2 home-hero-card">
+            <div class="text-xs uppercase text-slate-500 font-bold">Institutional Summary</div>
+            <div class="text-2xl md:text-3xl font-extrabold text-slate-800 mt-2">Executive dashboard and strategic controls</div>
+            <p class="text-slate-600 mt-2 max-w-2xl">Monitor capital movement, projects, governance participation, and timeline milestones from a single overview.</p>
+            <div class="mt-4 flex flex-wrap gap-2 text-xs">
+              <span class="chip-soft">Live Finance</span>
+              <span class="chip-soft">Project Delivery</span>
+              <span class="chip-soft">Governance Pulse</span>
+              <span class="chip-soft">Timeline Watch</span>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-3xl shadow border border-slate-100">
+            <div class="text-xs uppercase text-slate-500 font-bold mb-1">System Status</div>
+            <div id="home-system-status" class="text-sm text-slate-700">Waiting for dashboard metrics...</div>
+          </div>
         </div>
-        <div class="font-semibold text-slate-900">${escapeHtml(item.title || "Untitled")}</div>
-        <div class="text-xs text-slate-600 mt-1">${escapeHtml(item.eventType || "")}${item.recurrence ? " • " + escapeHtml(item.recurrence) : ""}</div>
-        ${item.description ? `<div class="text-sm text-slate-700 mt-2 whitespace-pre-wrap">${escapeHtml(item.description)}</div>` : ""}
-      </div>`;
-    }).join("");
-  };
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-5">
+          <button onclick="showPage('finance')" class="dashboard-tile text-left">
+            <div class="text-xs uppercase text-slate-500 font-bold">Finance Snapshot</div>
+            <div id="home-finance-snapshot" class="text-sm text-slate-700 mt-1">View capital, locks, and allocation trends.</div>
+          </button>
+          <button onclick="showPage('projects')" class="dashboard-tile text-left">
+            <div class="text-xs uppercase text-slate-500 font-bold">Projects Snapshot</div>
+            <div id="home-project-snapshot" class="text-sm text-slate-700 mt-1">Track active projects and delivery status.</div>
+          </button>
+          <button onclick="showPage('voting')" class="dashboard-tile text-left">
+            <div class="text-xs uppercase text-slate-500 font-bold">Governance Snapshot</div>
+            <div id="home-vote-snapshot" class="text-sm text-slate-700 mt-1">Review proposal outcomes and participation.</div>
+          </button>
+          <button onclick="showPage('timeline')" class="dashboard-tile text-left">
+            <div class="text-xs uppercase text-slate-500 font-bold">Timeline Snapshot</div>
+            <div id="home-timeline-snapshot" class="text-sm text-slate-700 mt-1">Browse family history and upcoming milestones.</div>
+          </button>
+        </div>
+        <div class="grid gap-4 xl:grid-cols-5">
+          <div class="bg-white p-6 rounded-3xl shadow border border-slate-100 xl:col-span-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Financial Distribution</h3>
+            <div class="chart-shell"><canvas id="financeChart"></canvas></div>
+            <div id="home-chart-empty" class="hidden mt-3 text-xs text-slate-500">No chart data yet. Contributions and locks will appear here once records are available.</div>
+          </div>
+          <div class="bg-white p-5 rounded-3xl shadow border border-slate-100 xl:col-span-2">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-xs font-bold text-slate-400 uppercase">Recent Timeline Highlights</h3>
+              <button onclick="loadHomeEssentials(true)" class="text-xs px-2 py-1 rounded-lg bg-slate-100 text-slate-600">Refresh</button>
+            </div>
+            <div id="home-activity-list" class="space-y-2"></div>
+          </div>
+        </div>
+      </div>
 
-  window.renderHistoryList = function(items){
-    const container = document.getElementById("timeline-history");
-    if(!container){ return; }
-    if(!items || !items.length){
-      container.innerHTML = "<div class='ptv-shell p-4 text-sm text-slate-500'>No historical records found.</div>";
-      return;
-    }
-    container.innerHTML = items.map(function(item){
-      return `<div class="ptv-shell p-4">
-        <div class="text-xs text-slate-500">${escapeHtml(formatDate(item.EventDate))}</div>
-        <div class="font-semibold text-slate-900">${escapeHtml(item.Title || "Untitled")}</div>
-        <div class="text-xs text-slate-600 mt-1">${escapeHtml(item.EventType || "")}</div>
-        ${item.Description ? `<div class="text-sm text-slate-700 mt-2 whitespace-pre-wrap">${escapeHtml(item.Description)}</div>` : ""}
-      </div>`;
-    }).join("");
-  };
+      <!-- FINANCE -->
+      <div id="page-finance" class="page">
+        <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+          <h2 class="text-2xl font-bold">Finance</h2>
+          <button onclick="loadFinanceDashboard()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+        </div>
+        <div id="finance-error" class="hidden text-sm text-red-600 mb-3"></div>
+        <div class="grid gap-4 lg:grid-cols-3">
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+            <div class="text-xs text-slate-500 uppercase font-bold mb-1">Total Contributions</div>
+            <div id="finance-total-contributions" class="text-2xl font-bold text-slate-800">$0.00</div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+            <div class="text-xs text-slate-500 uppercase font-bold mb-1">Founder Locked Capital</div>
+            <div id="finance-total-locked" class="text-2xl font-bold text-slate-800">$0.00</div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+            <div class="text-xs text-slate-500 uppercase font-bold mb-1">Projected Distribution</div>
+            <div id="finance-total-projected" class="text-2xl font-bold text-slate-800">$0.00</div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-slate-500 uppercase">Investment Allocation</h3>
+              <span id="finance-allocation-validation" class="text-xs font-semibold text-slate-500"></span>
+            </div>
+            <div class="chart-shell chart-shell-sm"><canvas id="finance-allocation-chart" height="180"></canvas></div>
+            <div id="finance-allocation-breakdown" class="grid grid-cols-2 gap-2 mt-4 text-sm"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Contribution Categories</h3>
+            <div id="finance-category-summary" class="space-y-2 text-sm"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Founder Capital Status</h3>
+            <div class="chart-shell chart-shell-sm"><canvas id="finance-founder-lock-chart" height="180"></canvas></div>
+            <div id="finance-founder-lock-summary" class="mt-3 space-y-2 text-sm text-slate-700"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Founder Lock Records</h3>
+            <div id="finance-founder-lock-list" class="space-y-3"></div>
+          </div>
+        </div>
+      </div>
 
-  window.renderUpcomingList = function(items){
-    const container = document.getElementById("timeline-upcoming");
-    if(!container){ return; }
-    if(!items || !items.length){
-      container.innerHTML = "<div class='ptv-shell p-4 text-sm text-slate-500'>No upcoming events.</div>";
-      return;
-    }
-    container.innerHTML = items.map(function(item){
-      return `<div class="ptv-shell p-4">
-        <div class="text-xs text-blue-700 font-semibold">Next: ${escapeHtml(formatDate(item.NextOccurrence))}</div>
-        <div class="font-semibold text-slate-900">${escapeHtml(item.Title || "Untitled")}</div>
-        <div class="text-xs text-slate-600 mt-1">${escapeHtml(item.Recurrence || "One-time")}</div>
-        <div class="text-xs text-slate-500 mt-1">Original date: ${escapeHtml(formatDate(item.EventDate))}</div>
-      </div>`;
-    }).join("");
-  };
+      <!-- PROJECTS -->
+      <div id="page-projects" class="page">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">Projects</h2>
+          <button onclick="loadProjects()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+        </div>
+        <div id="project-error" class="hidden text-sm text-red-600 mb-3"></div>
+        <div id="project-status" class="hidden text-sm text-blue-700 mb-3"></div>
+        <div class="grid gap-4 lg:grid-cols-3">
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Project List</h3>
+            <div id="project-list" class="space-y-2"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
+            <div id="project-detail" class="space-y-3"></div>
+          </div>
+          <div id="project-create-panel" class="hidden bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Create Project</h3>
+            <div class="grid gap-3 md:grid-cols-4">
+              <input id="project-create-title" type="text" placeholder="Project title" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+              <input id="project-create-goal" type="number" min="0" step="0.01" placeholder="Goal USD" class="p-3 rounded-xl border border-slate-200" />
+              <input id="project-create-description" type="text" placeholder="Project description (optional)" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+              <input id="project-create-image" type="url" placeholder="Project image URL (optional)" class="p-3 rounded-xl border border-slate-200" />
+              <select id="project-create-status" class="p-3 rounded-xl border border-slate-200">
+                <option value="Planning">Planning</option>
+                <option value="In Progress">In Progress</option>
+                <option value="On Hold">On Hold</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+            <button id="btn-create-project" onclick="createProjectRecord()" class="mt-3 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Create Project</button>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-slate-500 uppercase">Task List</h3>
+              <span id="project-task-summary" class="text-xs text-slate-500">Select a project</span>
+            </div>
+            <div id="task-create-panel" class="hidden grid gap-3 md:grid-cols-5 mb-4">
+              <input id="task-project-id" type="text" readonly class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" />
+              <select id="task-create-status" class="p-3 rounded-xl border border-slate-200">
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Blocked">Blocked</option>
+                <option value="Done">Done</option>
+              </select>
+              <select id="task-create-priority" class="p-3 rounded-xl border border-slate-200">
+                <option value="High">High</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="Low">Low</option>
+              </select>
+              <input id="task-create-percent" type="number" min="0" max="100" placeholder="% complete" class="p-3 rounded-xl border border-slate-200" />
+              <input id="task-create-title" type="text" placeholder="Task title" class="p-3 rounded-xl border border-slate-200" />
+              <select id="task-create-assignee-type" class="p-3 rounded-xl border border-slate-200"><option value="">Assignee Type</option><option value="internal">internal</option><option value="external">external</option></select>
+              <input id="task-create-assignee" type="text" placeholder="Assignee name/email" class="p-3 rounded-xl border border-slate-200" />
+              <button id="btn-create-task" onclick="createTaskRecord()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Add Task</button>
+            </div>
+            <div id="project-task-list" class="space-y-3"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-slate-500 uppercase">Update History</h3>
+              <span id="project-update-summary" class="text-xs text-slate-500">Select a project</span>
+            </div>
+            <div id="project-update-form" class="hidden grid gap-3 md:grid-cols-5 mb-4">
+              <input id="project-update-project-id" type="text" readonly class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" />
+              <input id="project-update-task-id" type="text" placeholder="TaskID (optional)" class="p-3 rounded-xl border border-slate-200" />
+              <input id="project-update-text" type="text" placeholder="Update details" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+              <button id="btn-save-project-update" onclick="saveProjectUpdate()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Add Update</button>
+            </div>
+            <div id="project-update-list" class="space-y-2"></div>
+          </div>
+        </div>
+      </div>
 
-  const originalLoadProjects = window.loadProjects;
-  window.loadProjects = function(){
-    return originalLoadProjects && originalLoadProjects();
-  };
-})();
-</script>
-<script>
-(function(){
-  function startDefaultAuth(){
-    if(typeof initializeAuthView === "function"){
-      initializeAuthView();
-    }
-  }
+      <!-- MESSAGES -->
+      <div id="page-messages" class="page">
+        <h2 class="text-2xl font-bold mb-4">Messaging</h2>
+        <div class="messages-shell">
+          <div class="mail-panel p-4">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Channels</h3>
+            <div class="grid gap-2 mb-3">
+              <input id="channel-create-name" class="p-2 rounded-lg border" placeholder="New channel name" />
+              <select id="channel-create-type" class="p-2 rounded-lg border"><option value="private">private</option><option value="family broadcast">family broadcast</option><option value="project">project</option></select>
+              <button onclick="createChannelUI()" class="bg-blue-600 text-white p-2 rounded-lg text-sm">Create Channel</button>
+              <input id="channel-join-id" class="p-2 rounded-lg border" placeholder="ChannelID to join" />
+              <button onclick="joinChannelUI()" class="bg-slate-900 text-white p-2 rounded-lg text-sm">Join Channel</button>
+            </div>
+            <div class="mail-section-title mb-2">Inbox</div>
+            <div id="channel-list" class="space-y-2 max-h-[28vh] overflow-y-auto"></div>
+            <div class="mt-3 border-t pt-3">
+              <div class="mail-section-title mb-2">Sent / Outbox Directory</div>
+              <div id="channel-directory" class="space-y-2 max-h-[18vh] overflow-y-auto"></div>
+            </div>
+          </div>
+          <div class="mail-panel flex flex-col min-h-[64vh]">
+            <div class="mail-panel-head">
+              <h3 id="message-channel-title" class="text-sm font-bold text-slate-500 uppercase">Select a channel</h3>
+              <button onclick="refreshMessages()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+            </div>
+            <div class="p-4">
+              <div id="message-error" class="hidden text-sm text-red-600 mb-2"></div>
+              <div class="mb-3">
+                <input id="message-recipient-input" type="text" placeholder="To: search family member by name" class="w-full p-3 rounded-xl border border-slate-200" oninput="handleRecipientSearchInput()" autocomplete="off" />
+                <div id="message-recipient-results" class="mt-2 space-y-1"></div>
+              </div>
+              <div class="grid gap-3 lg:grid-cols-5">
+                <div class="lg:col-span-3">
+                  <div class="mail-section-title mb-2">Conversation</div>
+                  <div id="message-history" class="mail-pane space-y-2"></div>
+                </div>
+                <div class="lg:col-span-2">
+                  <div class="mail-section-title mb-2">Sent / Outbox</div>
+                  <div id="message-sent-list" class="mail-pane space-y-2"></div>
+                </div>
+              </div>
+              <div class="mt-3">
+                <div class="mail-section-title mb-2">Compose Message</div>
+                <div class="flex flex-col gap-2">
+                  <textarea id="message-input" placeholder="Write your message..." class="w-full p-3 rounded-xl border border-slate-200 mail-compose-box min-h-[220px]"></textarea>
+                  <div class="flex justify-end">
+                    <button id="btn-send-message" onclick="sendCurrentMessage()" class="bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Send</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  document.addEventListener("DOMContentLoaded", function(){
-    try{
-      if(typeof getAuthModeConfig !== "function"){
-        startDefaultAuth();
-        return;
-      }
+      <!-- SOS -->
+      <div id="page-sos" class="page">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">Emergency SOS</h2>
+          <button onclick="loadSOSAlerts()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+        </div>
+        <div id="sos-error" class="hidden text-sm text-red-600 mb-3"></div>
+        <div id="sos-status" class="hidden text-sm text-blue-700 mb-3"></div>
+        <div class="grid gap-4 lg:grid-cols-3">
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
+            <button id="btn-trigger-sos" onclick="triggerSOS()" class="bg-red-600 text-white p-4 rounded-xl font-bold w-full">Send SOS Alert</button>
+            <p class="text-xs text-slate-500 mt-3">This captures your current location and creates an emergency record.</p>
+            <div id="sos-whatsapp-action" class="mt-3"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Alert History</h3>
+            <div id="sos-alert-history" class="space-y-2"></div>
+            <div id="sos-map" class="mt-3"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-slate-500 uppercase">SOS Media References</h3>
+              <span id="sos-media-title" class="text-xs text-slate-500">Select an alert to view media</span>
+            </div>
+            <div class="grid gap-3 md:grid-cols-4 mb-4">
+              <select id="sos-media-type" class="p-3 rounded-xl border border-slate-200">
+                <option value="photo">photo</option>
+                <option value="video">video</option>
+                <option value="audio">audio</option>
+              </select>
+              <input id="sos-media-url" type="url" placeholder="https://example.com/media" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+              <button id="btn-save-sos-media" onclick="saveSOSMediaRef()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Save Media Link</button>
+            </div>
+            <div id="sos-media-list" class="space-y-2"></div>
+          </div>
+        </div>
+      </div>
 
-      const authMode = getAuthModeConfig() || {};
-      if(!authMode.developerBypassEnabled || typeof startDeveloperBypassSession !== "function"){
-        startDefaultAuth();
-        return;
-      }
+      <!-- VOTING -->
+      <div id="page-voting" class="page">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">Governance Voting</h2>
+          <button onclick="loadVotes()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+        </div>
+        <div id="vote-error" class="hidden text-sm text-red-600 mb-3"></div>
+        <div id="vote-create-panel" class="hidden bg-white p-4 rounded-2xl border border-slate-100 shadow mb-4">
+          <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Create Proposal</h3>
+          <div class="grid gap-3 md:grid-cols-4">
+            <input id="vote-title" type="text" placeholder="Proposal title" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+            <select id="vote-threshold" class="p-3 rounded-xl border border-slate-200">
+              <option value="Majority">Majority</option>
+              <option value="TwoThirds">TwoThirds</option>
+              <option value="SeventyFive">SeventyFive</option>
+            </select>
+            <textarea id="vote-description" placeholder="Proposal description (optional)" class="md:col-span-4 p-3 rounded-xl border border-slate-200 min-h-[96px]"></textarea>
+            <input id="vote-image" type="url" placeholder="Proposal image URL (optional)" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+            <div class="md:col-span-2 flex flex-col gap-2">
+              <input id="vote-image-file" type="file" accept="image/*" class="p-2 rounded-xl border border-slate-200 bg-white text-sm" onchange="handleVoteImageSelected(event)" />
+              <div class="text-xs text-slate-500">Optional: select an image file to auto-fill the image URL field (base64 data URL).</div>
+            </div>
+            <select id="vote-status" class="p-3 rounded-xl border border-slate-200">
+              <option value="Open">Open</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+          <button id="btn-create-vote" onclick="createVote()" class="mt-3 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Create Vote</button>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 mb-4">
+          <h3 class="text-sm font-bold text-slate-500 uppercase mb-2">Results Chart</h3>
+          <div class="chart-shell chart-shell-sm vote-chart-shell"><canvas id="vote-results-chart"></canvas></div>
+        </div>
+        <div id="vote-list" class="space-y-3"></div>
+      </div>
 
-      Promise.resolve(startDeveloperBypassSession())
-      .then(function(result){
-        const bypassToken = result && (result.token || result.sessionToken || result.authToken || result);
-        if(!bypassToken){
-          throw new Error("Developer bypass did not return a token.");
-        }
+      <!-- TIMELINE -->
+      <div id="page-timeline" class="page">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">Family Timeline</h2>
+          <button onclick="loadTimelineData()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+        </div>
+        <div id="timeline-error" class="hidden text-sm text-red-600 mb-3"></div>
+        <div class="grid gap-4 lg:grid-cols-3">
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Calendar View</h3>
+            <div id="timeline-calendar" class="text-sm"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Unified Timeline</h3>
+            <div id="timeline-list" class="space-y-3"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Historical</h3>
+            <div id="timeline-history" class="space-y-3"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Upcoming Events</h3>
+            <div id="timeline-upcoming" class="space-y-3"></div>
+          </div>
+        </div>
+      </div>
 
-        try{ window.token = bypassToken; }catch(_e){}
-        try{ token = bypassToken; }catch(_e){}
+      <!-- FAMILY -->
+      <div id="page-family" class="page">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">Family Data &amp; Tree</h2>
+          <button onclick="loadFamilyData()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+        </div>
+        <div id="family-error" class="hidden text-sm text-red-600 mb-3"></div>
+        <div class="grid gap-4 lg:grid-cols-3">
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Add / Update Member</h3>
+            <div class="grid gap-2">
+              <input id="family-person-id" class="p-2 rounded-lg border" placeholder="PersonID (optional for new)" />
+              <input id="family-full-name" class="p-2 rounded-lg border" placeholder="Full name" />
+              <input id="family-relationship" class="p-2 rounded-lg border" placeholder="RelationshipToPatriarch" />
+              <input id="family-generation" class="p-2 rounded-lg border" placeholder="GenerationTier" />
+              <input id="family-father" class="p-2 rounded-lg border" placeholder="FatherID" />
+              <input id="family-mother" class="p-2 rounded-lg border" placeholder="MotherID" />
+              <input id="family-spouse" class="p-2 rounded-lg border" placeholder="SpouseFullNameOptional" />
+              <button onclick="saveFamilyMember()" class="bg-blue-600 text-white p-2 rounded-lg">Save</button>
+            </div>
+            <div class="mt-5 border-t border-slate-200 pt-4">
+              <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Member Photo</h4>
+              <div class="grid gap-2">
+                <input id="family-photo-person-id" class="p-2 rounded-lg border" placeholder="PersonID (required)" />
+                <input id="family-photo-file" type="file" accept="image/*" class="p-2 rounded-lg border" />
+                <input id="family-photo-url" class="p-2 rounded-lg border" placeholder="Or paste PhotoFileURL" />
+                <input id="family-photo-type" class="p-2 rounded-lg border" placeholder="PhotoType (default: profile)" />
+                <button onclick="saveFamilyPhoto()" class="bg-slate-800 text-white p-2 rounded-lg">Save Photo</button>
+              </div>
+              <p class="text-xs text-slate-500 mt-2">Photos are stored in the existing Photos sheet and displayed on family cards.</p>
+            </div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Family Tree View</h3>
+            <div class="text-xs text-slate-500 mb-3">Patriarch/root is highlighted at the top. Ancestor and descendant placeholders keep lineage lanes visually clear even when links are missing.</div>
+            <div id="family-tree" class="space-y-2"></div>
+          </div>
+        </div>
+      </div>
 
-        const loginView = document.getElementById("view-login");
-        if(loginView){ loginView.classList.add("hidden"); }
+      <!-- ADMIN -->
+      <div id="page-admin" class="page">
+        <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+          <h2 class="text-2xl font-bold">Admin &amp; System Controls</h2>
+          <button onclick="loadAdmin()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+        </div>
+        <div id="admin-error" class="hidden text-sm text-red-600 mb-3"></div>
+        <div id="admin-status" class="hidden text-sm text-emerald-700 mb-3"></div>
+        <div class="grid gap-4 lg:grid-cols-4 mb-4">
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+            <div class="text-xs text-slate-500 uppercase">Users</div>
+            <div id="admin-stat-users" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+            <div class="text-xs text-slate-500 uppercase">Admins</div>
+            <div id="admin-stat-admins" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+            <div class="text-xs text-slate-500 uppercase">Settings Entries</div>
+            <div id="admin-stat-settings" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+            <div class="text-xs text-slate-500 uppercase">Health Issues</div>
+            <div id="admin-stat-issues" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+          </div>
+        </div>
+        <div class="grid gap-4 lg:grid-cols-3">
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Settings Summary</h3>
+            <div id="admin-settings-summary" class="space-y-2 text-sm"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Institution Settings</h3>
+            <div id="admin-inst-settings-summary" class="space-y-2 text-sm"></div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">System Health</h3>
+            <div id="admin-health-summary" class="space-y-2 text-sm"></div>
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow mt-4">
+          <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Member Management</h3>
+          <div class="grid gap-2 md:grid-cols-5 mb-3">
+            <input id="admin-member-email" class="p-2 rounded-lg border" placeholder="email"/>
+            <input id="admin-member-name" class="p-2 rounded-lg border" placeholder="full name"/>
+            <input id="admin-member-role" class="p-2 rounded-lg border" placeholder="role"/>
+            <button onclick="adminAddMember()" class="bg-blue-600 text-white p-2 rounded-lg">Add</button>
+            <button onclick="adminDeactivateMember()" class="bg-red-600 text-white p-2 rounded-lg">Deactivate</button>
+          </div>
+          <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Access Registry</h3>
+          <div id="user-list" class="space-y-2"></div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow mt-4">
+          <h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Emergency Configuration Guide</h3>
+          <div id="admin-guide" class="text-sm text-slate-700 space-y-2"></div>
+        </div>
+      </div>
 
-        if(typeof initApp === "function"){
-          initApp();
-          return;
-        }
-        throw new Error("initApp is unavailable.");
-      })
-      .catch(function(){
-        startDefaultAuth();
-      });
-    }catch(_err){
-      startDefaultAuth();
-    }
-  });
-})();
-</script>
+      <!-- INVESTMENT ALLOCATION — shell -->
+      <div id="page-investment" class="page">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">Investment Allocation</h2>
+        </div>
+        <div class="coming-soon-shell">
+          <div class="coming-soon-icon">
+            <span class="material-symbols-outlined" style="font-size:2rem">account_balance_wallet</span>
+          </div>
+          <h3 class="text-xl font-bold" style="color:var(--ink)">Investment Allocation</h3>
+          <p class="max-w-sm text-sm" style="color:var(--muted)">Portfolio tracking, asset allocation charts, and investment performance dashboards will be available here in the next release.</p>
+          <span class="chip-soft">Coming in Next Release</span>
+        </div>
+      </div>
+
+      <!-- DOCUMENT VAULT — shell -->
+      <div id="page-documents" class="page">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">Document Vault</h2>
+        </div>
+        <div class="coming-soon-shell">
+          <div class="coming-soon-icon">
+            <span class="material-symbols-outlined" style="font-size:2rem">folder_shared</span>
+          </div>
+          <h3 class="text-xl font-bold" style="color:var(--ink)">Document Vault</h3>
+          <p class="max-w-sm text-sm" style="color:var(--muted)">Secure storage for family documents, legal records, and institutional archives will be available here in the next release.</p>
+          <span class="chip-soft">Coming in Next Release</span>
+        </div>
+      </div>
+
+    </div><!-- /app-shell -->
+  </div><!-- /main-content -->
+
+  <!-- BOTTOM NAV (mobile only) -->
+  <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t p-2 sm:p-3 flex justify-around gap-1 overflow-x-auto">
+    <button onclick="showPage('home')">
+      <span class="material-icons-round text-blue-600">home</span>Home
+    </button>
+    <button onclick="showPage('finance')">
+      <span class="material-icons-round">account_balance</span>Finance
+    </button>
+    <button onclick="showPage('projects')">
+      <span class="material-icons-round">construction</span>Projects
+    </button>
+    <button onclick="showPage('messages')">
+      <span class="material-icons-round">chat</span>Messages
+    </button>
+    <button onclick="showPage('sos')">
+      <span class="material-icons-round text-red-600">warning</span>SOS
+    </button>
+    <button onclick="showPage('voting')">
+      <span class="material-icons-round">how_to_vote</span>Voting
+    </button>
+    <button onclick="showPage('timeline')">
+      <span class="material-icons-round">history</span>Timeline
+    </button>
+    <button onclick="showPage('family')">
+      <span class="material-icons-round">account_tree</span>Family
+    </button>
+    <button id="btn-nav-admin" onclick="showPage('admin')" class="hidden">
+      <span class="material-icons-round">security</span>Admin
+    </button>
+  </nav>
+
+</div><!-- /view-app -->
+
+<?!= include('JS') ?>
+
 </body>
 </html>
