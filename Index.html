@@ -1164,5 +1164,54 @@ Admin
   };
 })();
 </script>
+<script>
+(function(){
+  function startDefaultAuth(){
+    if(typeof initializeAuthView === "function"){
+      initializeAuthView();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    try{
+      if(typeof getAuthModeConfig !== "function"){
+        startDefaultAuth();
+        return;
+      }
+
+      const authMode = getAuthModeConfig() || {};
+      if(!authMode.developerBypassEnabled || typeof startDeveloperBypassSession !== "function"){
+        startDefaultAuth();
+        return;
+      }
+
+      Promise.resolve(startDeveloperBypassSession())
+      .then(function(result){
+        const bypassToken = result && (result.token || result.sessionToken || result.authToken || result);
+        if(!bypassToken){
+          throw new Error("Developer bypass did not return a token.");
+        }
+
+        try{ window.token = bypassToken; }catch(_e){}
+        try{ token = bypassToken; }catch(_e){}
+
+        const loginView = document.getElementById("view-login");
+        if(loginView){ loginView.classList.add("hidden"); }
+
+        if(typeof initApp === "function"){
+          initApp();
+          return;
+        }
+        throw new Error("initApp is unavailable.");
+      })
+      .catch(function(){
+        startDefaultAuth();
+      });
+    }catch(_err){
+      startDefaultAuth();
+    }
+  });
+})();
+</script>
 </body>
 </html>
