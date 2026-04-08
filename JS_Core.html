@@ -598,6 +598,15 @@ window.renderAdminUserList = function(users){
 window.renderSettingsSummary = function(settings){
   var el=document.getElementById("admin-settings-summary"); if(!el) return;
   var entries=Array.isArray(settings&&settings.entries)?settings.entries:[];
+  window._gcalId="";
+  window._renderCalendarEmbed(window._gcalId);
+  entries.forEach(function(e){
+    var k=String(e.Key||e.key||"").toLowerCase().replace(/[_\- ]/g,"");
+    if(k==="googlecalendarid"||k==="gcalendarid"||k==="calendarid"){
+      window._gcalId=String(e.Value||e.value||"").trim();
+      window._renderCalendarEmbed(window._gcalId);
+    }
+  });
   if(!entries.length){ el.innerHTML="<div style='color:var(--muted);font-size:.875rem'>No settings.</div>"; return; }
   el.innerHTML=entries.map(function(e){
     return "<div class='module-stat'><span>"+escapeHtml(e.Key||e.key||"")+"</span>"+
@@ -1004,6 +1013,28 @@ window.saveProjectUpdate = function(){
 };
 
 /* ── TIMELINE ── */
+window._renderCalendarEmbed=function(calendarId){
+  var wrap=document.getElementById("gcal-wrap");
+  var setup=document.getElementById("gcal-setup");
+  var iframe=document.getElementById("gcal-iframe");
+  var openLink=document.getElementById("gcal-open-link");
+  if(!wrap||!iframe) return;
+  if(!calendarId){
+    if(wrap) wrap.style.display="none";
+    if(setup) setup.style.display="block";
+    return;
+  }
+  var encId=encodeURIComponent(calendarId);
+  var tz=(Intl&&Intl.DateTimeFormat&&Intl.DateTimeFormat().resolvedOptions().timeZone)||"UTC";
+  var src="https://calendar.google.com/calendar/embed?src="+encId
+    +"&ctz="+encodeURIComponent(tz)
+    +"&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&mode=MONTH";
+  iframe.src=src;
+  if(openLink) openLink.href="https://calendar.google.com/calendar/embed?src="+encId;
+  if(wrap) wrap.style.display="block";
+  if(setup) setup.style.display="none";
+};
+
 window.renderTimelineCalendar = function(calendar){
   var el=document.getElementById("timeline-calendar"); if(!el) return;
   var months=calendar&&calendar.months?calendar.months:[];
