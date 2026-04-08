@@ -57,9 +57,7 @@ function onServerFailure(err){
 function _setText(id,v){ var e=document.getElementById(id); if(e) e.innerText=v; }
 function _setHtml(id,v){ var e=document.getElementById(id); if(e) e.innerHTML=v; }
 function _isDark(){
-  var h=document.documentElement;
-  if(h.classList.contains("dark")) return true;
-  if(h.classList.contains("light")) return false;
+  /* Falls back gracefully when no theme system is present */
   return window.matchMedia&&window.matchMedia("(prefers-color-scheme:dark)").matches;
 }
 
