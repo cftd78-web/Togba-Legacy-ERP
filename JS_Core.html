@@ -292,15 +292,23 @@ function _renderHomeFinanceChart(data){
 
 /* ── FINANCE RENDERERS ── */
 window.renderFinanceDashboard = function(payload){
-  _setText("finance-total-contributions", formatCurrency(payload.totalContributions||0));
-  _setText("finance-total-locked",        formatCurrency(payload.totalLocked||0));
-  _setText("finance-total-projected",     formatCurrency(payload.projectedDistribution||payload.totalProjected||0));
-  _renderAllocationChart(payload.allocation||[]);
-  _renderAllocationBreakdown(payload.allocation||[]);
-  _renderCategorySummary(payload.categories||[]);
-  _renderFounderLockChart(payload.founderLocks||[]);
-  _renderFounderLockSummary(payload.founderLocks||[]);
-  _renderFounderLockList(payload.founderLocks||[]);
+  payload = payload || {};
+  var totals = payload.totals || {};
+  _setText("finance-total-contributions", formatCurrency(totals.totalContributions||0));
+  var fl = payload.founderLocks || {};
+  _setText("finance-total-locked", formatCurrency(fl.totalLocked||0));
+  var proj = payload.projection || {};
+  _setText("finance-total-projected", formatCurrency(proj.totalProjected||0));
+  var breakdown = (payload.allocation && payload.allocation.breakdown) || [];
+  _renderAllocationChart(breakdown);
+  _renderAllocationBreakdown(breakdown, payload.allocation);
+  var catObj = totals.contributionCategories || {};
+  var cats = Object.keys(catObj).map(function(k){ return {type:k, total:catObj[k]}; });
+  _renderCategorySummary(cats);
+  var locks = fl.locks || [];
+  _renderFounderLockChart(locks);
+  _renderFounderLockSummary(fl);
+  _renderFounderLockList(locks);
 };
 
 function _renderAllocationChart(alloc){
@@ -320,15 +328,21 @@ function _renderAllocationChart(alloc){
   _setText("finance-allocation-validation", total?"Total: "+total.toFixed(1)+"%":"");
 }
 
-function _renderAllocationBreakdown(alloc){
+function _renderAllocationBreakdown(breakdown, alloc){
   var el=document.getElementById("finance-allocation-breakdown"); if(!el) return;
-  if(!alloc.length){ el.innerHTML=""; return; }
-  el.innerHTML=alloc.map(function(a){
-    return "<div class='ptv-metric text-left'>"+
-      "<div style='font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)'>"+escapeHtml(a.label||a.type||"")+"</div>"+
-      "<div style='font-weight:700;color:var(--ink)'>"+escapeHtml(formatPercent(a.percent||0))+"</div>"+
-      "<div style='font-size:.75rem;color:var(--muted)'>"+escapeHtml(formatCurrency(a.amount||0))+"</div></div>";
+  if(!breakdown.length){ el.innerHTML=""; return; }
+  el.innerHTML=breakdown.map(function(a){
+    return "<div class='ptv-metric text-left'>"
+      +"<div style='font-size:.62rem;font-weight:700;text-transform:uppercase;"
+      +"letter-spacing:.06em;color:var(--muted)'>"+escapeHtml(a.label||"")+"</div>"
+      +"<div style='font-weight:700;color:var(--ink)'>"+escapeHtml(formatPercent(a.percent||0))+"</div>"
+      +"<div style='font-size:.75rem;color:var(--muted)'>"+escapeHtml(formatCurrency(a.projectedAmount||0))+"</div>"
+      +"</div>";
   }).join("");
+  if(alloc){
+    _setText("finance-allocation-validation",
+      alloc.isValid ? "Total: "+Number(alloc.totalPercent||0).toFixed(1)+"%" : alloc.message||"");
+  }
 }
 
 function _renderCategorySummary(cats){
@@ -355,13 +369,14 @@ function _renderFounderLockChart(locks){
   });
 }
 
-function _renderFounderLockSummary(locks){
+function _renderFounderLockSummary(fl){
   var el=document.getElementById("finance-founder-lock-summary"); if(!el) return;
-  var total=locks.reduce(function(s,l){ return s+Number(l.AmountUSD||0); },0);
-  var active=locks.filter(function(l){ return !l.Released; }).length;
-  el.innerHTML="<div class='module-stat'><span>Total Locks</span><strong>"+locks.length+"</strong></div>"+
-    "<div class='module-stat'><span>Active</span><strong>"+active+"</strong></div>"+
-    "<div class='module-stat'><span>Total Amount</span><strong>"+escapeHtml(formatCurrency(total))+"</strong></div>";
+  el.innerHTML="<div class='module-stat'><span>Total Locks</span><strong>"
+    +(fl.totalRecords||0)+"</strong></div>"
+    +"<div class='module-stat'><span>Active Locked</span><strong>"
+    +escapeHtml(formatCurrency(fl.activeLocked||0))+"</strong></div>"
+    +"<div class='module-stat'><span>Total Locked</span><strong>"
+    +escapeHtml(formatCurrency(fl.totalLocked||0))+"</strong></div>";
 }
 
 function _renderFounderLockList(locks){
