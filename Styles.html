@@ -116,6 +116,18 @@ nav button.active{color:var(--accent);background:var(--accent-soft);}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:9999px;}
 
+.asset-ribbon-wrap { position:relative;overflow:hidden;border-radius:.75rem;background:var(--panel-alt); }
+.asset-ribbon-track { display:flex;width:max-content;animation:ribbon-scroll 35s linear infinite; }
+.asset-ribbon-track:hover { animation-play-state:paused; }
+.asset-ribbon-items { display:flex;align-items:center;gap:2rem;padding:.6rem 1.25rem;white-space:nowrap; }
+.asset-ribbon-fade-l,.asset-ribbon-fade-r { position:absolute;top:0;bottom:0;width:4rem;z-index:10;pointer-events:none; }
+.asset-ribbon-fade-l { left:0;background:linear-gradient(to right,var(--panel-alt),transparent); }
+.asset-ribbon-fade-r { right:0;background:linear-gradient(to left,var(--panel-alt),transparent); }
+.asset-ticker { display:flex;align-items:center;gap:.5rem; }
+.asset-ticker-label { font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted); }
+.asset-ticker-val { font-size:.78rem;font-weight:700;color:var(--ink); }
+@keyframes ribbon-scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
 .vault-gradient { background: linear-gradient(135deg, #adc6ff 0%, #4d8eff 100%); }
 body { font-family: 'Inter', system-ui, sans-serif; }
 
