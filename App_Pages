@@ -255,12 +255,15 @@
 
 <div id="page-messages" class="page">
 
-<h2 class="text-2xl font-bold mb-4">Messaging</h2>
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-2xl font-bold">Messaging</h2>
+<button onclick="refreshMessages()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+</div>
 
 <div class="messages-shell">
 
-<div class="mail-panel p-4">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Channels</h3>
+<div class="mail-panel p-4" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Channels</h3>
 <div class="grid gap-2 mb-3">
 <input id="channel-create-name" class="p-2 rounded-lg border" placeholder="New channel name" />
 <select id="channel-create-type" class="p-2 rounded-lg border"><option value="private">private</option><option value="family broadcast">family broadcast</option><option value="project">project</option></select>
@@ -276,7 +279,7 @@
 </div>
 </div>
 
-<div class="mail-panel flex flex-col min-h-[64vh]">
+<div class="mail-panel flex flex-col min-h-[64vh]" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;">
 <div class="mail-panel-head">
 <h3 id="message-channel-title" class="text-sm font-bold text-slate-500 uppercase">Select a channel</h3>
 <button onclick="refreshMessages()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
@@ -326,21 +329,21 @@
 <div id="sos-status" class="hidden text-sm text-blue-700 mb-3"></div>
 
 <div class="grid gap-4 lg:grid-cols-3">
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
-<button id="btn-trigger-sos" onclick="triggerSOS()" class="bg-red-600 text-white p-4 rounded-xl font-bold w-full">Send SOS Alert</button>
+<div class="lg:col-span-1" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
+<button id="btn-trigger-sos" onclick="triggerSOS()" class="p-4 rounded-xl w-full" style="background:#93000a;color:#ffdad6;font-weight:700;">Send SOS Alert</button>
 <p class="text-xs text-slate-500 mt-3">This captures your current location and creates an emergency record.</p>
 <div id="sos-whatsapp-action" class="mt-3"></div>
 </div>
 
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Alert History</h3>
+<div class="lg:col-span-2" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Alert History</h3>
 <div id="sos-alert-history" class="space-y-2"></div>
 <div id="sos-map" class="mt-3"></div>
 </div>
 
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-3">
+<div class="lg:col-span-3" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
 <div class="flex items-center justify-between mb-3">
-<h3 class="text-sm font-bold text-slate-500 uppercase">SOS Media References</h3>
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);">SOS Media References</h3>
 <span id="sos-media-title" class="text-xs text-slate-500">Select an alert to view media</span>
 </div>
 <div class="grid gap-3 md:grid-cols-4 mb-4">
@@ -437,8 +440,8 @@
 </div>
 <div id="family-error" class="hidden text-sm text-red-600 mb-3"></div>
 <div class="grid gap-4 lg:grid-cols-3">
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-1">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Add / Update Member</h3>
+<div class="lg:col-span-1" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Add / Update Member</h3>
 <div class="grid gap-2">
 <input id="family-person-id" class="p-2 rounded-lg border" placeholder="PersonID (optional for new)" />
 <input id="family-full-name" class="p-2 rounded-lg border" placeholder="Full name" />
@@ -461,8 +464,8 @@
 <p class="text-xs text-slate-500 mt-2">Photos are stored in the existing Photos sheet and displayed on family cards.</p>
 </div>
 </div>
-<div class="bg-white p-4 rounded-2xl shadow border border-slate-100 lg:col-span-2">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Family Tree View</h3>
+<div class="lg:col-span-2" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Family Tree View</h3>
 <div class="text-xs text-slate-500 mb-3">Patriarch/root is highlighted at the top. Ancestor and descendant placeholders keep lineage lanes visually clear even when links are missing.</div>
 <div id="family-tree" class="space-y-2"></div>
 </div>
@@ -482,41 +485,41 @@
 <div id="admin-status" class="hidden text-sm text-emerald-700 mb-3"></div>
 
 <div class="grid gap-4 lg:grid-cols-4 mb-4">
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+<div style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
 <div class="text-xs text-slate-500 uppercase">Users</div>
 <div id="admin-stat-users" class="text-2xl font-bold text-slate-800 mt-1">--</div>
 </div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+<div style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
 <div class="text-xs text-slate-500 uppercase">Admins</div>
 <div id="admin-stat-admins" class="text-2xl font-bold text-slate-800 mt-1">--</div>
 </div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+<div style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
 <div class="text-xs text-slate-500 uppercase">Settings Entries</div>
 <div id="admin-stat-settings" class="text-2xl font-bold text-slate-800 mt-1">--</div>
 </div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow">
+<div style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
 <div class="text-xs text-slate-500 uppercase">Health Issues</div>
 <div id="admin-stat-issues" class="text-2xl font-bold text-slate-800 mt-1">--</div>
 </div>
 </div>
 
 <div class="grid gap-4 lg:grid-cols-3">
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Settings Summary</h3>
+<div class="lg:col-span-1" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Settings Summary</h3>
 <div id="admin-settings-summary" class="space-y-2 text-sm"></div>
 </div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Institution Settings</h3>
+<div class="lg:col-span-1" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Institution Settings</h3>
 <div id="admin-inst-settings-summary" class="space-y-2 text-sm"></div>
 </div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow lg:col-span-1">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">System Health</h3>
+<div class="lg:col-span-1" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">System Health</h3>
 <div id="admin-health-summary" class="space-y-2 text-sm"></div>
 </div>
 </div>
 
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow mt-4">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Member Management</h3>
+<div class="mt-4" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Member Management</h3>
 <div class="grid gap-2 md:grid-cols-5 mb-3">
 <input id="admin-member-email" class="p-2 rounded-lg border" placeholder="email"/>
 <input id="admin-member-name" class="p-2 rounded-lg border" placeholder="full name"/>
@@ -524,11 +527,11 @@
 <button onclick="adminAddMember()" class="bg-blue-600 text-white p-2 rounded-lg">Add</button>
 <button onclick="adminDeactivateMember()" class="bg-red-600 text-white p-2 rounded-lg">Deactivate</button>
 </div>
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Access Registry</h3>
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Access Registry</h3>
 <div id="user-list" class="space-y-2"></div>
 </div>
-<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow mt-4">
-<h3 class="text-sm font-bold text-slate-500 uppercase mb-3">Emergency Configuration Guide</h3>
+<div class="mt-4" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Emergency Configuration Guide</h3>
 <div id="admin-guide" class="text-sm text-slate-700 space-y-2"></div>
 </div>
 
