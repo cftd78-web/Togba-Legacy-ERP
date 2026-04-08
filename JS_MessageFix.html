@@ -1,0 +1,36 @@
+<script>
+/* Overrides renderMessageHistory from JS_Core.html with chat bubbles.
+   NO DOMContentLoaded. NO initApp. Safe direct override. */
+(function(){
+
+  window.renderMessageHistory = function(messages){
+    var el = document.getElementById("message-history");
+    if(!el) return;
+    if(!messages.length){
+      el.innerHTML = "<div style='text-align:center;padding:1.5rem 1rem;"
+        +"font-size:.8rem;color:var(--muted)'>No messages yet.<br>Start the conversation.</div>";
+      return;
+    }
+    var me = (window.currentUser&&currentUser.email)||"";
+    el.innerHTML = messages.map(function(m){
+      var mine = m.SenderEmail === me;
+      var body = String(m.Body||"")
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+      var t = "";
+      try{
+        if(m.SentAt) t = new Date(m.SentAt).toLocaleTimeString([],
+          {hour:"2-digit",minute:"2-digit"});
+      }catch(e){}
+      var sender = mine ? "You"
+        : String(m.SenderEmail||"").replace(/^([^@]+)@.*/,"$1");
+      return "<div class='chat-wrap "+(mine?"mine":"them")+"'>"
+        +"<div class='bubble "+(mine?"mine":"them")+"'>"+body+"</div>"
+        +"<div class='bubble-meta'>"+sender+(t?" &middot; "+t:"")+"</div>"
+        +"</div>";
+    }).join("");
+    el.scrollTop = el.scrollHeight;
+  };
+
+})();
+</script>
