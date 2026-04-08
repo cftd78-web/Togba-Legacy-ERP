@@ -1,1 +1,29 @@
-<script>/* theme placeholder */</script>
+<script>
+(function(){
+  var MODES=["auto","light","dark"];
+  var ICONS={auto:"brightness_auto",light:"light_mode",dark:"dark_mode"};
+  var LABELS={auto:"Auto",light:"Light",dark:"Dark"};
+  function applyTheme(mode){
+    var h=document.documentElement;
+    h.classList.remove("dark","light");
+    if(mode==="dark") h.classList.add("dark");
+    if(mode==="light") h.classList.add("light");
+    try{ localStorage.setItem("togba-theme",mode); }catch(e){}
+    document.querySelectorAll("[data-theme-icon]").forEach(function(el){
+      el.textContent=ICONS[mode]||"brightness_auto";
+    });
+    document.querySelectorAll("[data-theme-label]").forEach(function(el){
+      el.textContent=LABELS[mode]||"Auto";
+    });
+  }
+  window.cycleTheme=function(){
+    var cur="auto";
+    try{ cur=localStorage.getItem("togba-theme")||"auto"; }catch(e){}
+    var idx=MODES.indexOf(cur);
+    applyTheme(MODES[(idx+1)%MODES.length]);
+  };
+  var saved="auto";
+  try{ saved=localStorage.getItem("togba-theme")||"auto"; }catch(e){}
+  applyTheme(saved);
+})();
+</script>
