@@ -1,0 +1,28 @@
+<!-- LOGIN VIEW -->
+
+<div id="view-login" class="login-shell">
+<div class="login-card">
+<div class="text-center mb-6">
+<div class="inline-flex items-center justify-center mb-3 h-12 w-12 rounded-2xl bg-blue-50 border border-blue-100">
+<span class="material-icons-round text-blue-600">account_balance</span>
+</div>
+<h1 class="text-2xl font-bold">Togba Legacy</h1>
+<p class="text-sm text-slate-500 mt-1">Secure institutional access</p>
+</div>
+<div id="dev-bypass-banner" class="hidden mb-3 text-xs rounded-xl border px-3 py-2"></div>
+<div id="login-state-message" class="hidden mb-3 text-xs rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-blue-700"></div>
+<div id="step-1">
+<label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Registry Email</label>
+<input id="email" type="email" placeholder="name@family-office.com" class="w-full p-4 bg-slate-100 rounded-xl mb-4 border border-transparent focus:border-blue-200 focus:outline-none">
+<button id="btn-get-code" onclick="handleOTP()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold">Send One-Time Code</button>
+</div>
+<div id="step-2" class="hidden">
+<div class="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">Enter the 6-digit code sent to your email. This code expires quickly for security.</div>
+<input id="otp" type="text" placeholder="000000" maxlength="6" class="otp-code w-full p-4 bg-slate-100 rounded-xl mb-3 border border-transparent focus:border-blue-200 focus:outline-none">
+<div class="grid grid-cols-2 gap-2">
+<button id="btn-verify" onclick="handleVerify()" class="bg-blue-600 text-white p-4 rounded-xl font-bold">Verify</button>
+<button onclick="resetToStepOne()" class="bg-slate-200 text-slate-700 p-4 rounded-xl font-bold">Back</button>
+</div>
+</div>
+</div>
+</div>
