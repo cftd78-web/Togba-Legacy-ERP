@@ -38,7 +38,7 @@
 <div class="grid gap-3 lg:grid-cols-5">
 <div class="lg:col-span-3">
 <div class="mail-section-title mb-2">Conversation</div>
-<div id="message-history" class="mail-pane space-y-2"></div>
+<div id="message-history" class="chat-pane"></div>
 </div>
 <div class="lg:col-span-2">
 <div class="mail-section-title mb-2">Sent / Outbox</div>
@@ -48,7 +48,7 @@
 <div class="mt-3">
 <div class="mail-section-title mb-2">Compose Message</div>
 <div class="flex flex-col gap-2">
-<textarea id="message-input" placeholder="Write your message..." class="w-full p-3 rounded-xl border mail-compose-box min-h-[220px]"></textarea>
+<textarea id="message-input" placeholder="Write your message..." class="w-full p-3 rounded-xl border mail-compose-box min-h-[80px]"></textarea>
 <div class="flex justify-end">
 <button id="btn-send-message" onclick="sendCurrentMessage()" class="btn-primary">Send</button>
 </div>
