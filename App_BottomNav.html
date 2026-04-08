@@ -1,57 +1,103 @@
-<nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 p-2 sm:p-3 flex justify-around gap-1 overflow-x-auto">
+<nav id="bottom-nav">
 
-<button onclick="showPage('home')" class="active">
-<span class="material-icons-round">home</span>
-Home
-</button>
+  <button data-page="home" onclick="_nb('home')">
+    <span class="material-icons-round">home</span>Home
+  </button>
 
-<button onclick="showPage('finance')">
-<span class="material-icons-round">account_balance</span>
-Finance
-</button>
+  <button data-page="finance" onclick="_nb('finance')">
+    <span class="material-icons-round">account_balance</span>Finance
+  </button>
 
-<button onclick="showPage('projects')">
-<span class="material-icons-round">construction</span>
-Projects
-</button>
+  <button data-page="sos" onclick="_nb('sos')" class="sos-btn">
+    <span class="material-icons-round">warning</span>SOS
+  </button>
 
-<button onclick="showPage('messages')">
-<span class="material-icons-round">chat</span>
-Messages
-</button>
+  <button data-page="messages" onclick="_nb('messages')">
+    <span class="material-icons-round">chat</span>Messages
+  </button>
 
-<button onclick="showPage('documents')">
-<span class="material-icons-round">description</span>
-Docs
-</button>
+  <button onclick="_openMore()" id="bnav-more">
+    <span class="material-icons-round">grid_view</span>More
+  </button>
 
-<button onclick="showPage('sos')" class="sos-btn">
-<span class="material-icons-round">warning</span>
-SOS
-</button>
-
-<button onclick="showPage('voting')">
-<span class="material-icons-round">how_to_vote</span>
-Voting
-</button>
-
-<button onclick="showPage('timeline')">
-<span class="material-icons-round">history</span>
-Timeline
-</button>
-
-<button onclick="showPage('family')">
-<span class="material-icons-round">account_tree</span>
-Family
-</button>
-
-<button id="btn-nav-admin"
-onclick="showPage('admin')"
-class="hidden">
-
-<span class="material-icons-round">security</span>
-Admin
-
-</button>
+  <!-- Kept for JS_Core compatibility — hidden in primary bar -->
+  <button id="btn-nav-admin" data-page="admin" onclick="_nb('admin')"
+    style="display:none">
+    <span class="material-icons-round">security</span>Admin
+  </button>
 
 </nav>
+
+<!-- Backdrop -->
+<div id="more-drawer-bg" onclick="_closeMore()"></div>
+
+<!-- More drawer -->
+<div id="more-drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-grid">
+
+    <button class="drawer-btn" data-page="projects" onclick="_db('projects')">
+      <span class="material-icons-round">construction</span>Projects
+    </button>
+    <button class="drawer-btn" data-page="voting" onclick="_db('voting')">
+      <span class="material-icons-round">how_to_vote</span>Voting
+    </button>
+    <button class="drawer-btn" data-page="timeline" onclick="_db('timeline')">
+      <span class="material-icons-round">history</span>Timeline
+    </button>
+    <button class="drawer-btn" data-page="family" onclick="_db('family')">
+      <span class="material-icons-round">account_tree</span>Family
+    </button>
+    <button class="drawer-btn" data-page="documents" onclick="_db('documents')">
+      <span class="material-icons-round">description</span>Docs
+    </button>
+    <button class="drawer-btn" data-page="admin" id="drawer-admin"
+      onclick="_db('admin')" style="display:none">
+      <span class="material-icons-round">security</span>Admin
+    </button>
+
+  </div>
+</div>
+
+<script>
+/* ── Navigation helpers ── */
+window._nb = function(p){ showPage(p); _navMark(p); };
+
+window._db = function(p){ _closeMore(); showPage(p); _navMark(p); };
+
+function _navMark(p){
+  /* Primary bar */
+  document.querySelectorAll("#bottom-nav [data-page]").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-page")===p);
+  });
+  /* Drawer */
+  document.querySelectorAll("#more-drawer .drawer-btn[data-page]").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-page")===p);
+  });
+  /* "More" button active when current page lives in drawer */
+  var inDrawer=["projects","voting","timeline","family","documents","admin"];
+  var mb=document.getElementById("bnav-more");
+  if(mb) mb.classList.toggle("active", inDrawer.indexOf(p)!==-1);
+}
+
+window._openMore = function(){
+  /* Check admin visibility at open time — currentUser is set after login */
+  var isAdmin = window.currentUser && currentUser.role==="Admin";
+  var da = document.getElementById("drawer-admin");
+  if(da) da.style.display = isAdmin ? "flex" : "none";
+  document.getElementById("more-drawer").classList.add("open");
+  document.getElementById("more-drawer-bg").classList.add("open");
+  document.body.style.overflow = "hidden";
+};
+
+window._closeMore = function(){
+  document.getElementById("more-drawer").classList.remove("open");
+  document.getElementById("more-drawer-bg").classList.remove("open");
+  document.body.style.overflow = "";
+};
+
+/* Patch _updateBottomNav so showPage() keeps the nav in sync.
+   Direct assignment — no wrapper, no event listeners. */
+window._updateBottomNav = function(pageId){ _navMark(pageId); };
+
+</script>

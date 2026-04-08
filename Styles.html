@@ -356,4 +356,38 @@ html.dark .btn-primary{color:#00285d;}
     max-height:48vh; overflow-y:auto; padding:.5rem;
     scroll-behavior:smooth;
   }
+
+
+#more-drawer {
+  position:fixed; bottom:0; left:0; right:0; z-index:60;
+  background:var(--panel); border-top:1px solid var(--line);
+  border-radius:1.25rem 1.25rem 0 0;
+  padding:.75rem .75rem 1.75rem;
+  transform:translateY(100%);
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 -8px 32px rgba(0,0,0,.14);
+}
+#more-drawer.open { transform:translateY(0); }
+#more-drawer-bg {
+  display:none; position:fixed; inset:0; z-index:59;
+  background:rgba(0,0,0,.35);
+}
+#more-drawer-bg.open { display:block; }
+.drawer-handle {
+  width:36px; height:4px; border-radius:9999px;
+  background:var(--line); margin:0 auto .75rem;
+}
+.drawer-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:.6rem; }
+.drawer-btn {
+  display:flex; flex-direction:column; align-items:center;
+  gap:.2rem; padding:.55rem .25rem; border-radius:.75rem;
+  border:none; background:var(--panel-alt); color:var(--muted);
+  font-size:.65rem; font-weight:500; cursor:pointer;
+  transition:background .13s, color .13s;
+}
+.drawer-btn .material-icons-round { font-size:22px; }
+.drawer-btn:hover, .drawer-btn.active {
+  background:var(--accent-soft); color:var(--accent);
+}
+
 </style>
