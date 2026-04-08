@@ -1,0 +1,111 @@
+<script>
+/* Live market ticker — Finnhub free API
+   NO DOMContentLoaded. NO initApp override.
+   Hooks into renderSettingsSummary by direct assignment after JS_Core loads.
+   Fallback: static dashes shown immediately, replaced on first API response. */
+(function(){
+
+  var SYMS = [
+    { label:"S&P 500",   sym:"SPY",             pfx:"",  dp:2 },
+    { label:"NASDAQ",    sym:"QQQ",             pfx:"",  dp:2 },
+    { label:"GOLD",      sym:"OANDA:XAU_USD",   pfx:"$", dp:2 },
+    { label:"BTC/USD",   sym:"BINANCE:BTCUSDT", pfx:"$", dp:0 },
+    { label:"EUR/USD",   sym:"OANDA:EUR_USD",   pfx:"",  dp:4 },
+    { label:"WTI CRUDE", sym:"OANDA:USOIL_USD", pfx:"$", dp:2 }
+  ];
+
+  var _key   = "";
+  var _timer = null;
+  var MS     = 90000;
+
+  /* Render the track with current data */
+  function _render(items){
+    var track = document.getElementById("ticker-track");
+    if(!track) return;
+    var html = items.map(function(t){
+      var col = t.dir>0?"var(--green)":t.dir<0?"var(--red)":"var(--muted)";
+      var arrow = t.dir>0?"<span class='t-up'>▲ </span>"
+                 :t.dir<0?"<span class='t-down'>▼ </span>"
+                 :"<span class='t-flat'>— </span>";
+      return "<div class='asset-ticker'>"
+        +"<span class='asset-ticker-label'>"+t.label+"</span>"
+        +"<span class='asset-ticker-val'>"+t.price+"</span>"
+        +"<span class='asset-ticker-chg' style='color:"+col+"'>"+arrow+t.chg+"</span>"
+        +"</div>";
+    }).join("");
+    track.innerHTML = "<div class='asset-ribbon-items'>"+html+"</div>"
+                    + "<div class='asset-ribbon-items' aria-hidden='true'>"+html+"</div>";
+  }
+
+  /* Fetch one symbol */
+  function _one(sym){
+    return fetch("https://finnhub.io/api/v1/quote?symbol="
+        +encodeURIComponent(sym.sym)+"&token="+encodeURIComponent(_key))
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(d){
+        if(!d||!d.c) return null;
+        var dir = d.dp>0?1:d.dp<0?-1:0;
+        var n   = Number(d.c);
+        var price = sym.pfx+(sym.dp===0
+          ? Math.round(n).toLocaleString()
+          : n.toLocaleString(undefined,{minimumFractionDigits:sym.dp,maximumFractionDigits:sym.dp}));
+        var chg = (d.dp>0?"+":"")+Number(d.dp||0).toFixed(2)+"%";
+        return { label:sym.label, price:price, chg:chg, dir:dir };
+      })
+      .catch(function(){ return null; });
+  }
+
+  /* Fetch all — stagger requests to respect rate limits */
+  function _fetchAll(){
+    if(!_key) return;
+    var live = SYMS.map(function(s){ return {label:s.label,price:"—",chg:"—",dir:0}; });
+    var chain = Promise.resolve();
+    SYMS.forEach(function(sym,i){
+      chain = chain
+        .then(function(){ return new Promise(function(res){ setTimeout(res,i*200); }); })
+        .then(function(){ return _one(sym); })
+        .then(function(result){
+          if(result) live[i]=result;
+          _render(live);
+        });
+    });
+    clearTimeout(_timer);
+    _timer = setTimeout(_fetchAll, MS);
+  }
+
+  /* Called when API key becomes available */
+  window._tickerStart = function(key){
+    _key = String(key||"").trim();
+    if(_key) _fetchAll();
+  };
+
+  /* Hook: override renderSettingsSummary DIRECTLY (no wrapper, no events).
+     This works because JS_Core.html loads before JS_Ticker.html,
+     so this assignment replaces its version cleanly. */
+  var _coreSettings = window.renderSettingsSummary;
+  window.renderSettingsSummary = function(settings){
+    if(_coreSettings) _coreSettings.apply(this, arguments);
+    var entries = Array.isArray(settings&&settings.entries)?settings.entries:[];
+    entries.forEach(function(e){
+      var k = String(e.Key||e.key||"").toLowerCase().replace(/[_\- ]/g,"");
+      if(k==="finnhubapikey"||k==="marketapikey"||k==="tickerapikey")
+        window._tickerStart(e.Value||e.value||"");
+    });
+  };
+
+  var _coreInst = window.renderInstitutionSettingsSummary;
+  window.renderInstitutionSettingsSummary = function(settings){
+    if(_coreInst) _coreInst.apply(this, arguments);
+    var entries = Array.isArray(settings&&settings.entries)?settings.entries:[];
+    entries.forEach(function(e){
+      var k = String(e.SettingKey||e.Key||e.key||"").toLowerCase().replace(/[_\- ]/g,"");
+      if(k==="finnhubapikey"||k==="marketapikey"||k==="tickerapikey")
+        window._tickerStart(e.SettingValue||e.Value||e.value||"");
+    });
+  };
+
+  /* Show placeholder immediately */
+  _render(SYMS.map(function(s){ return {label:s.label,price:"—",chg:"—",dir:0}; }));
+
+})();
+</script>
