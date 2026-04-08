@@ -384,7 +384,9 @@ window.loadSOSAlerts = function(){
   google.script.run
     .withSuccessHandler(function(res){
       setSosStatus(""); sosLoaded=true;
-      _renderSosAlerts(Array.isArray(res&&res.alerts)?res.alerts:[]);
+      var _alerts=Array.isArray(res&&res.alerts)?res.alerts:[];
+      window._sosAlertsCache=_alerts;
+      _renderSosAlerts(_alerts);
       _renderSosWhatsapp(res&&res.whatsappEnabled, res&&res.whatsappNumber);
     })
     .withFailureHandler(function(err){
@@ -398,6 +400,8 @@ window.loadSOSAlerts = function(){
 function _renderSosAlerts(alerts){
   var el=document.getElementById("sos-alert-history"); if(!el) return;
   if(!alerts.length){ el.innerHTML="<div style='color:var(--muted);font-size:.875rem'>No alerts recorded.</div>"; return; }
+  window._sosAlertsCache = alerts;
+  if(alerts[0]&&(alerts[0].Lat||alerts[0].Lng)) _renderSosMap(alerts[0].Lat, alerts[0].Lng);
   el.innerHTML=alerts.map(function(a){
     var isResolved=a.Status==="Resolved";
     var pillCls=isResolved?"bg-emerald-50 text-emerald-700 border border-emerald-200":"bg-rose-50 text-rose-700 border border-rose-200";
@@ -411,6 +415,19 @@ function _renderSosAlerts(alerts){
       "<button onclick=\"loadSOSMedia('"+escapeHtml(a.SOSID||a.AlertID||"")+"')\" style='font-size:.72rem;margin-top:.4rem;padding:.2rem .6rem;border-radius:.4rem;background:var(--panel-alt);color:var(--muted);border:1px solid var(--line)'>View Media</button>"+
       "</div>";
   }).join("");
+}
+
+function _renderSosMap(lat, lng){
+  var el=document.getElementById("sos-map"); if(!el) return;
+  if(!lat && !lng){
+    el.innerHTML="<div style='display:flex;align-items:center;justify-content:center;height:100%;font-size:.8rem;color:var(--muted)'>No location data for this alert.</div>";
+    return;
+  }
+  var bbox=[lng-.015,lat-.015,lng+.015,lat+.015].join(",");
+  el.innerHTML="<iframe src='https://www.openstreetmap.org/export/embed.html?bbox="
+    +bbox+"&layer=mapnik&marker="+lat+","+lng
+    +"' style='width:100%;height:100%;min-height:220px;border:none;border-radius:.85rem'"
+    +" allowfullscreen></iframe>";
 }
 
 function _renderSosWhatsapp(enabled, number){
@@ -465,6 +482,9 @@ window.saveSOSMediaRef = function(){
 window.loadSOSMedia = function(sosId){
   var titleEl=document.getElementById("sos-media-title");
   if(titleEl){ titleEl.innerText="Alert: "+sosId; titleEl.dataset.sosId=sosId; }
+  var alerts=window._sosAlertsCache||[];
+  var found=alerts.find(function(a){ return (a.SOSID||"")=== sosId; });
+  if(found) _renderSosMap(found.Lat, found.Lng);
   google.script.run
     .withSuccessHandler(function(res){
       var media=Array.isArray(res&&res.media)?res.media:[];
