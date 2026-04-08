@@ -1,27 +1,52 @@
 <div id="page-timeline" class="page">
 
-<div class="page-header">
-<h2 class="page-heading">Family Timeline</h2>
-<button onclick="loadTimelineData()" class="btn-refresh">Refresh</button>
-</div>
+  <div class="page-header">
+    <div><div class="page-heading">Family Timeline</div>
+    <div class="page-sub">Milestones, upcoming events, and connected calendar.</div></div>
+    <button onclick="loadTimelineData()" class="btn-refresh">Refresh</button>
+  </div>
+  <div id="timeline-error" class="err-box hidden" style="margin-bottom:.75rem"></div>
 
-<div id="timeline-error" class="hidden err-box mb-3"></div>
+  <div style="display:grid;gap:1rem">
 
-<div class="grid gap-4 lg:grid-cols-3">
-<div class="lg:col-span-3" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
-<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Calendar View</h3><div id="timeline-calendar" class="text-sm"></div></div>
-<div class="lg:col-span-3" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
-<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Unified Timeline</h3>
-<div id="timeline-list" class="space-y-3"></div>
-</div>
-<div  style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
-<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Historical</h3>
-<div id="timeline-history" class="space-y-3"></div>
-</div>
-<div class="lg:col-span-2" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
-<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Upcoming Events</h3>
-<div id="timeline-upcoming" class="space-y-3"></div>
-</div>
-</div>
+    <!-- Google Calendar embed — hidden until calendar ID is found -->
+    <div class="card" id="gcal-wrap" style="padding:0;overflow:hidden;display:none">
+      <div style="padding:.75rem 1rem;border-bottom:1px solid var(--line);
+        display:flex;align-items:center;justify-content:space-between">
+        <div class="section-label" style="margin:0">Connected Calendar</div>
+        <a id="gcal-open-link" href="#" target="_blank"
+          style="font-size:.72rem;color:var(--accent);text-decoration:none">
+          Open in Google Calendar ↗</a>
+      </div>
+      <iframe id="gcal-iframe" src=""
+        style="width:100%;height:500px;border:none" frameborder="0" scrolling="no">
+      </iframe>
+    </div>
 
+    <!-- Shown when no calendar ID is configured -->
+    <div class="card-alt" id="gcal-setup" style="display:none;text-align:center;padding:1.5rem">
+      <span class="material-icons-round" style="font-size:32px;color:var(--muted);display:block;margin-bottom:.5rem">calendar_month</span>
+      <div style="font-size:.875rem;font-weight:600;color:var(--ink);margin-bottom:.3rem">Google Calendar not connected</div>
+      <div style="font-size:.78rem;color:var(--muted)">Add a row in the
+        <strong>InstitutionSettings</strong> sheet with SettingKey =
+        <code>google_calendar_id</code> and the calendar's public address as the value.
+      </div>
+    </div>
+
+    <!-- Built-in custom calendar -->
+    <div class="card"><div class="section-label">Custom Timeline Calendar</div>
+      <div id="timeline-calendar" style="font-size:.875rem"></div></div>
+
+    <!-- Lists -->
+    <div class="card"><div class="section-label">Unified Timeline</div>
+      <div id="timeline-list" style="display:flex;flex-direction:column;gap:.5rem"></div></div>
+
+    <div style="display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+      <div class="card"><div class="section-label">Historical</div>
+        <div id="timeline-history" style="display:flex;flex-direction:column;gap:.5rem"></div></div>
+      <div class="card"><div class="section-label">Upcoming Events</div>
+        <div id="timeline-upcoming" style="display:flex;flex-direction:column;gap:.5rem"></div></div>
+    </div>
+
+  </div>
 </div>
