@@ -1,30 +1,30 @@
 <div id="page-finance" class="page">
 
-<div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
-<h2 class="text-2xl font-bold">Finance</h2>
-<button onclick="loadFinanceDashboard()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+<div class="page-header gap-3 flex-wrap">
+<h2 class="page-heading">Finance</h2>
+<button onclick="loadFinanceDashboard()" class="btn-refresh">Refresh</button>
 </div>
 
-<div id="finance-error" class="hidden text-sm text-red-600 mb-3"></div>
+<div id="finance-error" class="hidden err-box mb-3"></div>
 
 <div class="grid gap-4 lg:grid-cols-3">
-<div class="" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
+<div  style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
 <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Total Contributions</div>
-<div id="finance-total-contributions" class="text-2xl font-bold text-slate-800">$0.00</div>
+<div id="finance-total-contributions" style="color:var(--ink);font-size:1.5rem;font-weight:700;">$0.00</div>
 </div>
-<div class="" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
+<div  style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
 <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Founder Locked Capital</div>
-<div id="finance-total-locked" class="text-2xl font-bold text-slate-800">$0.00</div>
+<div id="finance-total-locked" style="color:var(--ink);font-size:1.5rem;font-weight:700;">$0.00</div>
 </div>
-<div class="" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
+<div  style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
 <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Projected Distribution</div>
-<div id="finance-total-projected" class="text-2xl font-bold text-slate-800">$0.00</div>
+<div id="finance-total-projected" style="color:var(--ink);font-size:1.5rem;font-weight:700;">$0.00</div>
 </div>
 
 <div class="lg:col-span-2" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
 <div class="flex items-center justify-between mb-3">
 <h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Investment Allocation</h3>
-<span id="finance-allocation-validation" class="text-xs font-semibold text-slate-500"></span>
+<span id="finance-allocation-validation" style="color:var(--muted);font-size:.75rem;font-weight:600;"></span>
 </div>
 <div class="chart-shell chart-shell-sm">
 <canvas id="finance-allocation-chart" height="180"></canvas>
@@ -32,17 +32,17 @@
 <div id="finance-allocation-breakdown" class="grid grid-cols-2 gap-2 mt-4 text-sm"></div>
 </div>
 
-<div class="" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
+<div  style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
 <h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Contribution Categories</h3>
 <div id="finance-category-summary" class="space-y-2 text-sm"></div>
 </div>
 
-<div class="" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
+<div  style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
 <h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Founder Capital Status</h3>
 <div class="chart-shell chart-shell-sm">
 <canvas id="finance-founder-lock-chart" height="180"></canvas>
 </div>
-<div id="finance-founder-lock-summary" class="mt-3 space-y-2 text-sm text-slate-700"></div>
+<div id="finance-founder-lock-summary" class="mt-3 space-y-2 text-sm" style="color:var(--ink);"></div>
 </div>
 
 <div class="lg:col-span-3" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">

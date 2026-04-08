@@ -1,29 +1,29 @@
 <div id="page-admin" class="page">
 
-<div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
-<h2 class="text-2xl font-bold">Admin & System Controls</h2>
-<button onclick="loadAdmin()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+<div class="page-header gap-3 flex-wrap">
+<h2 class="page-heading">Admin & System Controls</h2>
+<button onclick="loadAdmin()" class="btn-refresh">Refresh</button>
 </div>
 
-<div id="admin-error" class="hidden text-sm text-red-600 mb-3"></div>
-<div id="admin-status" class="hidden text-sm text-emerald-700 mb-3"></div>
+<div id="admin-error" class="hidden err-box mb-3"></div>
+<div id="admin-status" class="hidden state-box mb-3"></div>
 
 <div class="grid gap-4 lg:grid-cols-4 mb-4">
 <div style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
-<div class="text-xs text-slate-500 uppercase">Users</div>
-<div id="admin-stat-users" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+<div class="section-label">Users</div>
+<div id="admin-stat-users" class="mt-1" style="color:var(--ink);font-size:1.5rem;font-weight:700;">--</div>
 </div>
 <div style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
-<div class="text-xs text-slate-500 uppercase">Admins</div>
-<div id="admin-stat-admins" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+<div class="section-label">Admins</div>
+<div id="admin-stat-admins" class="mt-1" style="color:var(--ink);font-size:1.5rem;font-weight:700;">--</div>
 </div>
 <div style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
-<div class="text-xs text-slate-500 uppercase">Settings Entries</div>
-<div id="admin-stat-settings" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+<div class="section-label">Settings Entries</div>
+<div id="admin-stat-settings" class="mt-1" style="color:var(--ink);font-size:1.5rem;font-weight:700;">--</div>
 </div>
 <div style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
-<div class="text-xs text-slate-500 uppercase">Health Issues</div>
-<div id="admin-stat-issues" class="text-2xl font-bold text-slate-800 mt-1">--</div>
+<div class="section-label">Health Issues</div>
+<div id="admin-stat-issues" class="mt-1" style="color:var(--ink);font-size:1.5rem;font-weight:700;">--</div>
 </div>
 </div>
 
@@ -48,15 +48,15 @@
 <input id="admin-member-email" class="p-2 rounded-lg border" placeholder="email"/>
 <input id="admin-member-name" class="p-2 rounded-lg border" placeholder="full name"/>
 <input id="admin-member-role" class="p-2 rounded-lg border" placeholder="role"/>
-<button onclick="adminAddMember()" class="bg-blue-600 text-white p-2 rounded-lg">Add</button>
-<button onclick="adminDeactivateMember()" class="bg-red-600 text-white p-2 rounded-lg">Deactivate</button>
+<button onclick="adminAddMember()" class="btn-primary">Add</button>
+<button onclick="adminDeactivateMember()" class="btn-danger">Deactivate</button>
 </div>
 <h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Access Registry</h3>
 <div id="user-list" class="space-y-2"></div>
 </div>
 <div class="mt-4" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
 <h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Emergency Configuration Guide</h3>
-<div id="admin-guide" class="text-sm text-slate-700 space-y-2"></div>
+<div id="admin-guide" class="space-y-2" style="color:var(--ink);font-size:.875rem;"></div>
 </div>
 
 </div>

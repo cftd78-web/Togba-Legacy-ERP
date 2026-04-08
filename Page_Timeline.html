@@ -1,11 +1,11 @@
 <div id="page-timeline" class="page">
 
-<div class="flex items-center justify-between mb-4">
-<h2 class="text-2xl font-bold">Family Timeline</h2>
-<button onclick="loadTimelineData()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+<div class="page-header">
+<h2 class="page-heading">Family Timeline</h2>
+<button onclick="loadTimelineData()" class="btn-refresh">Refresh</button>
 </div>
 
-<div id="timeline-error" class="hidden text-sm text-red-600 mb-3"></div>
+<div id="timeline-error" class="hidden err-box mb-3"></div>
 
 <div class="grid gap-4 lg:grid-cols-3">
 <div class="lg:col-span-3" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
@@ -14,7 +14,7 @@
 <h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Unified Timeline</h3>
 <div id="timeline-list" class="space-y-3"></div>
 </div>
-<div class="" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
+<div  style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
 <h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Historical</h3>
 <div id="timeline-history" class="space-y-3"></div>
 </div>
