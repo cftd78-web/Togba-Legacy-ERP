@@ -539,6 +539,108 @@
 
 </div>
 
+<!-- DOCUMENT VAULT PAGE -->
+
+<div id="page-documents" class="page">
+
+<div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+<h2 class="text-2xl font-bold">Document Vault</h2>
+<div class="text-sm" style="color:var(--muted);">Secure archive for family legal, financial, and identity records.</div>
+</div>
+
+<div class="mb-5 rounded-xl p-5 border" style="background:var(--panel);border-color:var(--line);">
+  <div class="flex items-center justify-between gap-3 mb-2">
+    <div class="text-xs uppercase font-bold tracking-[0.12em]" style="color:var(--muted);">Vault Capacity</div>
+    <div class="text-sm font-semibold" style="color:var(--ink);">64% full</div>
+  </div>
+  <div class="h-2 rounded-full overflow-hidden" style="background:color-mix(in srgb,var(--panel-high) 70%, transparent);">
+    <div class="h-full" style="width:64%;background:linear-gradient(90deg,var(--accent),var(--accent-2));"></div>
+  </div>
+  <div class="mt-2 text-xs flex justify-between" style="color:var(--muted);">
+    <span>1.28TB used</span>
+    <span>2.00TB total</span>
+  </div>
+</div>
+
+<div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3 mb-5">
+  <div class="vault-folder-card group">
+    <div class="flex items-start justify-between gap-3 mb-4">
+      <div class="vault-folder-icon" style="background:color-mix(in srgb,var(--accent) 16%, transparent);color:var(--accent);"><span class="material-icons-round">gavel</span></div>
+      <span class="vault-folder-arrow material-icons-round" style="color:var(--accent);">arrow_forward</span>
+    </div>
+    <h3 class="text-lg font-bold mb-1" style="color:var(--ink);">Legal</h3>
+    <p class="text-sm mb-4" style="color:var(--muted);">Trusts, wills, filings, and legal instruments.</p>
+    <span class="chip-soft" style="width:max-content;">Coming Soon</span>
+  </div>
+
+  <div class="vault-folder-card group">
+    <div class="flex items-start justify-between gap-3 mb-4">
+      <div class="vault-folder-icon" style="background:color-mix(in srgb,var(--green) 16%, transparent);color:var(--green);"><span class="material-icons-round">payments</span></div>
+      <span class="vault-folder-arrow material-icons-round" style="color:var(--green);">arrow_forward</span>
+    </div>
+    <h3 class="text-lg font-bold mb-1" style="color:var(--ink);">Finance</h3>
+    <p class="text-sm mb-4" style="color:var(--muted);">Tax records, investment reports, and statements.</p>
+    <span class="chip-soft" style="width:max-content;">Coming Soon</span>
+  </div>
+
+  <div class="vault-folder-card group">
+    <div class="flex items-start justify-between gap-3 mb-4">
+      <div class="vault-folder-icon" style="background:color-mix(in srgb,var(--amber) 16%, transparent);color:var(--amber);"><span class="material-icons-round">badge</span></div>
+      <span class="vault-folder-arrow material-icons-round" style="color:var(--amber);">arrow_forward</span>
+    </div>
+    <h3 class="text-lg font-bold mb-1" style="color:var(--ink);">Identity</h3>
+    <p class="text-sm mb-4" style="color:var(--muted);">Passports, IDs, and credentials archive.</p>
+    <span class="chip-soft" style="width:max-content;">Coming Soon</span>
+  </div>
+
+  <div class="vault-folder-card group">
+    <div class="flex items-start justify-between gap-3 mb-4">
+      <div class="vault-folder-icon" style="background:color-mix(in srgb,var(--accent) 16%, transparent);color:var(--accent);"><span class="material-icons-round">family_history</span></div>
+      <span class="vault-folder-arrow material-icons-round" style="color:var(--accent);">arrow_forward</span>
+    </div>
+    <h3 class="text-lg font-bold mb-1" style="color:var(--ink);">Heritage</h3>
+    <p class="text-sm mb-4" style="color:var(--muted);">Lineage documents, stories, and archival records.</p>
+    <span class="chip-soft" style="width:max-content;">Coming Soon</span>
+  </div>
+
+  <div class="vault-folder-card group">
+    <div class="flex items-start justify-between gap-3 mb-4">
+      <div class="vault-folder-icon" style="background:color-mix(in srgb,var(--green) 16%, transparent);color:var(--green);"><span class="material-icons-round">assignment</span></div>
+      <span class="vault-folder-arrow material-icons-round" style="color:var(--green);">arrow_forward</span>
+    </div>
+    <h3 class="text-lg font-bold mb-1" style="color:var(--ink);">Governance</h3>
+    <p class="text-sm mb-4" style="color:var(--muted);">Resolutions, board minutes, and policies.</p>
+    <span class="chip-soft" style="width:max-content;">Coming Soon</span>
+  </div>
+
+  <div class="vault-folder-card group">
+    <div class="flex items-start justify-between gap-3 mb-4">
+      <div class="vault-folder-icon" style="background:color-mix(in srgb,var(--amber) 16%, transparent);color:var(--amber);"><span class="material-icons-round">real_estate_agent</span></div>
+      <span class="vault-folder-arrow material-icons-round" style="color:var(--amber);">arrow_forward</span>
+    </div>
+    <h3 class="text-lg font-bold mb-1" style="color:var(--ink);">Properties</h3>
+    <p class="text-sm mb-4" style="color:var(--muted);">Land titles, deeds, and estate records.</p>
+    <span class="chip-soft" style="width:max-content;">Coming Soon</span>
+  </div>
+</div>
+
+<div class="grid gap-3 md:grid-cols-3">
+  <div class="rounded-xl p-4 border" style="background:var(--panel);border-color:var(--line);border-left:4px solid var(--accent);">
+    <div class="text-sm font-bold mb-1" style="color:var(--ink);">Encrypted Node</div>
+    <div class="text-xs" style="color:var(--muted);">End-to-end encrypted storage with hardened vault controls.</div>
+  </div>
+  <div class="rounded-xl p-4 border" style="background:var(--panel);border-color:var(--line);border-left:4px solid var(--green);">
+    <div class="text-sm font-bold mb-1" style="color:var(--ink);">KYC Compliant</div>
+    <div class="text-xs" style="color:var(--muted);">Document indexing aligned with onboarding and compliance checks.</div>
+  </div>
+  <div class="rounded-xl p-4 border" style="background:var(--panel);border-color:var(--line);border-left:4px solid var(--amber);">
+    <div class="text-sm font-bold mb-1" style="color:var(--ink);">Access Control</div>
+    <div class="text-xs" style="color:var(--muted);">Role-scoped access policy model with audit-friendly segregation.</div>
+  </div>
+</div>
+
+</div>
+
 <!-- NAVIGATION -->
 
 <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 p-2 sm:p-3 flex justify-around gap-1 overflow-x-auto" style="background:rgba(11,19,38,.96);backdrop-filter:blur(12px);border-top:1px solid rgba(66,71,84,.3);">
@@ -561,6 +663,12 @@ Projects
 <button onclick="showPage('messages')">
 <span class="material-icons-round">chat</span>
 Messages
+</button>
+
+
+<button onclick="showPage('documents')">
+<span class="material-icons-round">description</span>
+Docs
 </button>
 
 <button onclick="showPage('sos')">
