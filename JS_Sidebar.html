@@ -1,1 +1,34 @@
-<script>/* sidebar placeholder */</script>
+<script>
+var sidebarExpanded=true;
+window.toggleSidebar=function(){
+  sidebarExpanded=!sidebarExpanded;
+  var s=document.getElementById('sidebar');
+  var m=document.getElementById('main-wrap');
+  var i=document.getElementById('sidebar-toggle-icon');
+  if(s) s.classList.toggle('collapsed',!sidebarExpanded);
+  if(m) m.classList.toggle('sidebar-collapsed',!sidebarExpanded);
+  if(i) i.textContent=sidebarExpanded?'chevron_left':'chevron_right';
+  try{localStorage.setItem('togba-sidebar',sidebarExpanded?'1':'0');}catch(e){}
+};
+/* Restore saved state — runs at bottom of body, DOM is ready */
+(function(){
+  var saved='1';
+  try{saved=localStorage.getItem('togba-sidebar')||'1';}catch(e){}
+  if(saved==='0'){
+    sidebarExpanded=false;
+    var s=document.getElementById('sidebar');
+    var m=document.getElementById('main-wrap');
+    var i=document.getElementById('sidebar-toggle-icon');
+    if(s) s.classList.add('collapsed');
+    if(m) m.classList.add('sidebar-collapsed');
+    if(i) i.textContent='chevron_right';
+  }
+})();
+window._updateSidebarNav=function(pageId){
+  var s=document.getElementById('sidebar');
+  if(!s) return;
+  s.querySelectorAll('[data-page]').forEach(function(btn){
+    btn.classList.toggle('active',btn.getAttribute('data-page')===pageId);
+  });
+};
+</script>

@@ -186,6 +186,8 @@ window.initApp = function(){
   _setText("welcome-name", currentUser.name||"Welcome");
   var isAdmin=currentUser.role==="Admin";
   var bna=document.getElementById("btn-nav-admin"); if(bna) bna.classList.toggle("hidden",!isAdmin);
+  var sna=document.getElementById("sidebar-nav-admin");
+  if(sna) sna.classList.toggle("hidden",!isAdmin);
   showPage("home");
   loadHomeEssentials(false);
 };
@@ -197,6 +199,7 @@ window.showPage = function(pageId){
   if(tgt) tgt.classList.add("active");
   currentPage=pageId;
   _updateBottomNav(pageId);
+  if(typeof window._updateSidebarNav==="function") window._updateSidebarNav(pageId);
   window.scrollTo(0,0);
   /* Auto-load guards — prevent redundant server calls */
   if(pageId==="finance"  && !financeLoaded)                           loadFinanceDashboard();
