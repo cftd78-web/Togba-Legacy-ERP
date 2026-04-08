@@ -1,0 +1,139 @@
+<script>
+/* ================================================================
+   JS_TICKER — Live market prices via Finnhub free API
+   API key: stored in InstitutionSettings as "finnhub_api_key"
+   Refresh: every 90 seconds (6 symbols = 6 calls, within free limits)
+   Fallback: static values shown until first successful fetch
+   ================================================================ */
+(function(){
+
+  var SYMBOLS = [
+    { label:"S&P 500",   sym:"SPY",             pfx:"",  dp:2 },
+    { label:"NASDAQ",    sym:"QQQ",             pfx:"",  dp:2 },
+    { label:"GOLD",      sym:"OANDA:XAU_USD",   pfx:"$", dp:2 },
+    { label:"BTC/USD",   sym:"BINANCE:BTCUSDT", pfx:"$", dp:0 },
+    { label:"EUR/USD",   sym:"OANDA:EUR_USD",   pfx:"",  dp:4 },
+    { label:"WTI CRUDE", sym:"OANDA:USOIL_USD", pfx:"$", dp:2 }
+  ];
+
+  var FALLBACK = [
+    { label:"S&P 500",   price:"—", chg:"—", dir:0 },
+    { label:"NASDAQ",    price:"—", chg:"—", dir:0 },
+    { label:"GOLD",      price:"—", chg:"—", dir:0 },
+    { label:"BTC/USD",   price:"—", chg:"—", dir:0 },
+    { label:"EUR/USD",   price:"—", chg:"—", dir:0 },
+    { label:"WTI CRUDE", price:"—", chg:"—", dir:0 }
+  ];
+
+  var _key = "";
+  var _timer = null;
+  var INTERVAL = 90000;
+
+  /* Called when settings are loaded (hooked via JS_FinanceFix or admin load) */
+  window._tickerSetKey = function(k){
+    _key = String(k||"").trim();
+    if(_key) _fetchAll();
+  };
+
+  function _arrow(dir){
+    if(dir>0) return "<span class='t-up'>▲ </span>";
+    if(dir<0) return "<span class='t-down'>▼ </span>";
+    return "<span class='t-flat'>— </span>";
+  }
+
+  function _fmtPct(dp){
+    var n=Number(dp)||0;
+    return (n>0?"+":"")+n.toFixed(2)+"%";
+  }
+
+  function _fmtPrice(c, pfx, dp){
+    if(!c) return "—";
+    var n=Number(c);
+    return pfx+(dp===0 ? Math.round(n).toLocaleString()
+      : n.toLocaleString(undefined,{minimumFractionDigits:dp,maximumFractionDigits:dp}));
+  }
+
+  function _render(items){
+    var track=document.getElementById("ticker-track");
+    if(!track) return;
+    var html=items.map(function(t){
+      var col=t.dir>0?"var(--green)":t.dir<0?"var(--red)":"var(--muted)";
+      return "<div class='asset-ticker'>"
+        +"<span class='asset-ticker-label'>"+t.label+"</span>"
+        +"<span class='asset-ticker-val'>"+t.price+"</span>"
+        +"<span class='asset-ticker-chg' style='color:"+col+"'>"
+        +_arrow(t.dir)+t.chg+"</span></div>";
+    }).join("");
+    /* Duplicate for seamless CSS scroll loop */
+    track.innerHTML="<div class='asset-ribbon-items'>"+html+"</div>"
+                   +"<div class='asset-ribbon-items' aria-hidden='true'>"+html+"</div>";
+  }
+
+  function _fetchOne(sym, idx){
+    return fetch("https://finnhub.io/api/v1/quote?symbol="
+        +encodeURIComponent(sym.sym)+"&token="+encodeURIComponent(_key))
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(d){
+        if(!d||!d.c) return null;
+        var dir=d.dp>0?1:d.dp<0?-1:0;
+        return {
+          label:sym.label,
+          price:_fmtPrice(d.c, sym.pfx, sym.dp),
+          chg:_fmtPct(d.dp),
+          dir:dir
+        };
+      })
+      .catch(function(){ return null; });
+  }
+
+  function _fetchAll(){
+    if(!_key) return;
+    var live=SYMBOLS.map(function(s,i){ return FALLBACK[i]; });
+    var chain=Promise.resolve();
+    SYMBOLS.forEach(function(sym,i){
+      chain=chain
+        .then(function(){
+          return new Promise(function(res){ setTimeout(res, i*200); });
+        })
+        .then(function(){ return _fetchOne(sym, i); })
+        .then(function(result){
+          if(result) live[i]=result;
+          _render(live);
+        });
+    });
+    clearTimeout(_timer);
+    _timer=setTimeout(_fetchAll, INTERVAL);
+  }
+
+  /* Show fallback immediately, fetch when key arrives */
+  _render(FALLBACK);
+
+  /* Hook into settings scan — patch the existing renderSettingsSummary
+     without modifying JS_Core.html. Wait until JS_Core is done loading. */
+  document.addEventListener("DOMContentLoaded", function(){
+    var _orig = window.renderSettingsSummary;
+    window.renderSettingsSummary = function(settings){
+      if(_orig) _orig.apply(this, arguments);
+      var entries=Array.isArray(settings&&settings.entries)?settings.entries:[];
+      entries.forEach(function(e){
+        var k=String(e.Key||e.key||"").toLowerCase().replace(/[_\- ]/g,"");
+        if(k==="finnhubapikey"||k==="marketapikey"||k==="tickerapikey"){
+          _tickerSetKey(String(e.Value||e.value||""));
+        }
+      });
+    };
+    var _orig2 = window.renderInstitutionSettingsSummary;
+    window.renderInstitutionSettingsSummary = function(settings){
+      if(_orig2) _orig2.apply(this, arguments);
+      var entries=Array.isArray(settings&&settings.entries)?settings.entries:[];
+      entries.forEach(function(e){
+        var k=String(e.SettingKey||e.Key||e.key||"").toLowerCase().replace(/[_\- ]/g,"");
+        if(k==="finnhubapikey"||k==="marketapikey"||k==="tickerapikey"){
+          _tickerSetKey(String(e.SettingValue||e.Value||e.value||""));
+        }
+      });
+    };
+  });
+
+})();
+</script>
