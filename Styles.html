@@ -7,34 +7,36 @@
 
 /* ── CSS Variables ── */
 :root{
---app-bg:#f3f6fb;
---panel:#ffffff;
---panel-alt:#f8fafc;
---ink:#0f172a;
---muted:#64748b;
---accent:#2563eb;
---accent-2:#3b82f6;
---accent-soft:#dbeafe;
---line:#e2e8f0;
---green:#16a34a;
---amber:#d97706;
---red:#dc2626;
+--app-bg:#f9f9fe;
+--panel:#f3f3f8;
+--panel-alt:#ececf2;
+--panel-high:#e4e4eb;
+--ink:#1a1c1f;
+--muted:#414755;
+--accent:#0058bc;
+--accent-2:#0070eb;
+--accent-soft:#dbe8ff;
+--line:rgba(66,71,84,.15);
+--green:#006e28;
+--amber:#894d00;
+--red:#ba1a1a;
 }
 
 @media (prefers-color-scheme:dark){
 :root{
 --app-bg:#0b1326;
---panel:#111a2d;
---panel-alt:#1a2236;
---ink:#e2e8f0;
---muted:#94a3b8;
---accent:#7aa2ff;
---accent-2:#60a5fa;
---accent-soft:#22335f;
---line:#28354f;
---green:#4ade80;
---amber:#fbbf24;
---red:#f87171;
+--panel:#131b2e;
+--panel-alt:#171f33;
+--panel-high:#222a3d;
+--ink:#dae2fd;
+--muted:#c2c6d6;
+--accent:#adc6ff;
+--accent-2:#4d8eff;
+--accent-soft:#1e2d4a;
+--line:rgba(66,71,84,.5);
+--green:#4edea3;
+--amber:#ffb95f;
+--red:#ffb4ab;
 }
 body{background:var(--app-bg)!important;color:var(--ink);}
 }
@@ -113,5 +115,8 @@ nav button.active{color:var(--accent);background:var(--accent-soft);}
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:9999px;}
+
+.vault-gradient { background: linear-gradient(135deg, #adc6ff 0%, #4d8eff 100%); }
+body { font-family: 'Inter', system-ui, sans-serif; }
 
 </style>
