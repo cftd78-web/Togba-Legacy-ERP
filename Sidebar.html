@@ -1,1 +1,73 @@
-<!-- sidebar placeholder -->
+<aside id="sidebar">
+  <!-- Brand row -->
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon">
+      <span class="material-icons-round" style="font-size:18px">account_balance</span>
+    </div>
+    <div class="sidebar-brand-text">
+      <div class="sidebar-brand-name">Togba Legacy</div>
+      <div class="sidebar-brand-sub">The Sovereign Vault</div>
+    </div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+      <span id="sidebar-toggle-icon" class="material-icons-round" style="font-size:14px">chevron_left</span>
+    </button>
+  </div>
+  <!-- Nav -->
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Overview</div>
+    <button data-page="home" data-tip="Dashboard" onclick="showPage('home')" class="sidebar-item">
+      <span class="material-icons-round" style="font-size:20px;flex-shrink:0">home</span>
+      <span class="sidebar-label">Dashboard</span>
+    </button>
+    <button data-page="family" data-tip="Family Registry" onclick="showPage('family')" class="sidebar-item">
+      <span class="material-icons-round" style="font-size:20px;flex-shrink:0">account_tree</span>
+      <span class="sidebar-label">Family Registry</span>
+    </button>
+    <div class="sidebar-section-label">Finance</div>
+    <button data-page="finance" data-tip="Finance" onclick="showPage('finance')" class="sidebar-item">
+      <span class="material-icons-round" style="font-size:20px;flex-shrink:0">account_balance</span>
+      <span class="sidebar-label">Contributions &amp; Finance</span>
+    </button>
+    <div class="sidebar-section-label">Operations</div>
+    <button data-page="projects" data-tip="Projects" onclick="showPage('projects')" class="sidebar-item">
+      <span class="material-icons-round" style="font-size:20px;flex-shrink:0">construction</span>
+      <span class="sidebar-label">Projects</span>
+    </button>
+    <button data-page="voting" data-tip="Governance" onclick="showPage('voting')" class="sidebar-item">
+      <span class="material-icons-round" style="font-size:20px;flex-shrink:0">how_to_vote</span>
+      <span class="sidebar-label">Governance &amp; Voting</span>
+    </button>
+    <button data-page="messages" data-tip="Messaging" onclick="showPage('messages')" class="sidebar-item">
+      <span class="material-icons-round" style="font-size:20px;flex-shrink:0">chat</span>
+      <span class="sidebar-label">Messaging</span>
+    </button>
+    <div class="sidebar-section-label">Legacy</div>
+    <button data-page="timeline" data-tip="Timeline" onclick="showPage('timeline')" class="sidebar-item">
+      <span class="material-icons-round" style="font-size:20px;flex-shrink:0">history</span>
+      <span class="sidebar-label">Timeline</span>
+    </button>
+    <button data-page="documents" data-tip="Document Vault" onclick="showPage('documents')" class="sidebar-item">
+      <span class="material-icons-round" style="font-size:20px;flex-shrink:0">description</span>
+      <span class="sidebar-label">Document Vault</span>
+    </button>
+  </nav>
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <button data-page="sos" data-tip="SOS Emergency" onclick="showPage('sos')" class="sidebar-item sos-item">
+      <span class="material-icons-round" style="font-size:20px;flex-shrink:0">warning</span>
+      <span class="sidebar-label">SOS Emergency</span>
+    </button>
+    <button id="sidebar-nav-admin" data-page="admin" data-tip="Admin" onclick="showPage('admin')" class="sidebar-item hidden">
+      <span class="material-icons-round" style="font-size:20px;flex-shrink:0">security</span>
+      <span class="sidebar-label">Admin</span>
+    </button>
+    <button onclick="cycleTheme()" class="sidebar-item" data-tip="Toggle Theme">
+      <span data-theme-icon class="material-icons-round" style="font-size:20px;flex-shrink:0">brightness_auto</span>
+      <span class="sidebar-label" data-theme-label>Auto</span>
+    </button>
+    <button onclick="resetToLogin('Logged out.')" class="sidebar-item" data-tip="Logout">
+      <span class="material-icons-round" style="font-size:20px;flex-shrink:0">logout</span>
+      <span class="sidebar-label">Logout</span>
+    </button>
+  </div>
+</aside>
