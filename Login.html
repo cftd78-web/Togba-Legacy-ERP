@@ -1,43 +1,126 @@
 <!-- LOGIN VIEW -->
 
-<div id="view-login" class="relative min-h-screen overflow-hidden bg-[#0b1326] px-6 py-10 text-[#dae2fd]">
-  <div class="pointer-events-none absolute inset-0">
-    <div class="absolute -top-40 -left-32 h-96 w-96 rounded-full bg-[radial-gradient(circle,rgba(77,142,255,0.22)_0%,rgba(11,19,38,0)_72%)]"></div>
-    <div class="absolute -bottom-44 -right-24 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(173,198,255,0.16)_0%,rgba(11,19,38,0)_70%)]"></div>
-  </div>
+<style>
+  #view-login.login-shell-polish{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--app-bg);
+    color:var(--ink);
+    padding:1.5rem 1rem;
+  }
+  .login-stage{
+    width:100%;
+    max-width:440px;
+    text-align:center;
+  }
+  .login-lock-badge{
+    width:72px;
+    height:72px;
+    margin:0 auto 1rem;
+    border-radius:9999px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--panel-alt);
+    border:1px solid var(--line);
+  }
+  .login-lock-badge .material-icons-round{
+    font-size:2rem;
+    color:var(--accent);
+  }
+  .login-brand-title{
+    margin:0;
+    font-size:1.75rem;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-.02em;
+  }
+  .login-brand-sub{
+    margin:.25rem 0 1.25rem;
+    font-size:.7rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.16em;
+    color:var(--muted);
+  }
+  .login-card{
+    text-align:left;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:1rem;
+    padding:1rem;
+    box-shadow:0 10px 28px color-mix(in srgb,var(--ink) 12%,transparent);
+  }
+  .login-label{
+    display:block;
+    margin:0 0 .4rem;
+    font-size:.72rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+  }
+  .login-note{
+    margin:0 0 .75rem;
+    border:1px solid var(--line);
+    background:var(--panel-alt);
+    border-radius:.7rem;
+    padding:.6rem .7rem;
+    font-size:.8rem;
+    color:var(--muted);
+  }
+  .login-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+  .login-theme-toggle-wrap{text-align:center;margin-top:.8rem;}
+  .login-theme-toggle{
+    border:none;
+    background:none;
+    color:var(--muted);
+    font-size:.82rem;
+    font-weight:600;
+    cursor:pointer;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .login-theme-toggle:hover{color:var(--ink);}
+</style>
 
-  <div class="pointer-events-none absolute left-6 top-6 h-10 w-10 border-l border-t border-[rgba(173,198,255,0.2)]"></div>
-  <div class="pointer-events-none absolute bottom-6 right-6 h-10 w-10 border-b border-r border-[rgba(173,198,255,0.2)]"></div>
+<div id="view-login" class="login-shell-polish">
+  <div class="login-stage">
+    <div class="login-lock-badge">
+      <span class="material-icons-round">lock</span>
+    </div>
 
-  <div class="relative z-10 mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-md items-center justify-center">
-    <div class="w-full">
-      <div class="mb-6 text-center">
-        <div class="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full border border-[rgba(173,198,255,0.3)] bg-[rgba(19,27,46,0.75)]">
-          <span class="material-icons-round text-3xl text-[#adc6ff]">lock</span>
-        </div>
-        <h1 class="text-3xl font-bold tracking-tight text-[#dae2fd]">Togba Legacy</h1>
-        <p class="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#c2c6d6]">The Sovereign Vault</p>
+    <h1 class="login-brand-title">Togba Legacy</h1>
+    <p class="login-brand-sub">The Sovereign Vault</p>
+
+    <div class="login-card">
+      <div id="dev-bypass-banner" class="hidden state-box" style="margin-bottom:.65rem;"></div>
+      <div id="login-state-message" class="hidden state-box" style="margin-bottom:.65rem;"></div>
+
+      <div id="step-1">
+        <label class="login-label" for="email">Registry Email</label>
+        <input id="email" type="email" placeholder="name@family-office.com" autocomplete="email" style="width:100%;margin-bottom:.75rem;background:var(--panel-alt);color:var(--ink);border:1px solid var(--line);border-radius:.75rem;padding:.8rem .9rem;">
+        <button id="btn-get-code" onclick="handleOTP()" class="btn-primary" style="width:100%;padding:.8rem .9rem;">Send One-Time Code</button>
       </div>
 
-      <div class="rounded-2xl border border-[rgba(66,71,84,0.2)] bg-[rgba(19,27,46,0.7)] p-8 shadow-2xl backdrop-blur-[16px]">
-        <div id="dev-bypass-banner" class="hidden mb-3 rounded-xl border border-[rgba(173,198,255,0.35)] bg-[rgba(173,198,255,0.09)] px-3 py-2 text-xs text-[#dae2fd]"></div>
-        <div id="login-state-message" class="hidden mb-3 rounded-xl border border-[rgba(173,198,255,0.35)] bg-[rgba(173,198,255,0.09)] px-3 py-2 text-xs text-[#dae2fd]"></div>
-
-        <div id="step-1">
-          <label class="mb-2 ml-1 block text-xs font-semibold uppercase tracking-wider text-[#c2c6d6]">Registry Email</label>
-          <input id="email" type="email" placeholder="name@family-office.com" class="mb-4 w-full rounded-xl border-0 bg-[#2d3449] p-4 text-[#dae2fd] placeholder:text-[#9ea6c0] focus:outline-none focus:ring-2 focus:ring-[#adc6ff]/40">
-          <button id="btn-get-code" onclick="handleOTP()" class="vault-gradient w-full rounded-xl p-4 font-bold text-[#00285d]">Send One-Time Code</button>
-        </div>
-
-        <div id="step-2" class="hidden">
-          <div class="mb-3 rounded-xl border border-[rgba(66,71,84,0.4)] bg-[rgba(45,52,73,0.55)] p-3 text-xs text-[#c2c6d6]">Enter the 6-digit code sent to your email. This code expires quickly for security.</div>
-          <input id="otp" type="text" placeholder="000000" maxlength="6" class="mb-3 w-full rounded-xl border-0 bg-[#2d3449] p-4 text-center font-mono tracking-[0.25em] text-[#dae2fd] placeholder:text-[#9ea6c0] focus:outline-none focus:ring-2 focus:ring-[#adc6ff]/40">
-          <div class="grid grid-cols-2 gap-2">
-            <button id="btn-verify" onclick="handleVerify()" class="vault-gradient rounded-xl p-4 font-bold text-[#00285d]">Verify</button>
-            <button onclick="resetToStepOne()" class="rounded-xl bg-[#2d3449] p-4 font-bold text-[#dae2fd]">Back</button>
-          </div>
+      <div id="step-2" class="hidden">
+        <div class="login-note">Enter the one-time code sent to your email.</div>
+        <label class="login-label" for="otp">One-Time Passcode</label>
+        <input id="otp" type="text" placeholder="Enter your code" autocomplete="one-time-code" style="width:100%;margin-bottom:.75rem;background:var(--panel-alt);color:var(--ink);border:1px solid var(--line);border-radius:.75rem;padding:.8rem .9rem;">
+        <div class="login-grid-2">
+          <button id="btn-verify" onclick="handleVerify()" class="btn-primary" style="padding:.8rem .9rem;">Verify</button>
+          <button onclick="resetToStepOne()" class="btn-secondary" style="padding:.8rem .9rem;">Back</button>
         </div>
       </div>
+    </div>
+
+    <div class="login-theme-toggle-wrap">
+      <button class="login-theme-toggle" onclick="cycleTheme()">
+        <span data-theme-icon>☼</span>
+        <span data-theme-label>Theme</span>
+      </button>
     </div>
   </div>
 </div>
