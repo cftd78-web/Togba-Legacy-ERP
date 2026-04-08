@@ -1,4 +1,4 @@
-<nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 p-2 sm:p-3 flex justify-around gap-1 overflow-x-auto" style="background:rgba(11,19,38,.96);backdrop-filter:blur(12px);border-top:1px solid rgba(66,71,84,.3);">
+<nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 p-2 sm:p-3 flex justify-around gap-1 overflow-x-auto">
 
 <button onclick="showPage('home')" class="active">
 <span class="material-icons-round">home</span>
@@ -20,14 +20,13 @@ Projects
 Messages
 </button>
 
-
 <button onclick="showPage('documents')">
 <span class="material-icons-round">description</span>
 Docs
 </button>
 
-<button onclick="showPage('sos')">
-<span class="material-icons-round text-red-600">warning</span>
+<button onclick="showPage('sos')" class="sos-btn">
+<span class="material-icons-round">warning</span>
 SOS
 </button>
 
