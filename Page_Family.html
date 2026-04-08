@@ -1,9 +1,9 @@
 <div id="page-family" class="page">
-<div class="flex items-center justify-between mb-4">
-<h2 class="text-2xl font-bold">Family Data & Tree</h2>
-<button onclick="loadFamilyData()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+<div class="page-header">
+<h2 class="page-heading">Family Data & Tree</h2>
+<button onclick="loadFamilyData()" class="btn-refresh">Refresh</button>
 </div>
-<div id="family-error" class="hidden text-sm text-red-600 mb-3"></div>
+<div id="family-error" class="hidden err-box mb-3"></div>
 <div class="grid gap-4 lg:grid-cols-3">
 <div class="lg:col-span-1" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
 <h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Add / Update Member</h3>
@@ -15,23 +15,23 @@
 <input id="family-father" class="p-2 rounded-lg border" placeholder="FatherID" />
 <input id="family-mother" class="p-2 rounded-lg border" placeholder="MotherID" />
 <input id="family-spouse" class="p-2 rounded-lg border" placeholder="SpouseFullNameOptional" />
-<button onclick="saveFamilyMember()" class="bg-blue-600 text-white p-2 rounded-lg">Save</button>
+<button onclick="saveFamilyMember()" class="btn-primary">Save</button>
 </div>
-<div class="mt-5 border-t border-slate-200 pt-4">
-<h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Member Photo</h4>
+<div class="mt-5 border-t pt-4" style="border-color:var(--line);">
+<h4 class="section-label mb-2">Member Photo</h4>
 <div class="grid gap-2">
 <input id="family-photo-person-id" class="p-2 rounded-lg border" placeholder="PersonID (required)" />
 <input id="family-photo-file" type="file" accept="image/*" class="p-2 rounded-lg border" />
 <input id="family-photo-url" class="p-2 rounded-lg border" placeholder="Or paste PhotoFileURL" />
 <input id="family-photo-type" class="p-2 rounded-lg border" placeholder="PhotoType (default: profile)" />
-<button onclick="saveFamilyPhoto()" class="bg-slate-800 text-white p-2 rounded-lg">Save Photo</button>
+<button onclick="saveFamilyPhoto()" class="btn-secondary">Save Photo</button>
 </div>
-<p class="text-xs text-slate-500 mt-2">Photos are stored in the existing Photos sheet and displayed on family cards.</p>
+<p class="text-xs mt-2" style="color:var(--muted);">Photos are stored in the existing Photos sheet and displayed on family cards.</p>
 </div>
 </div>
 <div class="lg:col-span-2" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;padding:1rem;">
 <h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Family Tree View</h3>
-<div class="text-xs text-slate-500 mb-3">Patriarch/root is highlighted at the top. Ancestor and descendant placeholders keep lineage lanes visually clear even when links are missing.</div>
+<div class="text-xs mb-3" style="color:var(--muted);">Patriarch/root is highlighted at the top. Ancestor and descendant placeholders keep lineage lanes visually clear even when links are missing.</div>
 <div id="family-tree" class="space-y-2"></div>
 </div>
 </div>
