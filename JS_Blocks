@@ -1,0 +1,500 @@
+<script>
+(function(){
+  function guardedServerCall(builder, onSuccess, onFailure){
+    try{
+      return builder()
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(function(err){
+        if(typeof onFailure === "function"){ onFailure(err); return; }
+        if(typeof onServerFailure === "function"){ onServerFailure(err); return; }
+        alert((err && err.message) || "Request failed.");
+      });
+    }catch(err){
+      if(typeof onFailure === "function"){ onFailure(err); return; }
+      if(typeof onServerFailure === "function"){ onServerFailure(err); return; }
+      alert((err && err.message) || "Request failed.");
+      return null;
+    }
+  }
+
+  function renderMessageModuleStats(stats){
+    const panel = document.querySelector("#page-messages .mail-panel .mail-section-title");
+    if(!panel) return;
+    const hostId = "messages-module-stats";
+    let host = document.getElementById(hostId);
+    if(!host){
+      host = document.createElement("div");
+      host.id = hostId;
+      host.className = "grid gap-2 mb-3";
+      panel.parentElement.insertBefore(host, panel.nextSibling);
+    }
+    host.innerHTML = [
+      `<div class="module-stat"><span>Joined Channels</span><strong>${Number(stats.joinedChannels || 0)}</strong></div>`,
+      `<div class="module-stat"><span>Recent Messages</span><strong>${Number(stats.recentMessageCount || 0)}</strong></div>`
+    ].join("");
+  }
+
+  function renderPhaseSummary(pageId, cards){
+    const page = document.getElementById(pageId);
+    if(!page){ return; }
+    const hostId = pageId + "-summary";
+    let host = document.getElementById(hostId);
+    if(!host){
+      host = document.createElement("div");
+      host.id = hostId;
+      host.className = "phase-module-summary";
+      const header = page.querySelector(".flex.items-center.justify-between");
+      if(header && header.parentElement){
+        header.parentElement.insertBefore(host, header.nextSibling);
+      }else{
+        page.prepend(host);
+      }
+    }
+    host.innerHTML = (cards || []).map(function(card){
+      return `<div class="phase-summary-card"><div class="label">${card.label || ""}</div><div class="value">${card.value || "0"}</div></div>`;
+    }).join("");
+  }
+
+  window.loadHomeEssentials = function(forceReload){
+    if(window.homeLoaded && !forceReload){ return; }
+    window.homeLoaded = true;
+    setHomeError("");
+    setHomeStatus("Loading priority modules...");
+    document.getElementById("home-system-status").innerText = "Syncing dashboard modules...";
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(bundle){
+        const data = bundle && bundle.home ? bundle.home : {};
+        renderHomeFinanceSummary(data.finance || {});
+        renderHomeProjectSnapshot(data.projects || {});
+        renderHomeVoteSnapshot(data.voting || {});
+        renderHomeTimelineSnapshot(data.timeline || {});
+        document.getElementById("home-system-status").innerText = "Connected and current as of this session.";
+        setHomeStatus("Dashboard loaded.");
+      },
+      function(err){
+        window.homeLoaded = false;
+        setHomeError((err && err.message) || "Unable to load home dashboard.");
+        setHomeStatus("Dashboard unavailable. Retry from Home.");
+      }
+    ).getPriorityModuleBundle(token);
+  };
+
+  window.loadFinanceDashboard = function(){
+    setFinanceError("");
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(bundle){
+        const payload = bundle && bundle.finance ? bundle.finance : {};
+        financeLoaded = true;
+        renderFinanceDashboard(payload);
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        financeLoaded = false;
+        setFinanceError((err && err.message) || "Unable to load finance dashboard.");
+      }
+    ).getPriorityModuleBundle(token);
+  };
+
+  window.loadAdmin = function(){
+    adminLoaded = false;
+    setAdminError("");
+    setAdminStatus("Loading admin dashboard...");
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(bundle){
+        const admin = bundle && bundle.admin ? bundle.admin : null;
+        if(!admin){
+          setAdminError("Admin dashboard is available for Admin role only.");
+          setAdminStatus("");
+          return;
+        }
+        renderAdminUserList([]);
+        document.getElementById("admin-stat-users").innerText = Number(admin.dashboard && admin.dashboard.userOverview ? admin.dashboard.userOverview.totalUsers : 0);
+        document.getElementById("admin-stat-admins").innerText = Number(admin.dashboard && admin.dashboard.userOverview ? admin.dashboard.userOverview.adminUsers : 0);
+        document.getElementById("admin-stat-settings").innerText = Number(admin.dashboard && admin.dashboard.settingsOverview ? admin.dashboard.settingsOverview.totalEntries : 0);
+        document.getElementById("admin-stat-issues").innerText = Number(admin.health && admin.health.issueCount ? admin.health.issueCount : 0);
+        renderSettingsSummary(admin.settings || {entries:[]});
+        renderInstitutionSettingsSummary(admin.institution || {entries:[]});
+        renderSystemHealth(admin.health || {healthy:false, issueCount:0, issues:[]});
+        adminLoaded = true;
+        setAdminStatus("Admin dashboard loaded.");
+        google.script.run.withSuccessHandler(function(users){ renderAdminUserList(Array.isArray(users) ? users : []); }).withFailureHandler(function(err){ setAdminError((err&&err.message)||"Unable to load Access registry."); }).adminGetAllUsers(token);
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        adminLoaded = false;
+        setAdminError((err && err.message) || "Unable to load admin dashboard summary.");
+        setAdminStatus("");
+      }
+    ).getPriorityModuleBundle(token);
+  };
+
+  window.loadUserChannels = function(){
+    setMessageError("");
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(bundle){
+        const messages = bundle && bundle.messages ? bundle.messages : {};
+        userChannels = Array.isArray(messages.channels) ? messages.channels : [];
+        channelDirectory = messages.directory && Array.isArray(messages.directory.channels) ? messages.directory.channels : [];
+        renderChannelDirectory();
+        renderMessageModuleStats(messages.stats || {});
+        renderChannelList();
+        if(!userChannels.length){
+          selectedChannelID = "";
+          renderMessageHistory([]);
+          document.getElementById("message-channel-title").innerText = "No channels available";
+          setMessageError("You are not a member of any active channel.");
+        }else{
+          if(!selectedChannelID || !userChannels.some(c=>c.ChannelID===selectedChannelID)){
+            selectedChannelID = userChannels[0].ChannelID;
+          }
+          refreshMessages();
+        }
+        loadMessagingRecipients();
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        setMessageError((err && err.message) || "Unable to load channels.");
+      }
+    ).getPriorityModuleBundle(token);
+  };
+
+  window.loadProjects = function(){
+    setProjectError("");
+    setProjectStatus("");
+    const list = document.getElementById("project-list");
+    if(!projectsLoaded && list){
+      list.innerHTML = "<div class='text-sm text-slate-500'>Loading projects...</div>";
+    }
+
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(res){
+        const projects = res && res.projects ? res.projects : {};
+        const summary = projects.summary || {};
+        projectsLoaded = true;
+        projectPermissions = {
+          canCreateProject: !!(projects.permissions && projects.permissions.canCreateProject),
+          canEditTask: !!(projects.permissions && projects.permissions.canEditTask)
+        };
+        projectsCache = Array.isArray(projects.projects) ? projects.projects : [];
+        if(!selectedProjectID || !projectsCache.some(function(p){ return p.ProjectID===selectedProjectID; })){
+          selectedProjectID = projectsCache.length ? projectsCache[0].ProjectID : "";
+        }
+        renderPhaseSummary("page-projects", [
+          {label:"Projects", value:String(Number(summary.projectCount || projectsCache.length || 0))},
+          {label:"Tasks", value:String(Number(summary.totalTasks || 0))},
+          {label:"Assigned", value:String(Number(summary.assignedTasks || 0))},
+          {label:"Avg Progress", value:formatPercent(summary.averageProgress || 0)},
+          {label:"At Risk", value:String(Number(summary.atRiskProjects || 0))},
+          {label:"Goal Budget", value:formatCurrency(summary.totalGoalUSD || 0)}
+        ]);
+        renderProjects();
+        if(selectedProjectID){
+          loadProjectTasks(selectedProjectID);
+          loadProjectUpdates(selectedProjectID);
+        }else{
+          renderProjectDetail(null);
+          renderProjectTasks([]);
+          renderProjectUpdates([]);
+        }
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        setProjectError((err && err.message) || "Unable to load projects.");
+        renderProjects();
+      }
+    ).getProjectsVotingTimelineBundle(token, "projects");
+  };
+
+  window.loadVotes = function(){
+    setVoteError("");
+    const list = document.getElementById("vote-list");
+    if(!voteDataLoaded && list){
+      list.innerHTML = "<div class='text-sm text-slate-500'>Loading votes...</div>";
+    }
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(res){
+        const voting = res && res.voting ? res.voting : {};
+        const summary = voting.summary || {};
+        voteDataLoaded = true;
+        votePermissions = {
+          canCreateVote: !!voting.canCreateVote,
+          canCastBallot: !!voting.canCastBallot
+        };
+        renderPhaseSummary("page-voting", [
+          {label:"Total Proposals", value:String(Number(summary.totalVotes || 0))},
+          {label:"Open", value:String(Number(summary.open || 0))},
+          {label:"Passed", value:String(Number(summary.passed || 0))},
+          {label:"Ballots", value:String(Number(summary.totalBallots || 0))},
+          {label:"Eligible Voters", value:String(Number(summary.eligibleVoters || 0))},
+          {label:"Avg Participation", value:formatPercent(summary.avgParticipationPct || 0)}
+        ]);
+        renderVotes(Array.isArray(voting.votes) ? voting.votes : []);
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        setVoteError((err && err.message) || "Unable to load votes.");
+        if(!voteDataLoaded){ renderVotes([]); }
+      }
+    ).getProjectsVotingTimelineBundle(token, "voting");
+  };
+
+  window.loadTimelineData = function(){
+    setTimelineError("");
+    if(!timelineLoaded){
+      document.getElementById("timeline-list").innerHTML = "<div class='text-sm text-slate-500'>Loading timeline...</div>";
+      document.getElementById("timeline-history").innerHTML = "<div class='text-sm text-slate-500'>Loading history...</div>";
+      document.getElementById("timeline-upcoming").innerHTML = "<div class='text-sm text-slate-500'>Loading upcoming events...</div>";
+    }
+    guardedServerCall(
+      function(){ return google.script.run; },
+      function(res){
+        const timeline = res && res.timeline ? res.timeline : {};
+        const summary = timeline.summary || {};
+        timelineLoaded = true;
+        renderPhaseSummary("page-timeline", [
+          {label:"Historical", value:String(Number(summary.historicalCount || 0))},
+          {label:"Upcoming", value:String(Number(summary.upcomingCount || 0))},
+          {label:"Latest History", value:formatDate(summary.latestHistoricalDate)},
+          {label:"Next Event", value:formatDate(summary.nextUpcomingDate)},
+          {label:"Next 30 Days", value:String(Number(summary.upcomingNext30Days || 0))}
+        ]);
+        renderTimelineList(timeline.timeline || []);
+        renderHistoryList(timeline.historical || []);
+        renderUpcomingList(timeline.upcoming || []);
+        renderTimelineCalendar(timeline.calendar || {});
+      },
+      function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        setTimelineError((err && err.message) || "Unable to load timeline data.");
+        if(!timelineLoaded){
+          renderTimelineList([]);
+          renderHistoryList([]);
+          renderUpcomingList([]);
+        }
+      }
+    ).getProjectsVotingTimelineBundle(token, "timeline");
+  };
+})();
+</script>
+<script>
+(function(){
+  function pct(value){
+    return Math.max(0, Math.min(100, Number(value || 0)));
+  }
+
+  window.renderProjects = function(){
+    const list = document.getElementById("project-list");
+    const createPanel = document.getElementById("project-create-panel");
+    if(!list || !createPanel){ return; }
+    (projectPermissions.canCreateProject ? createPanel.classList.remove("hidden") : createPanel.classList.add("hidden"));
+
+    if(!projectsCache.length){
+      list.innerHTML = "<div class='ptv-shell p-4 text-sm text-slate-500'>No projects found.</div>";
+      renderProjectDetail(null);
+      return;
+    }
+
+    list.innerHTML = projectsCache.map(function(project){
+      const selected = project.ProjectID===selectedProjectID;
+      const progress = pct(project.ProgressPercent);
+      const status = String(project.Status || "Planning");
+      const statusTone = /blocked|stalled|risk/i.test(status) ? "bg-rose-50 text-rose-700 border border-rose-200" : /done|completed/i.test(status) ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-blue-50 text-blue-700 border border-blue-200";
+      return `
+      <button onclick="selectProject('${escapeHtml(project.ProjectID)}')" class="w-full text-left ptv-shell p-4 transition ${selected ? "ring-2 ring-blue-300" : "hover:shadow-lg"}">
+        <div class="flex items-start gap-3">
+          <div class="h-16 w-16 shrink-0 rounded-xl border border-slate-200 bg-slate-100 overflow-hidden">
+            ${project.ImageURL ? `<img src="${escapeHtml(project.ImageURL)}" alt="Project thumbnail" class="h-full w-full object-cover"/>` : `<div class="h-full w-full flex items-center justify-center text-[10px] text-slate-500 px-1 text-center">No Image</div>`}
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center justify-between gap-2">
+              <div class="text-xs text-slate-500">${escapeHtml(project.ProjectID || "")}</div>
+              <div class="ptv-pill ${statusTone}">${escapeHtml(status)}</div>
+            </div>
+            <div class="font-semibold text-slate-900 mt-1 truncate">${escapeHtml(project.Title || "Untitled project")}</div>
+            <div class="text-xs text-slate-600 mt-1 line-clamp-2">${escapeHtml(project.Description || "No description provided.")}</div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <div class="flex justify-between text-xs text-slate-500 mb-1"><span>Progress</span><span>${formatPercent(progress)}</span></div>
+          <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="h-full bg-gradient-to-r from-blue-500 to-indigo-600" style="width:${progress}%"></div></div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mt-3">
+          <div class="ptv-metric"><div class="text-[10px] uppercase text-slate-500">Tasks</div><div class="font-bold text-slate-800">${Number(project.TaskCount || 0)}</div></div>
+          <div class="ptv-metric"><div class="text-[10px] uppercase text-slate-500">Assigned</div><div class="font-bold text-slate-800">${Number(project.AssignedTaskCount || 0)}</div></div>
+          <div class="ptv-metric"><div class="text-[10px] uppercase text-slate-500">Goal</div><div class="font-bold text-slate-800 text-xs">${formatCurrency(project.GoalUSD || 0)}</div></div>
+        </div>
+      </button>`;
+    }).join("");
+
+    const selected = projectsCache.find(function(p){ return p.ProjectID===selectedProjectID; });
+    renderProjectDetail(selected || null);
+  };
+
+  window.renderVotes = function(votes){
+    const list = document.getElementById("vote-list");
+    const createPanel = document.getElementById("vote-create-panel");
+    if(!list || !createPanel){ return; }
+    (votePermissions.canCreateVote ? createPanel.classList.remove("hidden") : createPanel.classList.add("hidden"));
+    if(!votes || !votes.length){
+      list.innerHTML = "<div class='ptv-shell p-4 text-sm text-slate-500'>No votes found.</div>";
+      return;
+    }
+    renderVoteChart(votes);
+    list.innerHTML = votes.map(function(v){
+      const isOpen = String(v.Status || "").toLowerCase() === "open";
+      const canCast = votePermissions.canCastBallot && isOpen && !v.hasUserVoted;
+      const total = Number(v.totalBallots||0) || 1;
+      const yesPct = Math.round((Number(v.yesCount||0) / total) * 100);
+      const noPct = Math.round((Number(v.noCount||0) / total) * 100);
+      const abstainPct = Math.max(0, 100 - yesPct - noPct);
+      return `<div class="ptv-shell p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <div class="text-xs text-slate-500 uppercase">${escapeHtml(v.VoteID || "")}</div>
+            <div class="font-semibold text-slate-900">${escapeHtml(v.Title || "Untitled vote")}</div>
+            ${v.Description ? `<div class="text-sm text-slate-700 mt-2 whitespace-pre-wrap">${escapeHtml(v.Description)}</div>` : ""}
+          </div>
+          <div class="ptv-pill ${v.thresholdPassed ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200"}">${v.thresholdPassed ? "Passed" : "Pending"}</div>
+        </div>
+        ${v.ImageURL ? `<img src="${escapeHtml(v.ImageURL)}" class="mt-3 h-32 w-full object-cover rounded-xl border border-slate-200"/>` : ""}
+        <div class="mt-3">
+          <div class="h-2 rounded-full overflow-hidden bg-slate-100 flex">
+            <div class="bg-emerald-500" style="width:${yesPct}%"></div>
+            <div class="bg-rose-500" style="width:${noPct}%"></div>
+            <div class="bg-slate-400" style="width:${abstainPct}%"></div>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs mt-2">
+            <div class="ptv-metric"><div class="text-slate-500">Ballots</div><div class="font-bold">${Number(v.totalBallots||0)}</div></div>
+            <div class="ptv-metric"><div class="text-slate-500">Yes</div><div class="font-bold">${Number(v.yesCount||0)}</div></div>
+            <div class="ptv-metric"><div class="text-slate-500">No</div><div class="font-bold">${Number(v.noCount||0)}</div></div>
+            <div class="ptv-metric"><div class="text-slate-500">Abstain</div><div class="font-bold">${Number(v.abstainCount||0)}</div></div>
+            <div class="ptv-metric"><div class="text-slate-500">Your ballot</div><div class="font-bold">${v.hasUserVoted ? "Submitted" : "Pending"}</div></div>
+          </div>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2 items-center">
+          <select id="choice-${escapeHtml(v.VoteID)}" class="p-2 rounded-lg border border-slate-200 text-sm bg-white" ${canCast ? "" : "disabled"}>
+            <option value="Yes">Yes</option><option value="No">No</option><option value="Abstain">Abstain</option>
+          </select>
+          <button onclick="castBallot('${escapeHtml(v.VoteID)}')" class="px-3 py-2 rounded-lg text-sm font-semibold ${canCast ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-500 cursor-not-allowed"}" ${canCast ? "" : "disabled"}>Cast Ballot</button>
+        </div>
+      </div>`;
+    }).join("");
+  };
+
+  window.renderTimelineList = function(items){
+    const container = document.getElementById("timeline-list");
+    if(!container){ return; }
+    if(!items || !items.length){
+      container.innerHTML = "<div class='ptv-shell p-4 text-sm text-slate-500'>No timeline items.</div>";
+      return;
+    }
+    container.innerHTML = items.map(function(item){
+      const isUpcoming = String(item.category||"").toLowerCase()==="upcoming";
+      return `<div class="ptv-shell p-4 ptv-timeline-rail">
+        <span class="ptv-timeline-dot"></span>
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <div class="text-xs text-slate-500">${escapeHtml(formatDate(item.date))}</div>
+          <div class="ptv-pill ${isUpcoming ? "bg-indigo-50 text-indigo-700 border border-indigo-200" : "bg-slate-100 text-slate-700 border border-slate-200"}">${escapeHtml(item.category || "entry")}</div>
+        </div>
+        <div class="font-semibold text-slate-900">${escapeHtml(item.title || "Untitled")}</div>
+        <div class="text-xs text-slate-600 mt-1">${escapeHtml(item.eventType || "")}${item.recurrence ? " • " + escapeHtml(item.recurrence) : ""}</div>
+        ${item.description ? `<div class="text-sm text-slate-700 mt-2 whitespace-pre-wrap">${escapeHtml(item.description)}</div>` : ""}
+      </div>`;
+    }).join("");
+  };
+
+  window.renderHistoryList = function(items){
+    const container = document.getElementById("timeline-history");
+    if(!container){ return; }
+    if(!items || !items.length){
+      container.innerHTML = "<div class='ptv-shell p-4 text-sm text-slate-500'>No historical records found.</div>";
+      return;
+    }
+    container.innerHTML = items.map(function(item){
+      return `<div class="ptv-shell p-4">
+        <div class="text-xs text-slate-500">${escapeHtml(formatDate(item.EventDate))}</div>
+        <div class="font-semibold text-slate-900">${escapeHtml(item.Title || "Untitled")}</div>
+        <div class="text-xs text-slate-600 mt-1">${escapeHtml(item.EventType || "")}</div>
+        ${item.Description ? `<div class="text-sm text-slate-700 mt-2 whitespace-pre-wrap">${escapeHtml(item.Description)}</div>` : ""}
+      </div>`;
+    }).join("");
+  };
+
+  window.renderUpcomingList = function(items){
+    const container = document.getElementById("timeline-upcoming");
+    if(!container){ return; }
+    if(!items || !items.length){
+      container.innerHTML = "<div class='ptv-shell p-4 text-sm text-slate-500'>No upcoming events.</div>";
+      return;
+    }
+    container.innerHTML = items.map(function(item){
+      return `<div class="ptv-shell p-4">
+        <div class="text-xs text-blue-700 font-semibold">Next: ${escapeHtml(formatDate(item.NextOccurrence))}</div>
+        <div class="font-semibold text-slate-900">${escapeHtml(item.Title || "Untitled")}</div>
+        <div class="text-xs text-slate-600 mt-1">${escapeHtml(item.Recurrence || "One-time")}</div>
+        <div class="text-xs text-slate-500 mt-1">Original date: ${escapeHtml(formatDate(item.EventDate))}</div>
+      </div>`;
+    }).join("");
+  };
+
+  const originalLoadProjects = window.loadProjects;
+  window.loadProjects = function(){
+    return originalLoadProjects && originalLoadProjects();
+  };
+})();
+</script>
+<script>
+(function(){
+  function startDefaultAuth(){
+    if(typeof initializeAuthView === "function"){
+      initializeAuthView();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    try{
+      if(typeof getAuthModeConfig !== "function"){
+        startDefaultAuth();
+        return;
+      }
+
+      const authMode = getAuthModeConfig() || {};
+      if(!authMode.developerBypassEnabled || typeof startDeveloperBypassSession !== "function"){
+        startDefaultAuth();
+        return;
+      }
+
+      Promise.resolve(startDeveloperBypassSession())
+      .then(function(result){
+        const bypassToken = result && (result.token || result.sessionToken || result.authToken || result);
+        if(!bypassToken){
+          throw new Error("Developer bypass did not return a token.");
+        }
+
+        try{ window.token = bypassToken; }catch(_e){}
+        try{ token = bypassToken; }catch(_e){}
+
+        const loginView = document.getElementById("view-login");
+        if(loginView){ loginView.classList.add("hidden"); }
+
+        if(typeof initApp === "function"){
+          initApp();
+          return;
+        }
+        throw new Error("initApp is unavailable.");
+      })
+      .catch(function(){
+        startDefaultAuth();
+      });
+    }catch(_err){
+      startDefaultAuth();
+    }
+  });
+})();
+</script>
