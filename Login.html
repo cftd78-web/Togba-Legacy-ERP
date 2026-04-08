@@ -1,28 +1,43 @@
 <!-- LOGIN VIEW -->
 
-<div id="view-login" class="login-shell">
-<div class="login-card">
-<div class="text-center mb-6">
-<div class="inline-flex items-center justify-center mb-3 h-12 w-12 rounded-2xl bg-blue-50 border border-blue-100">
-<span class="material-icons-round text-blue-600">account_balance</span>
-</div>
-<h1 class="text-2xl font-bold">Togba Legacy</h1>
-<p class="text-sm text-slate-500 mt-1">Secure institutional access</p>
-</div>
-<div id="dev-bypass-banner" class="hidden mb-3 text-xs rounded-xl border px-3 py-2"></div>
-<div id="login-state-message" class="hidden mb-3 text-xs rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-blue-700"></div>
-<div id="step-1">
-<label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Registry Email</label>
-<input id="email" type="email" placeholder="name@family-office.com" class="w-full p-4 bg-slate-100 rounded-xl mb-4 border border-transparent focus:border-blue-200 focus:outline-none">
-<button id="btn-get-code" onclick="handleOTP()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold">Send One-Time Code</button>
-</div>
-<div id="step-2" class="hidden">
-<div class="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">Enter the 6-digit code sent to your email. This code expires quickly for security.</div>
-<input id="otp" type="text" placeholder="000000" maxlength="6" class="otp-code w-full p-4 bg-slate-100 rounded-xl mb-3 border border-transparent focus:border-blue-200 focus:outline-none">
-<div class="grid grid-cols-2 gap-2">
-<button id="btn-verify" onclick="handleVerify()" class="bg-blue-600 text-white p-4 rounded-xl font-bold">Verify</button>
-<button onclick="resetToStepOne()" class="bg-slate-200 text-slate-700 p-4 rounded-xl font-bold">Back</button>
-</div>
-</div>
-</div>
+<div id="view-login" class="relative min-h-screen overflow-hidden bg-[#0b1326] px-6 py-10 text-[#dae2fd]">
+  <div class="pointer-events-none absolute inset-0">
+    <div class="absolute -top-40 -left-32 h-96 w-96 rounded-full bg-[radial-gradient(circle,rgba(77,142,255,0.22)_0%,rgba(11,19,38,0)_72%)]"></div>
+    <div class="absolute -bottom-44 -right-24 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(173,198,255,0.16)_0%,rgba(11,19,38,0)_70%)]"></div>
+  </div>
+
+  <div class="pointer-events-none absolute left-6 top-6 h-10 w-10 border-l border-t border-[rgba(173,198,255,0.2)]"></div>
+  <div class="pointer-events-none absolute bottom-6 right-6 h-10 w-10 border-b border-r border-[rgba(173,198,255,0.2)]"></div>
+
+  <div class="relative z-10 mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-md items-center justify-center">
+    <div class="w-full">
+      <div class="mb-6 text-center">
+        <div class="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full border border-[rgba(173,198,255,0.3)] bg-[rgba(19,27,46,0.75)]">
+          <span class="material-icons-round text-3xl text-[#adc6ff]">lock</span>
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight text-[#dae2fd]">Togba Legacy</h1>
+        <p class="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#c2c6d6]">The Sovereign Vault</p>
+      </div>
+
+      <div class="rounded-2xl border border-[rgba(66,71,84,0.2)] bg-[rgba(19,27,46,0.7)] p-8 shadow-2xl backdrop-blur-[16px]">
+        <div id="dev-bypass-banner" class="hidden mb-3 rounded-xl border border-[rgba(173,198,255,0.35)] bg-[rgba(173,198,255,0.09)] px-3 py-2 text-xs text-[#dae2fd]"></div>
+        <div id="login-state-message" class="hidden mb-3 rounded-xl border border-[rgba(173,198,255,0.35)] bg-[rgba(173,198,255,0.09)] px-3 py-2 text-xs text-[#dae2fd]"></div>
+
+        <div id="step-1">
+          <label class="mb-2 ml-1 block text-xs font-semibold uppercase tracking-wider text-[#c2c6d6]">Registry Email</label>
+          <input id="email" type="email" placeholder="name@family-office.com" class="mb-4 w-full rounded-xl border-0 bg-[#2d3449] p-4 text-[#dae2fd] placeholder:text-[#9ea6c0] focus:outline-none focus:ring-2 focus:ring-[#adc6ff]/40">
+          <button id="btn-get-code" onclick="handleOTP()" class="vault-gradient w-full rounded-xl p-4 font-bold text-[#00285d]">Send One-Time Code</button>
+        </div>
+
+        <div id="step-2" class="hidden">
+          <div class="mb-3 rounded-xl border border-[rgba(66,71,84,0.4)] bg-[rgba(45,52,73,0.55)] p-3 text-xs text-[#c2c6d6]">Enter the 6-digit code sent to your email. This code expires quickly for security.</div>
+          <input id="otp" type="text" placeholder="000000" maxlength="6" class="mb-3 w-full rounded-xl border-0 bg-[#2d3449] p-4 text-center font-mono tracking-[0.25em] text-[#dae2fd] placeholder:text-[#9ea6c0] focus:outline-none focus:ring-2 focus:ring-[#adc6ff]/40">
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btn-verify" onclick="handleVerify()" class="vault-gradient rounded-xl p-4 font-bold text-[#00285d]">Verify</button>
+            <button onclick="resetToStepOne()" class="rounded-xl bg-[#2d3449] p-4 font-bold text-[#dae2fd]">Back</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
