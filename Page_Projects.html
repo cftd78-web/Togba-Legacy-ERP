@@ -1,0 +1,80 @@
+<div id="page-projects" class="page">
+
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-2xl font-bold">Projects</h2>
+<button onclick="loadProjects()" class="text-xs px-3 py-2 rounded-lg bg-slate-100">Refresh</button>
+</div>
+
+<div id="project-error" class="hidden text-sm text-red-600 mb-3"></div>
+<div id="project-status" class="hidden text-sm text-blue-700 mb-3"></div>
+
+<div class="grid gap-4 lg:grid-cols-3">
+<div class="lg:col-span-1" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Project List</h3>
+<div id="project-list" class="space-y-2"></div>
+</div>
+
+<div class="lg:col-span-2" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
+<div id="project-detail" class="space-y-3"></div>
+</div>
+
+<div id="project-create-panel" class="hidden lg:col-span-3" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Create Project</h3>
+<div class="grid gap-3 md:grid-cols-4">
+<input id="project-create-title" type="text" placeholder="Project title" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+<input id="project-create-goal" type="number" min="0" step="0.01" placeholder="Goal USD" class="p-3 rounded-xl border border-slate-200" />
+<input id="project-create-description" type="text" placeholder="Project description (optional)" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+<input id="project-create-image" type="url" placeholder="Project image URL (optional)" class="p-3 rounded-xl border border-slate-200" />
+<select id="project-create-status" class="p-3 rounded-xl border border-slate-200">
+<option value="Planning">Planning</option>
+<option value="In Progress">In Progress</option>
+<option value="On Hold">On Hold</option>
+<option value="Completed">Completed</option>
+</select>
+</div>
+<button id="btn-create-project" onclick="createProjectRecord()" class="mt-3 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">Create Project</button>
+</div>
+
+<div class="lg:col-span-3" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
+<div class="flex items-center justify-between mb-3">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Task List</h3>
+<span id="project-task-summary" class="text-xs text-slate-500">Select a project</span>
+</div>
+<div id="task-create-panel" class="hidden grid gap-3 md:grid-cols-5 mb-4">
+<input id="task-project-id" type="text" readonly class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" />
+<select id="task-create-status" class="p-3 rounded-xl border border-slate-200">
+<option value="Pending">Pending</option>
+<option value="In Progress">In Progress</option>
+<option value="Blocked">Blocked</option>
+<option value="Done">Done</option>
+</select>
+<select id="task-create-priority" class="p-3 rounded-xl border border-slate-200">
+<option value="High">High</option>
+<option value="Medium" selected>Medium</option>
+<option value="Low">Low</option>
+</select>
+<input id="task-create-percent" type="number" min="0" max="100" placeholder="% complete" class="p-3 rounded-xl border border-slate-200" />
+<input id="task-create-title" type="text" placeholder="Task title" class="p-3 rounded-xl border border-slate-200" />
+<select id="task-create-assignee-type" class="p-3 rounded-xl border border-slate-200"><option value="">Assignee Type</option><option value="internal">internal</option><option value="external">external</option></select>
+<input id="task-create-assignee" type="text" placeholder="Assignee name/email" class="p-3 rounded-xl border border-slate-200" />
+<button id="btn-create-task" onclick="createTaskRecord()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Add Task</button>
+</div>
+<div id="project-task-list" class="space-y-3"></div>
+</div>
+
+<div class="lg:col-span-3" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.75rem;padding:1.25rem;">
+<div class="flex items-center justify-between mb-3">
+<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Update History</h3>
+<span id="project-update-summary" class="text-xs text-slate-500">Select a project</span>
+</div>
+<div id="project-update-form" class="hidden grid gap-3 md:grid-cols-5 mb-4">
+<input id="project-update-project-id" type="text" readonly class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" />
+<input id="project-update-task-id" type="text" placeholder="TaskID (optional)" class="p-3 rounded-xl border border-slate-200" />
+<input id="project-update-text" type="text" placeholder="Update details" class="md:col-span-2 p-3 rounded-xl border border-slate-200" />
+<button id="btn-save-project-update" onclick="saveProjectUpdate()" class="bg-blue-600 text-white p-3 rounded-xl font-bold">Add Update</button>
+</div>
+<div id="project-update-list" class="space-y-2"></div>
+</div>
+</div>
+
+</div>
