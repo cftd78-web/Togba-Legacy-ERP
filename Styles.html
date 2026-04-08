@@ -129,6 +129,15 @@ nav button.active{color:var(--accent);background:var(--accent-soft);}
 @keyframes ribbon-scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
 .vault-gradient { background: linear-gradient(135deg, #adc6ff 0%, #4d8eff 100%); }
+
+.vault-folder-card { background:var(--panel);border-radius:.75rem;padding:1.5rem;
+  display:flex;flex-direction:column;cursor:pointer;transition:background .2s;
+  border:1px solid rgba(66,71,84,.1); }
+.vault-folder-card:hover { background:var(--panel-high); }
+.vault-folder-card:hover .vault-folder-arrow { opacity:1 !important; }
+.vault-folder-icon { width:52px;height:52px;border-radius:.75rem;
+  display:flex;align-items:center;justify-content:center; }
+.vault-folder-arrow { opacity:0;transition:opacity .2s; }
 body { font-family: 'Inter', system-ui, sans-serif; }
 
 </style>

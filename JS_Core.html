@@ -208,6 +208,7 @@ window.showPage = function(pageId){
   if(pageId==="sos"      && !sosLoaded)                               loadSOSAlerts();
   if(pageId==="family"   && !familyLoaded)                            loadFamilyData();
   if(pageId==="admin"    && !adminLoaded)                             loadAdmin();
+  if(pageId==="documents") { /* no load needed — static UI */ }
 };
 
 function _updateBottomNav(pageId){
