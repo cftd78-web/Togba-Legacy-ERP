@@ -208,6 +208,7 @@ window.showPage = function(pageId){
   else if(pageId==="messages" && selectedChannelID)                   refreshMessages();
   if(pageId==="voting"   && !voteDataLoaded)                          loadVotes();
   if(pageId==="timeline" && !timelineLoaded)                          loadTimelineData();
+  if(window._gcalId && typeof window._renderCalendarEmbed==="function") window._renderCalendarEmbed(window._gcalId);
   if(pageId==="sos"      && !sosLoaded)                               loadSOSAlerts();
   if(pageId==="family"   && !familyLoaded)                            loadFamilyData();
   if(pageId==="admin"    && !adminLoaded)                             loadAdmin();
@@ -615,8 +616,14 @@ window.renderSettingsSummary = function(settings){
 };
 
 window.renderInstitutionSettingsSummary = function(settings){
+  var entries = Array.isArray(settings && settings.entries) ? settings.entries : [];
+  entries.forEach(function(e){
+    var k = String(e.key||e.Key||"").toLowerCase().replace(/[_\- ]/g,"");
+    if(k==="googlecalendarid"||k==="calendarid"||k==="gcalendarid"){
+      window._gcalId = String(e.value||e.Value||"").trim();
+    }
+  });
   var el=document.getElementById("admin-inst-settings-summary"); if(!el) return;
-  var entries=Array.isArray(settings&&settings.entries)?settings.entries:[];
   if(!entries.length){ el.innerHTML="<div style='color:var(--muted);font-size:.875rem'>No institution settings.</div>"; return; }
   el.innerHTML=entries.map(function(e){
     return "<div class='module-stat'><span>"+escapeHtml(e.SettingKey||e.Key||e.key||"")+"</span>"+
