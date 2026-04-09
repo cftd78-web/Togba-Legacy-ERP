@@ -185,7 +185,8 @@ window.initApp = function(){
   var va=document.getElementById("view-app"); if(va) va.classList.remove("hidden");
   _setText("welcome-name", currentUser.name||"Welcome");
   var isAdmin=currentUser.role==="Admin";
-  var bna=document.getElementById("btn-nav-admin"); if(bna) bna.classList.toggle("hidden",!isAdmin);
+  var bna=document.getElementById("btn-nav-admin");
+  if(bna){ bna.style.display=isAdmin?"":"none"; }
   var sna=document.getElementById("sidebar-nav-admin");
   if(sna) sna.classList.toggle("hidden",!isAdmin);
   showPage("home");
