@@ -284,16 +284,5 @@ window.renderSystemHealth = function(health){
 })();
 
 </script>
-<script>
-/* Patch: restore donut chart call missing from renderHomeFinanceSummary */
-(function(){
-  var _orig = window.renderHomeFinanceSummary;
-  window.renderHomeFinanceSummary = function(data){
-    if(typeof _orig === "function") _orig(data);
-    if(typeof window._renderHomeFinanceChart === "function")
-      window._renderHomeFinanceChart(data);
-  };
-})();
-</script>
 </body>
 </html>
