@@ -37,9 +37,16 @@
 <?!= include('JS_Ticker') ?>
 <?!= include('JS_MessageFix') ?>
 <?!= include('JS_Blocks') ?>
+
 <script>
-/* Messaging hotfix: clickable channels + robust message loading + auto-select */
+/* ================================================================
+   MESSAGING HOTFIX
+   Overrides JS_Core renderChannelList with improved styling and
+   auto-selects the first channel. Also makes refreshMessages
+   handle both array and object server responses.
+   ================================================================ */
 (function(){
+
   window.renderChannelList = function(){
     var el = document.getElementById("channel-list"); if(!el) return;
     if(!userChannels.length){
@@ -48,17 +55,23 @@
     }
     el.innerHTML = userChannels.map(function(c){
       var active = c.ChannelID === selectedChannelID;
-      var baseStyle = "cursor:pointer;padding:.6rem .75rem;border-radius:.6rem;border:1px solid var(--line);background:var(--panel-alt);margin-bottom:3px";
-      var activeStyle = "background:var(--accent-soft);border-color:var(--accent);color:var(--accent)";
-      var style = "display:block;width:100%;text-align:left;" + baseStyle + ";" + (active ? activeStyle : "");
+      var style = "display:block;width:100%;text-align:left;"
+        + "cursor:pointer;padding:.6rem .75rem;border-radius:.6rem;"
+        + "border:1px solid var(--line);margin-bottom:3px;"
+        + (active
+            ? "background:var(--accent-soft);border-color:var(--accent);color:var(--accent);"
+            : "background:var(--panel-alt);color:var(--ink);");
       var over = "if(this.dataset.active!=='1'){this.style.background='var(--accent-soft)';this.style.borderColor='var(--accent)';this.style.color='var(--accent)';}";
       var out  = "if(this.dataset.active!=='1'){this.style.background='var(--panel-alt)';this.style.borderColor='var(--line)';this.style.color='var(--ink)';}";
-      return "<button onclick=\"selectChannel('"+escapeHtml(c.ChannelID)+"')\" data-active=\""+(active?"1":"0")+"\" onmouseover=\""+over+"\" onmouseout=\""+out+"\" style=\""+style+"\">"+
-        "<div style='font-weight:600;font-size:.8rem'>"+escapeHtml(c.Name||c.ChannelID)+"</div>"+
-        "<div style='font-size:.68rem;color:var(--muted)'>"+escapeHtml(c.Type||"")+"</div></button>";
+      return "<button onclick=\"selectChannel('"+escapeHtml(c.ChannelID)+"')\" "
+        + "data-active=\""+(active?"1":"0")+"\" "
+        + "onmouseover=\""+over+"\" onmouseout=\""+out+"\" "
+        + "style=\""+style+"\">"
+        + "<div style='font-weight:600;font-size:.8rem'>"+escapeHtml(c.Name||c.ChannelID)+"</div>"
+        + "<div style='font-size:.68rem;color:var(--muted)'>"+escapeHtml(c.Type||"")+"</div>"
+        + "</button>";
     }).join("");
 
-    /* Auto-select first channel if none selected */
     if(!selectedChannelID && userChannels.length){
       selectChannel(userChannels[0].ChannelID);
     }
@@ -82,7 +95,139 @@
       })
       .getMessages(token, selectedChannelID);
   };
+
 })();
 </script>
+
+<script>
+/* ================================================================
+   INSTITUTION SETTINGS OVERLAY
+   Extends JS_Core renderInstitutionSettingsSummary to trigger the
+   live ticker and mask sensitive values like API keys.
+   ================================================================ */
+window.renderInstitutionSettingsSummary = function(settings){
+  var entries = Array.isArray(settings&&settings.entries) ? settings.entries : [];
+
+  entries.forEach(function(e){
+    var k = String(e.key||e.Key||"").toLowerCase().replace(/[_\- ]/g,"");
+    var v = String(e.value||e.Value||"").trim();
+
+    if(k==="googlecalendarid"||k==="gcalendarid"||k==="calendarid"){
+      window._gcalId = v;
+      if(typeof window._renderCalendarEmbed==="function") window._renderCalendarEmbed(v);
+    }
+
+    if(k==="finnhubapikey"||k==="marketapikey"||k==="tickerapikey"){
+      if(typeof window._tickerStart==="function") window._tickerStart(v);
+    }
+  });
+
+  var el = document.getElementById("admin-inst-settings-summary"); if(!el) return;
+  if(!entries.length){
+    el.innerHTML = "<div style='color:var(--muted);font-size:.875rem'>No institution settings.</div>";
+    return;
+  }
+  var sensitive = ["apikey","password","secret","token"];
+  el.innerHTML = entries.map(function(e){
+    var k = String(e.SettingKey||e.key||e.Key||"").replace(/&/g,"&amp;");
+    var v = String(e.SettingValue||e.value||e.Value||"—");
+    var mask = sensitive.some(function(s){ return k.toLowerCase().indexOf(s)!==-1; });
+    return "<div class='module-stat'><span>"+k+"</span>"
+      +"<span style='color:var(--ink);font-size:.75rem'>"
+      +(mask ? "••••••••" : v.replace(/&/g,"&amp;").replace(/</g,"&lt;"))
+      +"</span></div>";
+  }).join("");
+};
+</script>
+
+<script>
+/* ================================================================
+   LIVE ASSET TICKER
+   Fetches prices from Finnhub. Key is loaded via:
+     1. Admin loads Admin page → renderInstitutionSettingsSummary
+        reads finnhub_api_key from InstitutionSettings sheet and
+        calls _tickerStart(key), which stores it in localStorage.
+     2. All subsequent logins (any role, same browser) auto-start
+        from localStorage without needing Admin to log in again.
+   ================================================================ */
+(function(){
+  var SYMS = [
+    {label:"S&P 500",  sym:"SPY",             pfx:"",  dp:2},
+    {label:"NASDAQ",   sym:"QQQ",             pfx:"",  dp:2},
+    {label:"GOLD",     sym:"OANDA:XAU_USD",   pfx:"$", dp:2},
+    {label:"BTC/USD",  sym:"BINANCE:BTCUSDT", pfx:"$", dp:0},
+    {label:"EUR/USD",  sym:"OANDA:EUR_USD",   pfx:"",  dp:4},
+    {label:"WTI",      sym:"OANDA:USOIL_USD", pfx:"$", dp:2}
+  ];
+  var _key = "", _timer = null;
+
+  function _fmt(n, pfx, dp){
+    if(!n) return "—";
+    return pfx+(dp===0
+      ? Math.round(n).toLocaleString()
+      : Number(n).toLocaleString(undefined,{minimumFractionDigits:dp,maximumFractionDigits:dp}));
+  }
+  function _pct(dp){ var n=Number(dp)||0; return (n>0?"+":"")+n.toFixed(2)+"%"; }
+  function _arrow(dir){
+    return dir>0  ? "<span style='color:var(--green)'>▲ </span>"
+         : dir<0  ? "<span style='color:var(--red)'>▼ </span>"
+                  : "<span style='color:var(--muted)'>— </span>";
+  }
+  function _render(items){
+    var track = document.getElementById("ticker-track"); if(!track) return;
+    var html = items.map(function(t){
+      var col = t.dir>0?"var(--green)":t.dir<0?"var(--red)":"var(--muted)";
+      return "<div class='asset-ticker'>"
+        +"<span class='asset-ticker-label'>"+t.label+"</span>"
+        +"<span class='asset-ticker-val'>"+t.price+"</span>"
+        +"<span class='asset-ticker-chg' style='color:"+col+"'>"+_arrow(t.dir)+t.chg+"</span>"
+        +"</div>";
+    }).join("");
+    track.innerHTML = "<div class='asset-ribbon-items'>"+html+"</div>"
+                    + "<div class='asset-ribbon-items' aria-hidden='true'>"+html+"</div>";
+  }
+  function _fetchOne(sym, i, live, renderFn){
+    return fetch("https://finnhub.io/api/v1/quote?symbol="
+        +encodeURIComponent(sym.sym)+"&token="+encodeURIComponent(_key))
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(d){
+        if(d&&d.c){ var dir=d.dp>0?1:d.dp<0?-1:0;
+          live[i]={label:sym.label,price:_fmt(d.c,sym.pfx,sym.dp),chg:_pct(d.dp),dir:dir}; }
+        renderFn(live);
+      }).catch(function(){ renderFn(live); });
+  }
+  function _fetchAll(){
+    if(!_key) return;
+    var live = SYMS.map(function(s){ return {label:s.label,price:"…",chg:"",dir:0}; });
+    var chain = Promise.resolve();
+    SYMS.forEach(function(sym,i){
+      chain = chain
+        .then(function(){ return new Promise(function(res){ setTimeout(res,i*250); }); })
+        .then(function(){ return _fetchOne(sym,i,live,_render); });
+    });
+    clearTimeout(_timer);
+    _timer = setTimeout(_fetchAll, 90000);
+  }
+
+  window._tickerStart = function(key){
+    _key = String(key||"").trim();
+    if(_key){
+      try{ localStorage.setItem("_tgbfhk", _key); }catch(e){}
+      _fetchAll();
+    }
+  };
+
+  /* Auto-start from localStorage — works for all user roles */
+  try{
+    var _sk = localStorage.getItem("_tgbfhk");
+    if(_sk){ _key = _sk; setTimeout(_fetchAll, 1500); }
+  }catch(e){}
+
+  /* Placeholder dashes until a key is available */
+  _render(SYMS.map(function(s){ return {label:s.label,price:"—",chg:"",dir:0}; }));
+
+})();
+</script>
+
 </body>
 </html>
