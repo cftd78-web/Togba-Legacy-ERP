@@ -37,5 +37,52 @@
 <?!= include('JS_Ticker') ?>
 <?!= include('JS_MessageFix') ?>
 <?!= include('JS_Blocks') ?>
+<script>
+/* Messaging hotfix: clickable channels + robust message loading + auto-select */
+(function(){
+  window.renderChannelList = function(){
+    var el = document.getElementById("channel-list"); if(!el) return;
+    if(!userChannels.length){
+      el.innerHTML = "<div style='color:var(--muted);font-size:.8rem'>No channels.</div>";
+      return;
+    }
+    el.innerHTML = userChannels.map(function(c){
+      var active = c.ChannelID === selectedChannelID;
+      var baseStyle = "cursor:pointer;padding:.6rem .75rem;border-radius:.6rem;border:1px solid var(--line);background:var(--panel-alt);margin-bottom:3px";
+      var activeStyle = "background:var(--accent-soft);border-color:var(--accent);color:var(--accent)";
+      var style = "display:block;width:100%;text-align:left;" + baseStyle + ";" + (active ? activeStyle : "");
+      var over = "if(this.dataset.active!=='1'){this.style.background='var(--accent-soft)';this.style.borderColor='var(--accent)';this.style.color='var(--accent)';}";
+      var out  = "if(this.dataset.active!=='1'){this.style.background='var(--panel-alt)';this.style.borderColor='var(--line)';this.style.color='var(--ink)';}";
+      return "<button onclick=\"selectChannel('"+escapeHtml(c.ChannelID)+"')\" data-active=\""+(active?"1":"0")+"\" onmouseover=\""+over+"\" onmouseout=\""+out+"\" style=\""+style+"\">"+
+        "<div style='font-weight:600;font-size:.8rem'>"+escapeHtml(c.Name||c.ChannelID)+"</div>"+
+        "<div style='font-size:.68rem;color:var(--muted)'>"+escapeHtml(c.Type||"")+"</div></button>";
+    }).join("");
+
+    /* Auto-select first channel if none selected */
+    if(!selectedChannelID && userChannels.length){
+      selectChannel(userChannels[0].ChannelID);
+    }
+  };
+
+  window.refreshMessages = function(){
+    if(!selectedChannelID) return;
+    setMessageError("");
+    google.script.run
+      .withSuccessHandler(function(res){
+        var msgs = Array.isArray(res) ? res
+          : Array.isArray(res&&res.messages) ? res.messages
+          : [];
+        var sent = Array.isArray(res&&res.sent) ? res.sent : [];
+        renderMessageHistory(msgs);
+        _renderSentMessages(sent);
+      })
+      .withFailureHandler(function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        setMessageError((err&&err.message)||"Failed to load messages.");
+      })
+      .getMessages(token, selectedChannelID);
+  };
+})();
+</script>
 </body>
 </html>
