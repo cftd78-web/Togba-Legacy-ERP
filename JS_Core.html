@@ -519,25 +519,71 @@ window.loadFamilyData = function(){
 };
 
 window.renderFamilyTree = function(tree){
-  var el=document.getElementById("family-tree"); if(!el) return;
-  var members=Array.isArray(tree&&tree.members)?tree.members:(Array.isArray(tree)?tree:[]);
-  if(!members.length){ el.innerHTML="<div style='color:var(--muted);font-size:.875rem'>No family records found.</div>"; return; }
-  var byGen={};
-  members.forEach(function(m){ var g=String(m.GenerationTier||m.generation||"?"); if(!byGen[g]) byGen[g]=[]; byGen[g].push(m); });
-  el.innerHTML=Object.keys(byGen).sort().map(function(g){
-    return "<div style='margin-bottom:1rem'>"+
-      "<div style='font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem'>Generation "+escapeHtml(g)+"</div>"+
-      "<div style='display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.5rem'>"+
-      byGen[g].map(function(m){
-        return "<div class='ptv-shell p-3'>"+
-          (m.PhotoURL?"<img src='"+escapeHtml(m.PhotoURL)+"' style='width:2.5rem;height:2.5rem;border-radius:50%;object-fit:cover;margin-bottom:.4rem' alt=''>":"")+
-          "<div style='font-weight:600;color:var(--ink);font-size:.875rem'>"+escapeHtml(m.FullName||m.fullName||"Unknown")+"</div>"+
-          "<div style='font-size:.7rem;color:var(--muted)'>"+escapeHtml(m.RelationshipToPatriarch||m.relationship||"")+"</div>"+
-          (m.SpouseFullNameOptional?"<div style='font-size:.68rem;color:var(--muted)'>Spouse: "+escapeHtml(m.SpouseFullNameOptional)+"</div>":"")+
-          "</div>";
-      }).join("")+"</div></div>";
-  }).join("");
-};
+    var el=document.getElementById("family-tree"); if(!el) return;
+    var members=Array.isArray(tree&&tree.members)?tree.members:(Array.isArray(tree)?tree:[]);
+    if(!members.length){
+      el.innerHTML="<div style='color:var(--muted);font-size:.875rem;padding:1rem'>No family records found.</div>";
+      return;
+    }
+
+    /* Build lookup map */
+    var map={};
+    members.forEach(function(m){ map[m.PersonID||m.personID||""]=m; });
+
+    /* Group by generation */
+    var byGen={};
+    members.forEach(function(m){
+      var g=String(m.GenerationTier||m.generation||"?");
+      if(!byGen[g]) byGen[g]=[];
+      byGen[g].push(m);
+    });
+
+    var genLabels={"0th":"Patriarch","1st":"First Generation","2nd":"Second Generation","3rd":"Third Generation","4th":"Fourth Generation"};
+
+    el.innerHTML=Object.keys(byGen).sort().map(function(g){
+      var label=genLabels[g]||("Generation "+g);
+      var isPatriarch=(g==="0th");
+
+      return "<div style='margin-bottom:1.5rem'>"
+        /* Generation header with decorative line */
+        +"<div style='display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem'>"
+        +"<div style='font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;"
+        +"color:var(--accent);white-space:nowrap'>"+escapeHtml(label)+"</div>"
+        +"<div style='flex:1;height:1px;background:var(--line)'></div>"
+        +"<div style='font-size:.58rem;color:var(--muted)'>"+byGen[g].length+" member"+(byGen[g].length!==1?"s":"")+"</div>"
+        +"</div>"
+        /* Member cards */
+        +"<div style='display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.6rem'>"
+        +byGen[g].map(function(m){
+          var name=escapeHtml(m.FullName||m.fullName||"Unknown");
+          var rel=escapeHtml(m.RelationshipToPatriarch||m.relationship||"");
+          var spouse=m.SpouseFullNameOptional?escapeHtml(m.SpouseFullNameOptional):"";
+          var country=escapeHtml(m.CountryResidence||m.country||"");
+          var photo=m.PhotoURL||m.photoURL||"";
+          var initials=(m.FullName||m.fullName||"?").split(" ").map(function(w){return w[0]||"";}).slice(0,2).join("").toUpperCase();
+
+          return "<div class='ptv-shell' style='padding:.85rem;display:flex;flex-direction:column;gap:.35rem;"
+            +(isPatriarch?"border:2px solid var(--accent);":"")+"'>"
+            /* Avatar */
+            +"<div style='display:flex;align-items:center;gap:.5rem;margin-bottom:.2rem'>"
+            +(photo
+              ?"<img src='"+photo+"' style='width:2.2rem;height:2.2rem;border-radius:50%;object-fit:cover;flex-shrink:0' alt=''>"
+              :"<div style='width:2.2rem;height:2.2rem;border-radius:50%;background:var(--accent-soft);"
+              +"display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;"
+              +"color:var(--accent);flex-shrink:0'>"+initials+"</div>")
+            +"<div style='min-width:0'>"
+            +"<div style='font-weight:700;color:var(--ink);font-size:.82rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>"+name+"</div>"
+            +(rel?"<div style='font-size:.62rem;color:var(--accent)'>"+rel+"</div>":"")
+            +"</div></div>"
+            /* Details */
+            +(spouse?"<div style='font-size:.68rem;color:var(--muted)'><span style='color:var(--ink);font-weight:600'>+</span> "+spouse+"</div>":"")
+            +(country?"<div style='font-size:.62rem;color:var(--muted)'>📍 "+country+"</div>":"")
+            +(m.Occupation||m.occupation?"<div style='font-size:.62rem;color:var(--muted)'>"+escapeHtml(m.Occupation||m.occupation)+"</div>":"")
+            +"</div>";
+        }).join("")
+        +"</div></div>";
+    }).join("");
+  };
 
 window.saveFamilyMember = function(){
   var payload={
