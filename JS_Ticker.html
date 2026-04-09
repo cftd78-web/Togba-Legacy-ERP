@@ -76,16 +76,8 @@
   /* Called when API key becomes available */
   window._tickerStart = function(key){
     _key = String(key||"").trim();
-    if(_key){
-      try{localStorage.setItem("_tgbfhk",_key);}catch(e){}
-      _fetchAll();
-    }
+    if(_key) _fetchAll();
   };
-  /* Auto-start from localStorage for Member users */
-  try{
-    var _sk=localStorage.getItem("_tgbfhk");
-    if(_sk){_key=_sk; setTimeout(_fetchAll,2000);}
-  }catch(e){}
 
   /* Hook: override renderSettingsSummary DIRECTLY (no wrapper, no events).
      This works because JS_Core.html loads before JS_Ticker.html,
