@@ -509,7 +509,7 @@ window.loadFamilyData = function(){
   google.script.run
     .withSuccessHandler(function(res){
       familyLoaded=true;
-      renderFamilyTree(res&&res.tree?res.tree:(Array.isArray(res)?res:{}));
+      renderFamilyTree(res&&res.nodes?{members:res.nodes}:res&&res.members?res:res&&res.tree?res.tree:(Array.isArray(res)?res:{}));
     })
     .withFailureHandler(function(err){
       if(isSessionExpiredError(err)){ onServerFailure(err); return; }
