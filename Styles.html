@@ -99,6 +99,12 @@ input:focus,select:focus,textarea:focus{
 
 /* ── Layout / Pages ── */
 css.hidden { display: none !important; }
+@keyframes ribbon-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.asset-ribbon-items{display:flex;align-items:center;gap:2rem;white-space:nowrap}
+.asset-ticker{display:flex;align-items:center;gap:.4rem;padding:0 .25rem}
+.asset-ticker-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.asset-ticker-val{font-size:.75rem;font-weight:700;color:var(--ink)}
+.asset-ticker-chg{font-size:.65rem;font-weight:700}
 .page{display:none;}
 .page.active{display:block;animation:page-fade-in .18s ease-out both;}
 .app-shell{max-width:1280px;margin:0 auto;padding:1rem 1rem 6rem 1rem;}
@@ -238,13 +244,13 @@ html.dark .btn-primary{color:#00285d;}
 .asset-ribbon-wrap{position:relative;overflow:hidden;border-radius:.75rem;background:var(--panel-alt);border:1px solid var(--line);}
 .asset-ribbon-track{display:flex;width:max-content;animation:ribbon-scroll 35s linear infinite;}
 .asset-ribbon-track:hover{animation-play-state:paused;}
-.asset-ribbon-items{display:flex;align-items:center;gap:2rem;padding:.6rem 1.25rem;white-space:nowrap;}
+.asset-ribbon-items{display:flex;align-items:center;gap:2rem;white-space:nowrap}
 .asset-ribbon-fade-l,.asset-ribbon-fade-r{position:absolute;top:0;bottom:0;width:4rem;z-index:10;pointer-events:none;}
 .asset-ribbon-fade-l{left:0;background:linear-gradient(to right,var(--panel-alt),transparent);}
 .asset-ribbon-fade-r{right:0;background:linear-gradient(to left,var(--panel-alt),transparent);}
-.asset-ticker{display:flex;align-items:center;gap:.5rem;}
-.asset-ticker-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);}
-.asset-ticker-val{font-size:.78rem;font-weight:700;color:var(--ink);}
+.asset-ticker{display:flex;align-items:center;gap:.4rem;padding:0 .25rem}
+.asset-ticker-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.asset-ticker-val{font-size:.75rem;font-weight:700;color:var(--ink)}
 @keyframes ribbon-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 .vault-gradient{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-2) 100%);}

@@ -64,12 +64,11 @@
   <div id="home-system-status" class="text-sm" style="color:var(--ink);">Waiting for dashboard metrics...</div>
 </div>
 
-<div class="asset-ribbon-wrap">
-  <div class="asset-ribbon-fade-l"></div>
-  <div class="asset-ribbon-fade-r"></div>
-  <div class="asset-ribbon-track" id="ticker-track">
-    <!-- populated by JS_Ticker.html -->
-  </div>
+<!-- Live asset ticker ribbon -->
+<div style="overflow:hidden;border-radius:.75rem;background:var(--panel-alt);margin:.75rem 0;position:relative">
+  <div style="position:absolute;top:0;bottom:0;left:0;width:3rem;background:linear-gradient(90deg,var(--panel-alt),transparent);z-index:2;pointer-events:none"></div>
+  <div style="position:absolute;top:0;bottom:0;right:0;width:3rem;background:linear-gradient(270deg,var(--panel-alt),transparent);z-index:2;pointer-events:none"></div>
+  <div id="ticker-track" style="display:flex;width:max-content;animation:ribbon-scroll 35s linear infinite;padding:.55rem 1rem"></div>
 </div>
 
 </div>
