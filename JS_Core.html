@@ -227,51 +227,51 @@ function _updateBottomNav(pageId){
 /* ── HOME RENDERERS ── */
 window.renderHomeFinanceSummary = function(data){
   var el=document.getElementById("home-finance-snapshot"); if(!el) return;
-  var tc=(data.totals&&data.totals.totalContributions)||0;
-  var tl=(data.founderLocks&&data.founderLocks.totalLocked)||0;
-  var tp=(data.projection&&data.projection.totalProjected)||0;
-  el.innerHTML="<strong>"+formatCurrency(tc)+"</strong> contributions"
-    +" &middot; <strong>"+formatCurrency(tl)+"</strong> locked"
-    +" &middot; <strong>"+formatCurrency(tp)+"</strong> projected";
-  _renderHomeFinanceChart(data);
+  var finance=data||{};
+  var totals=finance.totals||{};
+  var founderLocks=finance.founderLocks||{};
+  var projection=finance.projection||{};
+  var contrib=Number(totals.totalContributions!=null?totals.totalContributions:finance.totalContributions||0);
+  var locked=Number(founderLocks.totalLocked!=null?founderLocks.totalLocked:finance.totalLocked||0);
+  var projected=Number(projection.totalProjected!=null?projection.totalProjected:finance.totalProjected||0);
+  function _currencyOrDash(v){ return v>0?escapeHtml(formatCurrency(v)):"—"; }
+  el.innerHTML=_currencyOrDash(contrib)+" total contributions &middot; "+
+    _currencyOrDash(locked)+" locked &middot; "+_currencyOrDash(projected)+" projected";
+  _renderHomeFinanceChart(Object.assign({}, finance, { totalContributions:contrib, totalLocked:locked }));
 };
 
 window.renderHomeProjectSnapshot = function(data){
   var el=document.getElementById("home-project-snapshot"); if(!el) return;
-  var projects=Array.isArray(data.projects)?data.projects:[];
-  var active=projects.filter(function(p){return /in.progress|active/i.test(p.Status||"");}).length;
-  var done=projects.filter(function(p){return /completed|done/i.test(p.Status||"");}).length;
-  var tasks=projects.reduce(function(s,p){return s+(p.tasks?p.tasks.length:0);},0);
-  el.innerHTML="<strong>"+active+"</strong> active"
-    +" &middot; <strong>"+done+"</strong> completed"
-    +" &middot; <strong>"+tasks+"</strong> tasks";
+  var projects=data||{};
+  var summary=projects.summary||projects;
+  var active=Number(summary.activeProjects||0);
+  var completed=Number(summary.completedProjects||0);
+  var tasks=Number(summary.totalTasks||0);
+  function _countOrDash(v){ return v>0?String(v):"—"; }
+  el.innerHTML=_countOrDash(active)+" active &middot; "+
+    _countOrDash(completed)+" completed &middot; "+_countOrDash(tasks)+" tasks";
 };
 
 window.renderHomeVoteSnapshot = function(data){
   var el=document.getElementById("home-vote-snapshot"); if(!el) return;
-  var votes=Array.isArray(data.votes)?data.votes:[];
-  var open=votes.filter(function(v){return /open/i.test(v.Status||"");}).length;
-  var total=votes.length;
-  el.innerHTML="<strong>"+open+"</strong> open proposal"+(open!==1?"s":"")
-    +" &middot; <strong>"+total+"</strong> total";
+  var voting=data||{};
+  var votes=Array.isArray(voting.votes)?voting.votes:[];
+  var open=votes.filter(function(v){ return String(v&&v.Status||"").toLowerCase()==="open"; }).length;
+  var totalCast=votes.length;
+  function _countOrDash(v){ return v>0?String(v):"—"; }
+  el.innerHTML=_countOrDash(open)+" open proposals &middot; "+_countOrDash(totalCast)+" total votes cast";
 };
 
 window.renderHomeTimelineSnapshot = function(data){
+  var timeline=data||{};
+  var summary=timeline.summary||timeline;
+  var upcomingNext30=Number(summary.upcomingNext30Days||0);
+  var nextDate=summary.nextUpcomingDate?formatDate(summary.nextUpcomingDate):"";
   var snap=document.getElementById("home-timeline-snapshot");
-  if(snap){
-    var hist=Array.isArray(data.historical)?data.historical.length:0;
-    var upcoming=Array.isArray(data.upcoming)?data.upcoming:[];
-    var next30=upcoming.filter(function(e){
-      if(!e.NextOccurrence) return false;
-      var days=Math.floor((new Date(e.NextOccurrence)-new Date())/(86400000));
-      return days>=0&&days<=30;
-    }).length;
-    var nextDate=upcoming.length?formatDate(upcoming[0].NextOccurrence):"—";
-    snap.innerHTML="<strong>"+next30+"</strong> event"+(next30!==1?"s":"")+" in next 30 days"
-      +" &middot; Next: <strong>"+nextDate+"</strong>";
-  }
+  if(snap) snap.innerHTML=(upcomingNext30>0?String(upcomingNext30):"—")+
+    " events in next 30 days &middot; Next: "+(nextDate?escapeHtml(nextDate):"—");
   var el=document.getElementById("home-activity-list"); if(!el) return;
-  var items=Array.isArray(data.recent)?data.recent:[];
+  var items=Array.isArray(timeline.recent)?timeline.recent:[];
   if(!items.length){ el.innerHTML="<div style='color:var(--muted);font-size:.875rem'>No recent events.</div>"; return; }
   el.innerHTML=items.slice(0,5).map(function(it){
     return "<div class='ptv-shell p-3 mb-2'>"+
