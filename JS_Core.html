@@ -664,13 +664,20 @@ window.renderAdminUserList = function(users){
 window.renderSettingsSummary = function(settings){
   var el=document.getElementById("admin-settings-summary"); if(!el) return;
   var entries=Array.isArray(settings&&settings.entries)?settings.entries:[];
-  window._gcalId="";
-  window._renderCalendarEmbed(window._gcalId);
+  /* Scan for calendar — do NOT reset _gcalId first (preserves value
+     already set by renderInstitutionSettingsSummary) */
   entries.forEach(function(e){
     var k=String(e.Key||e.key||"").toLowerCase().replace(/[_\- ]/g,"");
-    if(k==="googlecalendarid"||k==="gcalendarid"||k==="calendarid"){
-      window._gcalId=String(e.Value||e.value||"").trim();
-      window._renderCalendarEmbed(window._gcalId);
+    var isCalKey = k==="googlecalendarid"||k==="gcalendarid"
+                 ||k==="calendarid"||k==="familycalendarid"
+                 ||k==="gcalid"||k==="familygooglecalendarid";
+    if(isCalKey){
+      var v=String(e.Value||e.value||"").trim();
+      if(v){
+        window._gcalId=v;
+        if(typeof window._renderCalendarEmbed==="function")
+          window._renderCalendarEmbed(v);
+      }
     }
   });
   if(!entries.length){ el.innerHTML="<div style='color:var(--muted);font-size:.875rem'>No settings.</div>"; return; }
