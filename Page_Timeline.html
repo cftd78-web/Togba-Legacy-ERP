@@ -1,5 +1,236 @@
 <div id="page-timeline" class="page">
 
+<div class="page-header">
+  <div>
+    <div class="page-heading">Family Timeline</div>
+    <div class="page-sub">Historical milestones, upcoming events, and connected calendar.</div>
+  </div>
+  <button onclick="loadTimelineData()" class="btn-refresh">Refresh</button>
+</div>
+
+<div id="timeline-error" class="err-box hidden" style="margin-bottom:.75rem"></div>
+
+<div style="display:grid;gap:1rem">
+
+  <!-- Google Calendar embed -->
+  <div class="card" id="gcal-wrap" style="padding:0;overflow:hidden;display:none">
+    <div style="padding:.75rem 1rem;border-bottom:1px solid var(--line);
+                display:flex;align-items:center;justify-content:space-between">
+      <div class="section-label" style="margin:0">Connected Calendar</div>
+      <a id="gcal-open-link" href="#" target="_blank"
+        style="font-size:.72rem;color:var(--accent);text-decoration:none">
+        Open in Google Calendar ↗
+      </a>
+    </div>
+    <iframe id="gcal-iframe" src="" style="width:100%;height:500px;border:none"
+      frameborder="0" scrolling="no"></iframe>
+  </div>
+
+  <!-- No calendar configured -->
+  <div class="card-alt" id="gcal-setup"
+    style="display:none;text-align:center;padding:1.5rem">
+    <span class="material-icons-round"
+      style="font-size:32px;color:var(--muted);display:block;margin-bottom:.5rem">
+      calendar_month
+    </span>
+    <div style="font-size:.875rem;font-weight:600;color:var(--ink);margin-bottom:.3rem">
+      Google Calendar not connected</div>
+    <div style="font-size:.78rem;color:var(--muted)">
+      Add a row in the <strong>Settings</strong> sheet with Key =
+      <code>FamilyCalendarId</code> and the calendar's public email address as the value.
+    </div>
+  </div>
+
+  <!-- Unified timeline list — events are clickable -->
+  <div class="card">
+    <div class="section-label">Unified Timeline</div>
+    <div id="timeline-list" style="display:flex;flex-direction:column;gap:.5rem"></div>
+  </div>
+
+  <!-- Event detail panel — slides open when an event is clicked -->
+  <div id="timeline-detail-panel"
+    style="display:none;border:1px solid var(--line);border-radius:1rem;
+           background:var(--panel);overflow:hidden;transition:all .2s">
+    <div style="display:flex;align-items:center;justify-content:space-between;
+                padding:.75rem 1rem;border-bottom:1px solid var(--line);
+                background:var(--panel-alt)">
+      <div class="section-label" style="margin:0">Event Details</div>
+      <button onclick="closeTimelineDetail()"
+        style="border:none;background:transparent;color:var(--muted);
+               font-size:1.1rem;cursor:pointer;line-height:1">✕</button>
+    </div>
+    <div id="timeline-detail-content" style="padding:1rem"></div>
+  </div>
+
+  <!-- Historical + Upcoming -->
+  <div style="display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+    <div class="card">
+      <div class="section-label">Historical</div>
+      <div id="timeline-history" style="display:flex;flex-direction:column;gap:.5rem"></div>
+    </div>
+    <div class="card">
+      <div class="section-label">Upcoming Events</div>
+      <div id="timeline-upcoming" style="display:flex;flex-direction:column;gap:.5rem"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── Timeline event detail ── */
+window._timelineEventsCache = [];
+
+window.openTimelineDetail = function(idx){
+  var ev = window._timelineEventsCache[idx]; if(!ev) return;
+  var panel  = document.getElementById("timeline-detail-panel");
+  var content= document.getElementById("timeline-detail-content");
+  if(!panel||!content) return;
+
+  var title   = escapeHtml(ev.Title||ev.title||"Event");
+  var date    = ev.EventDate||ev.date||ev.NextOccurrence||"";
+  var dateStr = date ? new Date(date).toLocaleDateString("en-US",
+    {weekday:"long",year:"numeric",month:"long",day:"numeric"}) : "—";
+  var timeStr = ev.EventTime||ev.time||"";
+  var loc     = escapeHtml(ev.Location||ev.location||"");
+  var desc    = escapeHtml(ev.Description||ev.description||ev.Body||"");
+  var host    = escapeHtml(ev.Host||ev.host||ev.Organiser||"");
+  var link    = ev.JoinLink||ev.joinLink||ev.Link||ev.link||"";
+  var lat     = Number(ev.Lat||ev.lat||0);
+  var lng     = Number(ev.Lng||ev.lng||0);
+  var type    = escapeHtml(ev.EventType||ev.type||"");
+
+  var html = "";
+
+  /* Title + type badge */
+  html += "<div style='margin-bottom:.75rem'>"
+    + "<div style='font-size:1.1rem;font-weight:800;color:var(--ink)'>" + title + "</div>"
+    + (type ? "<span style='font-size:.65rem;font-weight:700;text-transform:uppercase;"
+        + "letter-spacing:.06em;padding:.2rem .55rem;border-radius:9999px;"
+        + "background:var(--accent-soft);color:var(--accent)'>" + type + "</span>" : "")
+    + "</div>";
+
+  /* Date / time */
+  html += "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));"
+    + "gap:.5rem;margin-bottom:.75rem'>";
+  html += "<div class='ptv-metric'>"
+    + "<div style='font-size:.6rem;color:var(--muted);text-transform:uppercase;"
+      + "letter-spacing:.06em;margin-bottom:.2rem'>Date</div>"
+    + "<div style='font-size:.82rem;font-weight:600;color:var(--ink)'>" + dateStr + "</div>"
+    + "</div>";
+  if(timeStr){
+    html += "<div class='ptv-metric'>"
+      + "<div style='font-size:.6rem;color:var(--muted);text-transform:uppercase;"
+        + "letter-spacing:.06em;margin-bottom:.2rem'>Time</div>"
+      + "<div style='font-size:.82rem;font-weight:600;color:var(--ink)'>"
+        + escapeHtml(timeStr) + "</div>"
+      + "</div>";
+  }
+  if(host){
+    html += "<div class='ptv-metric'>"
+      + "<div style='font-size:.6rem;color:var(--muted);text-transform:uppercase;"
+        + "letter-spacing:.06em;margin-bottom:.2rem'>Host</div>"
+      + "<div style='font-size:.82rem;font-weight:600;color:var(--ink)'>" + host + "</div>"
+      + "</div>";
+  }
+  html += "</div>";
+
+  /* Description */
+  if(desc){
+    html += "<div style='font-size:.875rem;color:var(--ink);line-height:1.6;"
+      + "margin-bottom:.75rem;padding:.6rem .75rem;background:var(--panel-alt);"
+      + "border-radius:.6rem'>" + desc + "</div>";
+  }
+
+  /* Location + map */
+  if(loc){
+    html += "<div style='font-size:.8rem;color:var(--muted);margin-bottom:.4rem'>"
+      + "📍 " + loc + "</div>";
+  }
+  if(lat && lng){
+    var bbox=[lng-.015,lat-.015,lng+.015,lat+.015].join(",");
+    html += "<div style='border-radius:.85rem;overflow:hidden;margin-bottom:.75rem;height:220px'>"
+      + "<iframe src='https://www.openstreetmap.org/export/embed.html?bbox="
+        + bbox + "&layer=mapnik&marker=" + lat + "," + lng + "'"
+      + " style='width:100%;height:220px;border:none' allowfullscreen></iframe>"
+      + "</div>";
+  } else if(loc){
+    /* No GPS — show a search link */
+    html += "<a href='https://www.google.com/maps/search/"
+      + encodeURIComponent(loc)
+      + "' target='_blank' style='font-size:.75rem;color:var(--accent);"
+      + "display:inline-block;margin-bottom:.75rem'>View on Google Maps ↗</a>";
+  }
+
+  /* Join link */
+  if(link){
+    html += "<div style='margin-top:.25rem'>"
+      + "<a href='" + escapeHtml(link) + "' target='_blank'"
+      + " style='display:inline-flex;align-items:center;gap:.35rem;"
+        + "padding:.5rem 1rem;border-radius:.6rem;font-weight:700;font-size:.8rem;"
+        + "background:var(--accent);color:#fff;text-decoration:none'>"
+      + "Join online ↗</a></div>";
+  }
+
+  content.innerHTML = html;
+  panel.style.display = "block";
+  panel.scrollIntoView({behavior:"smooth", block:"nearest"});
+};
+
+window.closeTimelineDetail = function(){
+  var p = document.getElementById("timeline-detail-panel");
+  if(p) p.style.display = "none";
+  /* Remove active highlight from all events */
+  document.querySelectorAll(".tl-event-card").forEach(function(c){
+    c.style.borderColor = "var(--line)";
+    c.style.background  = "var(--panel)";
+  });
+};
+
+/* Override renderTimelineList from JS_Blocks to make events clickable */
+window._renderTimelineEvents = function(events, containerId){
+  var el = document.getElementById(containerId); if(!el) return;
+  if(!events.length){
+    el.innerHTML = "<div style='color:var(--muted);font-size:.875rem'>No events.</div>";
+    return;
+  }
+  /* Store in cache so detail panel can access by index */
+  if(containerId==="timeline-list"){
+    window._timelineEventsCache = events;
+  }
+  el.innerHTML = events.map(function(ev, i){
+    var title  = escapeHtml(ev.Title||ev.title||"Event");
+    var date   = ev.EventDate||ev.date||ev.NextOccurrence||"";
+    var dateStr= date ? new Date(date).toLocaleDateString("en-US",
+      {month:"short",day:"numeric",year:"numeric"}) : "";
+    var type   = escapeHtml(ev.EventType||ev.type||"");
+    var loc    = escapeHtml(ev.Location||ev.location||"");
+    var cacheIdx = containerId==="timeline-list" ? i : -1;
+    return "<div class='tl-event-card ptv-shell' "
+      + (cacheIdx>=0
+          ? "onclick='openTimelineDetail("+cacheIdx+");this.style.borderColor=\"var(--accent)\";this.style.background=\"var(--accent-soft)\"' "
+            + "style='padding:.65rem .85rem;cursor:pointer'"
+          : "style='padding:.65rem .85rem'")
+      + ">"
+      + "<div style='display:flex;align-items:center;justify-content:space-between;gap:.5rem'>"
+      + "<div style='min-width:0'>"
+      + "<div style='font-weight:600;color:var(--ink);font-size:.875rem;white-space:nowrap;"
+        + "overflow:hidden;text-overflow:ellipsis'>" + title + "</div>"
+      + "<div style='font-size:.7rem;color:var(--muted)'>"
+        + (dateStr ? dateStr : "")
+        + (loc ? " · 📍 " + loc : "")
+        + "</div>"
+      + "</div>"
+      + (type ? "<span style='font-size:.6rem;padding:.15rem .45rem;border-radius:9999px;"
+          + "background:var(--accent-soft);color:var(--accent);white-space:nowrap;flex-shrink:0'>"
+          + type + "</span>" : "")
+      + (cacheIdx>=0 ? "<span style='color:var(--muted);font-size:.7rem;flex-shrink:0'>›</span>" : "")
+      + "</div></div>";
+  }).join("");
+};
+</script>
+</div>
+<div id="page-timeline" class="page">
+
   <div class="page-header">
     <div><div class="page-heading">Family Timeline</div>
     <div class="page-sub">Milestones, upcoming events, and connected calendar.</div></div>
