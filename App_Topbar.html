@@ -3,7 +3,7 @@
   <div class="topbar-row">
     <div class="brand-mark">
 
-      <!-- Hamburger: mobile only -->
+      <!-- Hamburger: mobile only — toggleSidebar() is wired in index.html HOTFIX BLOCK 5 -->
       <button onclick="toggleSidebar()" id="mobile-menu-btn"
         style="display:flex;align-items:center;justify-content:center;
                width:34px;height:34px;border-radius:.5rem;
@@ -34,8 +34,11 @@
       </button>
 
       <!-- Theme toggle -->
-      <button class="theme-btn" onclick="cycleTheme()" title="Toggle theme" style="width:32px;height:32px;">
-        <span class="material-icons-round" data-theme-icon style="font-size:16px;">brightness_auto</span>
+      <button class="theme-btn" onclick="cycleTheme()" title="Toggle theme"
+        style="width:32px;height:32px;">
+        <span class="material-icons-round" data-theme-icon style="font-size:16px;">
+          brightness_auto
+        </span>
       </button>
 
       <!-- Logout -->
@@ -48,6 +51,7 @@
 </header>
 
 <style>
+/* Hamburger visible on mobile only */
 @media (min-width:768px){
   #mobile-menu-btn { display:none !important; }
 }
@@ -56,58 +60,3 @@
   #welcome-name    { display:none !important; }
 }
 </style>
-
-<script>
-/* Mobile sidebar overlay */
-(function(){
-  function _ensureOverlay(){
-    if(document.getElementById("sidebar-overlay")) return;
-    var o=document.createElement("div");
-    o.id="sidebar-overlay";
-    o.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:49;display:none;";
-    o.onclick=function(){ _closeM(); };
-    document.body.appendChild(o);
-  }
-  function _openM(){
-    var s=document.getElementById("sidebar");
-    var o=document.getElementById("sidebar-overlay");
-    if(s){ s.style.display="flex"; s.style.zIndex="50"; }
-    if(o) o.style.display="block";
-  }
-  function _closeM(){
-    var s=document.getElementById("sidebar");
-    var o=document.getElementById("sidebar-overlay");
-    if(s) s.style.removeProperty("display");
-    if(o) o.style.display="none";
-  }
-
-  /* Override toggleSidebar: mobile gets overlay drawer, desktop gets collapse */
-  var _orig=window.toggleSidebar;
-  window.toggleSidebar=function(){
-    if(window.innerWidth<768){
-      _ensureOverlay();
-      var s=document.getElementById("sidebar");
-      var open=s&&(s.style.display==="flex");
-      if(open) _closeM(); else _openM();
-    } else {
-      if(typeof _orig==="function") _orig();
-    }
-  };
-
-  /* Close when a nav item is tapped on mobile */
-  document.addEventListener("click",function(e){
-    if(window.innerWidth>=768) return;
-    if(e.target.closest(".sidebar-item")) setTimeout(_closeM,80);
-  });
-
-  /* Set role label */
-  var _origInit=window.initApp;
-  window.initApp=function(){
-    if(typeof _origInit==="function") _origInit();
-    var lbl=document.getElementById("topbar-role-label");
-    if(lbl&&window.currentUser) lbl.innerText=currentUser.role||"";
-    var wn=document.getElementById("welcome-name");
-    if(wn&&window.currentUser) wn.innerText=currentUser.name||"Welcome";
-  };
-})();
-</script>
