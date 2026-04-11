@@ -4,18 +4,42 @@
   var ICONS={auto:"brightness_auto",light:"light_mode",dark:"dark_mode"};
   var LABELS={auto:"Auto",light:"Light",dark:"Dark"};
   function applyTheme(mode){
-    var h=document.documentElement;
+    var h = document.documentElement;
     h.classList.remove("dark","light");
-    if(mode==="dark") h.classList.add("dark");
-    if(mode==="light") h.classList.add("light");
-    try{ localStorage.setItem("togba-theme",mode); }catch(e){}
+    if(mode === "dark")  h.classList.add("dark");
+    if(mode === "light") h.classList.add("light");
+    try{ localStorage.setItem("togba-theme", mode); }catch(e){}
+    /* Update every theme button icon on the page */
     document.querySelectorAll("[data-theme-icon]").forEach(function(el){
-      el.textContent=ICONS[mode]||"brightness_auto";
+      el.textContent = ICONS[mode] || "brightness_auto";
     });
     document.querySelectorAll("[data-theme-label]").forEach(function(el){
-      el.textContent=LABELS[mode]||"Auto";
+      el.textContent = LABELS[mode] || "Auto";
     });
+    /* Apply dark filter to Google Calendar iframe */
+    _applyCalendarFilter(mode);
   }
+
+  function _applyCalendarFilter(mode){
+    var iframe = document.getElementById("gcal-iframe");
+    if(!iframe) return;
+    var isDark = mode === "dark" ||
+      (mode === "auto" && window.matchMedia &&
+       window.matchMedia("(prefers-color-scheme:dark)").matches);
+    iframe.style.filter = isDark
+      ? "invert(1) hue-rotate(180deg) brightness(.85) contrast(.9)"
+      : "none";
+    iframe.style.borderRadius = ".85rem";
+  }
+
+  /* Also watch OS-level dark mode changes for auto mode */
+  try{
+    window.matchMedia("(prefers-color-scheme:dark)").addEventListener("change",function(){
+      var cur = "auto";
+      try{ cur = localStorage.getItem("togba-theme") || "auto"; }catch(e){}
+      if(cur === "auto") _applyCalendarFilter("auto");
+    });
+  }catch(e){}
   window.cycleTheme=function(){
     var cur="auto";
     try{ cur=localStorage.getItem("togba-theme")||"auto"; }catch(e){}
