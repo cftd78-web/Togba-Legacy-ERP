@@ -59,12 +59,23 @@
             : "background:var(--panel-alt);color:var(--ink);");
       var over = "if(this.dataset.active!=='1'){this.style.background='var(--accent-soft)';this.style.borderColor='var(--accent)';this.style.color='var(--accent)';}";
       var out  = "if(this.dataset.active!=='1'){this.style.background='var(--panel-alt)';this.style.borderColor='var(--line)';this.style.color='var(--ink)';}";
+      var preview=escapeHtml((c.LastMessage||c.lastMessage||"").slice(0,42));
+      var unread=Number(c.UnreadCount||c.unreadCount||0);
       return "<button onclick=\"selectChannel('"+escapeHtml(c.ChannelID)+"')\" "
         + "data-active=\""+(active?"1":"0")+"\" "
         + "onmouseover=\""+over+"\" onmouseout=\""+out+"\" "
         + "style=\""+style+"\">"
-        + "<div style='font-weight:600;font-size:.8rem'>"+escapeHtml(c.Name||c.ChannelID)+"</div>"
-        + "<div style='font-size:.68rem;color:var(--muted)'>"+escapeHtml(c.Type||"")+"</div>"
+        + "<div style='display:flex;align-items:center;justify-content:space-between;gap:.25rem'>"
+        + "<div style='font-weight:600;font-size:.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"
+        +   escapeHtml(c.Name||c.ChannelID)+"</div>"
+        + (unread?"<div style='min-width:16px;height:16px;border-radius:9999px;"
+            +"background:var(--accent);color:#fff;font-size:.58rem;font-weight:700;"
+            +"display:flex;align-items:center;justify-content:center;padding:0 4px'>"
+            +unread+"</div>":"")
+        + "</div>"
+        + "<div style='font-size:.68rem;color:var(--muted);white-space:nowrap;"
+        +   "overflow:hidden;text-overflow:ellipsis'>"
+        +   (preview||escapeHtml(c.Type||""))+"</div>"
         + "</button>";
     }).join("");
     if(!selectedChannelID && userChannels.length){
