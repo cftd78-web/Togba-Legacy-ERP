@@ -40,13 +40,10 @@
 
 <script>
 /* ================================================================
-   MESSAGING HOTFIX
-   Overrides JS_Core renderChannelList with improved styling and
-   auto-selects the first channel. Also makes refreshMessages
-   handle both array and object server responses.
+   HOTFIX BLOCK 1 — MESSAGING
+   Runs last so it wins over all earlier definitions.
    ================================================================ */
 (function(){
-
   window.renderChannelList = function(){
     var el = document.getElementById("channel-list"); if(!el) return;
     if(!userChannels.length){
@@ -71,7 +68,6 @@
         + "<div style='font-size:.68rem;color:var(--muted)'>"+escapeHtml(c.Type||"")+"</div>"
         + "</button>";
     }).join("");
-
     if(!selectedChannelID && userChannels.length){
       selectChannel(userChannels[0].ChannelID);
     }
@@ -83,8 +79,7 @@
     google.script.run
       .withSuccessHandler(function(res){
         var msgs = Array.isArray(res) ? res
-          : Array.isArray(res&&res.messages) ? res.messages
-          : [];
+          : Array.isArray(res&&res.messages) ? res.messages : [];
         var sent = Array.isArray(res&&res.sent) ? res.sent : [];
         renderMessageHistory(msgs);
         _renderSentMessages(sent);
@@ -95,41 +90,175 @@
       })
       .getMessages(token, selectedChannelID);
   };
+})();
+</script>
+
+<script>
+/* ================================================================
+   HOTFIX BLOCK 2 — HOME DASHBOARD SNAPSHOT RENDERERS
+   These run AFTER JS_FinanceFix so they are the final definitions.
+   ================================================================ */
+(function(){
+
+  /* ── Finance: text + donut chart ── */
+  window.renderHomeFinanceSummary = function(data){
+    var el = document.getElementById("home-finance-snapshot"); if(!el) return;
+    var tc = (data.totals&&data.totals.totalContributions) || data.totalContributions || 0;
+    var tl = (data.founderLocks&&data.founderLocks.totalLocked) || data.totalLocked || 0;
+    var tp = (data.projection&&data.projection.totalProjected) || data.totalProjected || 0;
+    function fc(n){ return "$"+Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    el.innerHTML = "<strong>"+fc(tc)+"</strong> raised"
+      +" &middot; <strong>"+fc(tl)+"</strong> locked"
+      +" &middot; <strong>"+fc(tp)+"</strong> projected";
+
+    /* Draw donut — always called here, never lost to overrides */
+    var canvas = document.getElementById("financeChart"); if(!canvas) return;
+    var empty  = document.getElementById("home-chart-empty");
+    if(window.financeChartInstance){
+      window.financeChartInstance.destroy();
+      window.financeChartInstance = null;
+    }
+    var contrib = Number(tc), locked = Number(tl);
+    if(!contrib && !locked){
+      if(empty) empty.classList.remove("hidden");
+      return;
+    }
+    if(empty) empty.classList.add("hidden");
+    var isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme:dark)").matches;
+    window.financeChartInstance = new Chart(canvas.getContext("2d"), {
+      type: "doughnut",
+      data: {
+        labels: ["Contributions","Locked Capital"],
+        datasets: [{ data:[contrib,locked], backgroundColor:["#2563eb","#4edea3"], borderWidth:0 }]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false, cutout:"70%",
+        plugins:{ legend:{ position:"bottom",
+          labels:{ color:isDark?"#e2e8f0":"#0f172a", font:{size:11} }
+        }}
+      }
+    });
+  };
+
+  /* ── Projects: total / active / planning / done / tasks ── */
+  window.renderHomeProjectSnapshot = function(data){
+    var el = document.getElementById("home-project-snapshot"); if(!el) return;
+    var projects = Array.isArray(data.projects) ? data.projects : [];
+    var total    = projects.length;
+    var active   = projects.filter(function(p){ return /in.progress|active/i.test(p.Status||""); }).length;
+    var planning = projects.filter(function(p){ return /planning/i.test(p.Status||""); }).length;
+    var done     = projects.filter(function(p){ return /complet|done/i.test(p.Status||""); }).length;
+    var tasks    = projects.reduce(function(s,p){ return s+(p.tasks?p.tasks.length:0); }, 0);
+
+    if(!total){ el.innerHTML = "No projects yet."; return; }
+
+    var parts = ["<strong>"+total+"</strong> total"];
+    if(active)   parts.push("<strong>"+active+"</strong> active");
+    if(planning) parts.push("<strong>"+planning+"</strong> planning");
+    if(done)     parts.push("<strong>"+done+"</strong> done");
+    if(tasks)    parts.push("<strong>"+tasks+"</strong> task"+(tasks!==1?"s":""));
+    el.innerHTML = parts.join(" &middot; ");
+  };
+
+  /* ── Governance: counts + up to 2 proposal titles ── */
+  window.renderHomeVoteSnapshot = function(data){
+    var el = document.getElementById("home-vote-snapshot"); if(!el) return;
+    var votes = Array.isArray(data.votes) ? data.votes : [];
+    var open   = votes.filter(function(v){ return /open/i.test(v.Status||""); });
+    var closed = votes.filter(function(v){ return /closed|done|passed|rejected/i.test(v.Status||""); });
+
+    if(!votes.length){ el.innerHTML = "No proposals yet."; return; }
+
+    var html = "<div style='display:flex;gap:1.2rem;margin-bottom:.5rem'>"
+      +"<div><div style='font-size:1.1rem;font-weight:800;color:var(--ink)'>"+open.length+"</div>"
+      +"<div style='font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em'>Open</div></div>"
+      +"<div><div style='font-size:1.1rem;font-weight:800;color:var(--ink)'>"+votes.length+"</div>"
+      +"<div style='font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em'>Total</div></div>"
+      +"<div><div style='font-size:1.1rem;font-weight:800;color:var(--ink)'>"+closed.length+"</div>"
+      +"<div style='font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em'>Closed</div></div>"
+      +"</div>";
+
+    var shown = open.slice(0,2);
+    if(shown.length){
+      html += shown.map(function(v){
+        return "<div style='font-size:.72rem;padding:.3rem 0;border-top:1px solid var(--line);"
+          +"white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)'>"
+          +"<span style='display:inline-block;width:6px;height:6px;border-radius:50%;"
+          +"background:#f59e0b;margin-right:.4rem;vertical-align:middle'></span>"
+          +escapeHtml(v.Title||"Untitled proposal")+"</div>";
+      }).join("");
+    }
+
+    el.innerHTML = html;
+  };
+
+  /* ── Timeline: events in 30 days + next event date + recent history ── */
+  window.renderHomeTimelineSnapshot = function(data){
+    var snap = document.getElementById("home-timeline-snapshot");
+    if(snap){
+      var upcoming = Array.isArray(data.upcoming) ? data.upcoming : [];
+      var next30 = upcoming.filter(function(e){
+        if(!e.NextOccurrence) return false;
+        var days = Math.floor((new Date(e.NextOccurrence)-new Date())/86400000);
+        return days>=0 && days<=30;
+      }).length;
+      var nextDate = upcoming.length ? formatDate(upcoming[0].NextOccurrence) : "—";
+      snap.innerHTML = "<strong>"+next30+"</strong> event"+(next30!==1?"s":"")+" in next 30 days"
+        +" &middot; Next: <strong>"+nextDate+"</strong>";
+    }
+    var act = document.getElementById("home-activity-list"); if(!act) return;
+    var hist = Array.isArray(data.historical) ? data.historical : [];
+    if(!hist.length){
+      act.innerHTML = "<div style='color:var(--muted);font-size:.875rem'>No recent events.</div>";
+      return;
+    }
+    act.innerHTML = hist.slice(0,5).map(function(e){
+      var d = e.EventDate
+        ? new Date(e.EventDate).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})
+        : "";
+      return "<div style='padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.8rem'>"
+        +"<div style='color:var(--ink);font-weight:600'>"
+        +escapeHtml(e.Title||e.title||"Event")+"</div>"
+        +"<div style='color:var(--muted);font-size:.68rem'>"+d
+        +(e.EventType?" &middot; "+escapeHtml(e.EventType):"")+"</div>"
+        +"</div>";
+    }).join("");
+  };
 
 })();
 </script>
 
 <script>
 /* ================================================================
-   INSTITUTION SETTINGS OVERLAY
-   Extends JS_Core renderInstitutionSettingsSummary to trigger the
-   live ticker and mask sensitive values like API keys.
+   HOTFIX BLOCK 3 — INSTITUTION SETTINGS
+   Triggers ticker and calendar from finnhub_api_key /
+   google_calendar_id in InstitutionSettings sheet.
    ================================================================ */
-/* Temporary hardcode: calendar visible for all users regardless of role.
-   Remove once Admin login works without dev bypass. */
+
+/* ── CALENDAR FIX ──────────────────────────────────────────────
+   Hardcode calendar ID so the Timeline page works for ALL users
+   regardless of role (needed while dev bypass gives Member role).
+   Remove this block once Admin login is working normally.
+   ──────────────────────────────────────────────────────────── */
 window._gcalId = "ef666a1fd28b250bedbb85add971169e871c0a90cf8624e5a610ee5723b2704c@group.calendar.google.com";
 try{ localStorage.setItem("_tgbgcal", window._gcalId); }catch(e){}
 if(typeof window._renderCalendarEmbed==="function") window._renderCalendarEmbed(window._gcalId);
 
 window.renderInstitutionSettingsSummary = function(settings){
   var entries = Array.isArray(settings&&settings.entries) ? settings.entries : [];
-
   entries.forEach(function(e){
     var k = String(e.key||e.Key||"").toLowerCase().replace(/[_\- ]/g,"");
     var v = String(e.value||e.Value||"").trim();
-
     if(k==="googlecalendarid"||k==="gcalendarid"||k==="calendarid"
        ||k==="familycalendarid"||k==="gcalid"||k==="familygooglecalendarid"){
       window._gcalId = v;
       try{ localStorage.setItem("_tgbgcal", v); }catch(e){}
       if(typeof window._renderCalendarEmbed==="function") window._renderCalendarEmbed(v);
     }
-
     if(k==="finnhubapikey"||k==="marketapikey"||k==="tickerapikey"){
       if(typeof window._tickerStart==="function") window._tickerStart(v);
     }
   });
-
   var el = document.getElementById("admin-inst-settings-summary"); if(!el) return;
   if(!entries.length){
     el.innerHTML = "<div style='color:var(--muted);font-size:.875rem'>No institution settings.</div>";
@@ -142,7 +271,7 @@ window.renderInstitutionSettingsSummary = function(settings){
     var mask = sensitive.some(function(s){ return k.toLowerCase().indexOf(s)!==-1; });
     return "<div class='module-stat'><span>"+k+"</span>"
       +"<span style='color:var(--ink);font-size:.75rem'>"
-      +(mask ? "••••••••" : v.replace(/&/g,"&amp;").replace(/</g,"&lt;"))
+      +(mask?"••••••••":v.replace(/&/g,"&amp;").replace(/</g,"&lt;"))
       +"</span></div>";
   }).join("");
 };
@@ -150,13 +279,9 @@ window.renderInstitutionSettingsSummary = function(settings){
 
 <script>
 /* ================================================================
-   LIVE ASSET TICKER
-   Fetches prices from Finnhub. Key is loaded via:
-     1. Admin loads Admin page → renderInstitutionSettingsSummary
-        reads finnhub_api_key from InstitutionSettings sheet and
-        calls _tickerStart(key), which stores it in localStorage.
-     2. All subsequent logins (any role, same browser) auto-start
-        from localStorage without needing Admin to log in again.
+   HOTFIX BLOCK 4 — LIVE ASSET TICKER
+   With localStorage persistence so Member users also get prices
+   after Admin has logged in once on the same browser.
    ================================================================ */
 (function(){
   var SYMS = [
@@ -169,7 +294,7 @@ window.renderInstitutionSettingsSummary = function(settings){
   ];
   var _key = "", _timer = null;
 
-  function _fmt(n, pfx, dp){
+  function _fmt(n,pfx,dp){
     if(!n) return "—";
     return pfx+(dp===0
       ? Math.round(n).toLocaleString()
@@ -194,7 +319,7 @@ window.renderInstitutionSettingsSummary = function(settings){
     track.innerHTML = "<div class='asset-ribbon-items'>"+html+"</div>"
                     + "<div class='asset-ribbon-items' aria-hidden='true'>"+html+"</div>";
   }
-  function _fetchOne(sym, i, live, renderFn){
+  function _fetchOne(sym,i,live,renderFn){
     return fetch("https://finnhub.io/api/v1/quote?symbol="
         +encodeURIComponent(sym.sym)+"&token="+encodeURIComponent(_key))
       .then(function(r){ return r.ok?r.json():null; })
@@ -220,7 +345,7 @@ window.renderInstitutionSettingsSummary = function(settings){
   window._tickerStart = function(key){
     _key = String(key||"").trim();
     if(_key){
-      try{ localStorage.setItem("_tgbfhk", _key); }catch(e){}
+      try{ localStorage.setItem("_tgbfhk",_key); }catch(e){}
       _fetchAll();
     }
   };
@@ -228,12 +353,11 @@ window.renderInstitutionSettingsSummary = function(settings){
   /* Auto-start from localStorage — works for all user roles */
   try{
     var _sk = localStorage.getItem("_tgbfhk");
-    if(_sk){ _key = _sk; setTimeout(_fetchAll, 1500); }
+    if(_sk){ _key=_sk; setTimeout(_fetchAll,1500); }
   }catch(e){}
 
   /* Placeholder dashes until a key is available */
   _render(SYMS.map(function(s){ return {label:s.label,price:"—",chg:"",dir:0}; }));
-
 })();
 </script>
 
