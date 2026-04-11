@@ -209,7 +209,13 @@ window.showPage = function(pageId){
   else if(pageId==="messages" && selectedChannelID)                   refreshMessages();
   if(pageId==="voting"   && !voteDataLoaded)                          loadVotes();
   if(pageId==="timeline" && !timelineLoaded)                          loadTimelineData();
-  if(window._gcalId && typeof window._renderCalendarEmbed==="function") window._renderCalendarEmbed(window._gcalId);
+  if(pageId==="timeline"){
+    if(!window._gcalId){
+      try{ var _sc=localStorage.getItem("_tgbgcal"); if(_sc) window._gcalId=_sc; }catch(e){}
+    }
+    if(window._gcalId && typeof window._renderCalendarEmbed==="function")
+      window._renderCalendarEmbed(window._gcalId);
+  }
   if(pageId==="sos"      && !sosLoaded)                               loadSOSAlerts();
   if(pageId==="family"   && !familyLoaded)                            loadFamilyData();
   if(pageId==="admin"    && !adminLoaded)                             loadAdmin();
