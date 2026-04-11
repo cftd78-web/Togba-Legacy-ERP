@@ -543,130 +543,71 @@ window.loadFamilyData = function(){
 };
 
 window.renderFamilyTree = function(tree){
-  var el=document.getElementById("family-tree"); if(!el) return;
-  var members=Array.isArray(tree&&tree.members)?tree.members:(Array.isArray(tree)?tree:[]);
-  if(!members.length){
-    el.innerHTML="<div style='color:var(--muted);font-size:.875rem;padding:1rem'>No family records found.</div>";
-    return;
-  }
+    var el=document.getElementById("family-tree"); if(!el) return;
+    var members=Array.isArray(tree&&tree.members)?tree.members:(Array.isArray(tree)?tree:[]);
+    if(!members.length){
+      el.innerHTML="<div style='color:var(--muted);font-size:.875rem;padding:1rem'>No family records found.</div>";
+      return;
+    }
 
-  /* ── Build maps ── */
-  var map={};
-  members.forEach(function(m){ map[m.PersonID||""]=m; });
+    /* Build lookup map */
+    var map={};
+    members.forEach(function(m){ map[m.PersonID||m.personID||""]=m; });
 
-  /* Children lookup */
-  var childrenOf={};
-  members.forEach(function(m){
-    [m.FatherID,m.MotherID].forEach(function(pid){
-      if(!pid||!map[pid]) return;
-      if(!childrenOf[pid]) childrenOf[pid]=[];
-      if(childrenOf[pid].indexOf(m.PersonID)===-1)
-        childrenOf[pid].push(m.PersonID);
+    /* Group by generation */
+    var byGen={};
+    members.forEach(function(m){
+      var g=String(m.GenerationTier||m.generation||"?");
+      if(!byGen[g]) byGen[g]=[];
+      byGen[g].push(m);
     });
-  });
 
-  /* ── Group by generation ── */
-  var byGen={};
-  members.forEach(function(m){
-    var g=String(m.GenerationTier||m.generation||"?");
-    if(!byGen[g]) byGen[g]=[];
-    byGen[g].push(m);
-  });
-  var genKeys=Object.keys(byGen).sort();
-  var genLabels={"0th":"Patriarch","1st":"First Generation",
-    "2nd":"Second Generation","3rd":"Third Generation","4th":"Fourth Generation"};
+    var genLabels={"0th":"Patriarch","1st":"First Generation","2nd":"Second Generation","3rd":"Third Generation","4th":"Fourth Generation"};
 
-  /* ── Card dimensions ── */
-  var CW=160, CH=88, HGAP=12, VGAP=64;
+    el.innerHTML=Object.keys(byGen).sort().map(function(g){
+      var label=genLabels[g]||("Generation "+g);
+      var isPatriarch=(g==="0th");
 
-  /* ── Layout: assign x,y to each node ── */
-  var pos={};
-  genKeys.forEach(function(g,gi){
-    var list=byGen[g];
-    list.forEach(function(m,i){
-      pos[m.PersonID]={
-        x: i*(CW+HGAP),
-        y: gi*(CH+VGAP)
-      };
-    });
-  });
+      return "<div style='margin-bottom:1.5rem'>"
+        /* Generation header with decorative line */
+        +"<div style='display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem'>"
+        +"<div style='font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;"
+        +"color:var(--accent);white-space:nowrap'>"+escapeHtml(label)+"</div>"
+        +"<div style='flex:1;height:1px;background:var(--line)'></div>"
+        +"<div style='font-size:.58rem;color:var(--muted)'>"+byGen[g].length+" member"+(byGen[g].length!==1?"s":"")+"</div>"
+        +"</div>"
+        /* Member cards */
+        +"<div style='display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.6rem'>"
+        +byGen[g].map(function(m){
+          var name=escapeHtml(m.FullName||m.fullName||"Unknown");
+          var rel=escapeHtml(m.RelationshipToPatriarch||m.relationship||"");
+          var spouse=m.SpouseFullNameOptional?escapeHtml(m.SpouseFullNameOptional):"";
+          var country=escapeHtml(m.CountryResidence||m.country||"");
+          var photo=m.PhotoURL||m.photoURL||"";
+          var initials=(m.FullName||m.fullName||"?").split(" ").map(function(w){return w[0]||"";}).slice(0,2).join("").toUpperCase();
 
-  /* ── Calculate SVG dimensions ── */
-  var maxX=0, maxY=0;
-  Object.keys(pos).forEach(function(id){
-    maxX=Math.max(maxX, pos[id].x+CW);
-    maxY=Math.max(maxY, pos[id].y+CH);
-  });
-  var SVG_W=Math.max(maxX+20, 400);
-  var SVG_H=maxY+CH+20;
-
-  /* ── Build SVG connector lines ── */
-  var lines="";
-  members.forEach(function(m){
-    var childId=m.PersonID;
-    var cp=pos[childId]; if(!cp) return;
-    [m.FatherID,m.MotherID].forEach(function(pid){
-      var pp=pos[pid]; if(!pp) return;
-      /* Parent bottom-center → child top-center */
-      var x1=pp.x+CW/2, y1=pp.y+CH;
-      var x2=cp.x+CW/2, y2=cp.y;
-      var my=(y1+y2)/2;
-      lines+="<path d='M"+x1+","+y1+" C"+x1+","+my+" "+x2+","+my+" "+x2+","+y2+"'"
-        +" fill='none' stroke='var(--accent)' stroke-width='1.5' stroke-opacity='.35' stroke-dasharray='4 3'/>";
-    });
-  });
-
-  /* ── Build HTML cards (positioned absolutely over SVG) ── */
-  var cards="";
-  members.forEach(function(m){
-    var p=pos[m.PersonID]; if(!p) return;
-    var name=escapeHtml(m.FullName||m.fullName||"Unknown");
-    var rel=escapeHtml(m.RelationshipToPatriarch||m.relationship||"");
-    var country=escapeHtml(m.CountryResidence||m.country||"");
-    var photo=m.PhotoURL||m.photoURL||"";
-    var isPatriarch=String(m.GenerationTier||m.generation||"?")=="0th";
-    var initials=(m.FullName||m.fullName||"?").split(" ")
-      .map(function(w){return w[0]||"";}).slice(0,2).join("").toUpperCase();
-
-    var avatar=photo
-      ? "<img src='"+photo+"' style='width:1.9rem;height:1.9rem;border-radius:50%;object-fit:cover;flex-shrink:0' alt=''>"
-      : "<div style='width:1.9rem;height:1.9rem;border-radius:50%;background:var(--accent-soft);"
-        +"display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700;"
-        +"color:var(--accent);flex-shrink:0'>"+initials+"</div>";
-
-    cards+="<div style='position:absolute;left:"+p.x+"px;top:"+p.y+"px;"
-      +"width:"+CW+"px;height:"+CH+"px;"
-      +"background:var(--panel);border:1px solid var(--line);border-radius:.75rem;"
-      +"padding:.5rem .6rem;box-sizing:border-box;overflow:hidden;"
-      +(isPatriarch?"border:2px solid var(--accent);":"")+"'>"
-      +"<div style='display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem'>"
-      +avatar
-      +"<div style='min-width:0'>"
-      +"<div style='font-weight:700;color:var(--ink);font-size:.72rem;line-height:1.2;"
-        +"white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:"+(CW-60)+"px'>"+name+"</div>"
-      +(rel?"<div style='font-size:.58rem;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>"+rel+"</div>":"")
-      +"</div></div>"
-      +(country?"<div style='font-size:.58rem;color:var(--muted)'>📍 "+country+"</div>":"")
-      +"</div>";
-  });
-
-  /* ── Render: SVG lines + absolutely-positioned cards inside a relative wrapper ── */
-  el.innerHTML="<div style='overflow-x:auto;padding-bottom:.5rem'>"
-    +"<div style='position:relative;width:"+SVG_W+"px;height:"+SVG_H+"px;min-width:100%'>"
-    +"<svg style='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none' "
-      +"viewBox='0 0 "+SVG_W+" "+SVG_H+"' preserveAspectRatio='none'>"+lines+"</svg>"
-    +cards
-    +"</div></div>"
-    /* Generation legend */
-    +"<div style='display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem'>"
-    +genKeys.map(function(g){
-      return "<div style='display:flex;align-items:center;gap:.35rem;font-size:.65rem;color:var(--muted)'>"
-        +"<div style='width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:.6'></div>"
-        +escapeHtml(genLabels[g]|| ("Gen "+g))+" ("+byGen[g].length+")</div>";
-    }).join("")
-    +"</div>";
-};
-
+          return "<div class='ptv-shell' style='padding:.85rem;display:flex;flex-direction:column;gap:.35rem;"
+            +(isPatriarch?"border:2px solid var(--accent);":"")+"'>"
+            /* Avatar */
+            +"<div style='display:flex;align-items:center;gap:.5rem;margin-bottom:.2rem'>"
+            +(photo
+              ?"<img src='"+photo+"' style='width:2.2rem;height:2.2rem;border-radius:50%;object-fit:cover;flex-shrink:0' alt=''>"
+              :"<div style='width:2.2rem;height:2.2rem;border-radius:50%;background:var(--accent-soft);"
+              +"display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;"
+              +"color:var(--accent);flex-shrink:0'>"+initials+"</div>")
+            +"<div style='min-width:0'>"
+            +"<div style='font-weight:700;color:var(--ink);font-size:.82rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>"+name+"</div>"
+            +(rel?"<div style='font-size:.62rem;color:var(--accent)'>"+rel+"</div>":"")
+            +"</div></div>"
+            /* Details */
+            +(spouse?"<div style='font-size:.68rem;color:var(--muted)'><span style='color:var(--ink);font-weight:600'>+</span> "+spouse+"</div>":"")
+            +(country?"<div style='font-size:.62rem;color:var(--muted)'>📍 "+country+"</div>":"")
+            +(m.Occupation||m.occupation?"<div style='font-size:.62rem;color:var(--muted)'>"+escapeHtml(m.Occupation||m.occupation)+"</div>":"")
+            +"</div>";
+        }).join("")
+        +"</div></div>";
+    }).join("");
+  };
 
 window.saveFamilyMember = function(){
   var payload={
