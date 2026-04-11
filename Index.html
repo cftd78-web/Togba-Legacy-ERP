@@ -441,5 +441,583 @@ window.renderInstitutionSettingsSummary = function(settings){
 })();
 </script>
 
+<script>
+/* ================================================================
+   HOTFIX BLOCK 7 — MESSAGING WHATSAPP STYLE
+   Runs LAST — safe to override renderChannelList and add helpers.
+   No overrides anywhere else (Page_Messages.html is HTML-only).
+   ================================================================ */
+(function(){
+
+  /* ── Tab switcher ── */
+  window.msgTab = function(tab){
+    ["updates","calls","chats"].forEach(function(t){
+      var pnl = document.getElementById("msgtab-content-"+t);
+      var btn = document.getElementById("msgtab-btn-"+t);
+      var active = t===tab;
+      if(pnl) pnl.style.display = active ? "block" : "none";
+      if(btn){
+        btn.style.color = active ? "var(--accent)" : "var(--muted)";
+        var icon = btn.querySelector(".material-icons-round");
+        if(icon) icon.style.color = active ? "var(--accent)" : "var(--muted)";
+      }
+    });
+  };
+
+  /* ── Show/hide bottom tab bar when Messages page becomes active ──
+     Uses MutationObserver so we NEVER touch showPage (safe for login) ── */
+  (function(){
+    function _watchPage(){
+      var msgPage = document.getElementById("page-messages"); if(!msgPage) return;
+      var tabs    = document.getElementById("msg-bottom-tabs");
+      new MutationObserver(function(){
+        var isActive = msgPage.classList.contains("active");
+        if(tabs) tabs.style.display = isActive ? "flex" : "none";
+        if(isActive) msgTab("chats");
+      }).observe(msgPage, {attributes:true, attributeFilter:["class"]});
+    }
+    /* DOM is ready since this script is at bottom of body */
+    _watchPage();
+  })();
+
+  /* ── Open full-screen thread (mobile) ── */
+  window.openMsgThread = function(){
+    var t = document.getElementById("msg-thread");
+    if(t) t.style.display = "flex";
+  };
+  window.closeMsgThread = function(){
+    var t = document.getElementById("msg-thread");
+    if(t) t.style.display = "none";
+  };
+
+  /* ── WhatsApp-style channel list ── */
+  window.renderChannelList = function(){
+    var el = document.getElementById("channel-list"); if(!el) return;
+    if(!userChannels.length){
+      el.innerHTML = "<div style='padding:.75rem 1rem;color:var(--muted);font-size:.8rem'>No channels yet. Create or join one below.</div>";
+      return;
+    }
+    el.innerHTML = userChannels.map(function(c){
+      var active  = c.ChannelID === selectedChannelID;
+      var initials= (c.Name||c.ChannelID||"?").slice(0,2).toUpperCase();
+      var preview = escapeHtml((c.LastMessage||c.lastMessage||c.Type||"").slice(0,55));
+      var unread  = Number(c.UnreadCount||c.unreadCount||0);
+      return "<div onclick=\"selectChannel('"+escapeHtml(c.ChannelID)+"')\""
+        +" style='display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;"
+          +"cursor:pointer;border-bottom:1px solid var(--line);"
+          +"background:"+(active?"var(--accent-soft)":"var(--panel)")+"'>"
+        +"<div style='width:46px;height:46px;border-radius:50%;background:var(--accent-soft);"
+          +"display:flex;align-items:center;justify-content:center;font-weight:700;"
+          +"font-size:.82rem;color:var(--accent);flex-shrink:0'>"+initials+"</div>"
+        +"<div style='flex:1;min-width:0'>"
+        +"<div style='font-weight:600;color:var(--ink);font-size:.875rem;white-space:nowrap;"
+          +"overflow:hidden;text-overflow:ellipsis'>"+escapeHtml(c.Name||c.ChannelID)+"</div>"
+        +(preview?"<div style='font-size:.75rem;color:var(--muted);white-space:nowrap;"
+          +"overflow:hidden;text-overflow:ellipsis'>"+preview+"</div>":"")
+        +"</div>"
+        +(unread?"<div style='min-width:20px;height:20px;border-radius:9999px;"
+          +"background:var(--accent);color:#fff;font-size:.62rem;font-weight:700;"
+          +"display:flex;align-items:center;justify-content:center;padding:0 5px;flex-shrink:0'>"
+          +unread+"</div>":"")
+        +"</div>";
+    }).join("");
+    if(!selectedChannelID && userChannels.length) selectChannel(userChannels[0].ChannelID);
+  };
+
+  /* ── Override selectChannel to open full-screen thread on mobile ── */
+  var _origSel = window.selectChannel;
+  window.selectChannel = function(channelId){
+    selectedChannelID = channelId;
+    var ch = userChannels.find(function(c){ return c.ChannelID===channelId; });
+    _setText("message-channel-title", ch?(ch.Name||channelId):channelId);
+    renderChannelList();
+    refreshMessages();
+    /* Mobile: open full-screen thread */
+    if(window.innerWidth < 768) openMsgThread();
+  };
+
+  /* ── Send family update ── */
+  window.sendFamilyUpdate = function(){
+    var body = ((document.getElementById("update-input")||{}).value||"").trim();
+    if(!body){ setMessageError("Update cannot be empty."); return; }
+    if(!selectedChannelID){ setMessageError("Select a channel in Chats first."); return; }
+    setMessageError("");
+    google.script.run
+      .withSuccessHandler(function(res){
+        if(res&&res.success){
+          var ui=document.getElementById("update-input"); if(ui) ui.value="";
+        } else { setMessageError((res&&res.message)||"Failed."); }
+      })
+      .withFailureHandler(function(err){ setMessageError((err&&err.message)||"Failed."); })
+      .sendMessage(token, selectedChannelID, body, "");
+  };
+
+  /* ── refreshMessages — handle both array and object responses ── */
+  window.refreshMessages = function(){
+    if(!selectedChannelID) return;
+    setMessageError("");
+    google.script.run
+      .withSuccessHandler(function(res){
+        var msgs = Array.isArray(res) ? res
+          : Array.isArray(res&&res.messages) ? res.messages : [];
+        var sent = Array.isArray(res&&res.sent) ? res.sent : [];
+        renderMessageHistory(msgs);
+        _renderSentMessages(sent);
+      })
+      .withFailureHandler(function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        setMessageError((err&&err.message)||"Failed to load messages.");
+      })
+      .getMessages(token, selectedChannelID);
+  };
+
+})();
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Togba Legacy ERP</title>
+<?!= include('Styles') ?>
+</head>
+<body>
+<?!= include('Login') ?>
+<div id="view-app" class="hidden">
+  <?!= include('Sidebar') ?>
+  <div id="main-wrap">
+    <?!= include('App_Topbar') ?>
+    <div class="app-shell">
+      <?!= include('Page_Home') ?>
+      <?!= include('Page_Finance') ?>
+      <?!= include('Page_Projects') ?>
+      <?!= include('Page_Messages') ?>
+      <?!= include('Page_SOS') ?>
+      <?!= include('Page_Voting') ?>
+      <?!= include('Page_Timeline') ?>
+      <?!= include('Page_Family') ?>
+      <?!= include('Page_Admin') ?>
+      <?!= include('Page_Documents') ?>
+    </div><!-- /app-shell -->
+    <?!= include('App_BottomNav') ?>
+  </div><!-- /main-wrap -->
+</div><!-- /view-app -->
+<?!= include('JS_Theme') ?>
+<?!= include('JS_Sidebar') ?>
+<?!= include('JS_Core') ?>
+<?!= include('JS_FinanceFix') ?>
+<?!= include('JS_Ticker') ?>
+<?!= include('JS_MessageFix') ?>
+<?!= include('JS_Blocks') ?>
+
+<script>
+/* ================================================================
+   HOTFIX BLOCK 1 — MESSAGING
+   ================================================================ */
+(function(){
+  window.renderChannelList = function(){
+    var el = document.getElementById("channel-list"); if(!el) return;
+    if(!userChannels.length){
+      el.innerHTML = "<div style='color:var(--muted);font-size:.8rem'>No channels.</div>";
+      return;
+    }
+    el.innerHTML = userChannels.map(function(c){
+      var active = c.ChannelID === selectedChannelID;
+      var style = "display:block;width:100%;text-align:left;"
+        + "cursor:pointer;padding:.6rem .75rem;border-radius:.6rem;"
+        + "border:1px solid var(--line);margin-bottom:3px;"
+        + (active
+            ? "background:var(--accent-soft);border-color:var(--accent);color:var(--accent);"
+            : "background:var(--panel-alt);color:var(--ink);");
+      var over = "if(this.dataset.active!=='1'){this.style.background='var(--accent-soft)';this.style.borderColor='var(--accent)';this.style.color='var(--accent)';}";
+      var out  = "if(this.dataset.active!=='1'){this.style.background='var(--panel-alt)';this.style.borderColor='var(--line)';this.style.color='var(--ink)';}";
+      return "<button onclick=\"selectChannel('"+escapeHtml(c.ChannelID)+"')\" "
+        + "data-active=\""+(active?"1":"0")+"\" "
+        + "onmouseover=\""+over+"\" onmouseout=\""+out+"\" "
+        + "style=\""+style+"\">"
+        + "<div style='font-weight:600;font-size:.8rem'>"+escapeHtml(c.Name||c.ChannelID)+"</div>"
+        + "<div style='font-size:.68rem;color:var(--muted)'>"+escapeHtml(c.Type||"")+"</div>"
+        + "</button>";
+    }).join("");
+    if(!selectedChannelID && userChannels.length){
+      selectChannel(userChannels[0].ChannelID);
+    }
+  };
+
+  window.refreshMessages = function(){
+    if(!selectedChannelID) return;
+    setMessageError("");
+    google.script.run
+      .withSuccessHandler(function(res){
+        var msgs = Array.isArray(res) ? res
+          : Array.isArray(res&&res.messages) ? res.messages : [];
+        var sent = Array.isArray(res&&res.sent) ? res.sent : [];
+        renderMessageHistory(msgs);
+        _renderSentMessages(sent);
+      })
+      .withFailureHandler(function(err){
+        if(isSessionExpiredError(err)){ onServerFailure(err); return; }
+        setMessageError((err&&err.message)||"Failed to load messages.");
+      })
+      .getMessages(token, selectedChannelID);
+  };
+})();
+</script>
+
+<script>
+/* ================================================================
+   HOTFIX BLOCK 2 — HOME DASHBOARD SNAPSHOT RENDERERS
+   ================================================================ */
+(function(){
+
+  window.renderHomeFinanceSummary = function(data){
+    var el = document.getElementById("home-finance-snapshot"); if(!el) return;
+    var tc = (data.totals&&data.totals.totalContributions) || data.totalContributions || 0;
+    var tl = (data.founderLocks&&data.founderLocks.totalLocked) || data.totalLocked || 0;
+    var tp = (data.projection&&data.projection.totalProjected) || data.totalProjected || 0;
+    function fc(n){ return "$"+Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    el.innerHTML = "<strong>"+fc(tc)+"</strong> raised"
+      +" &middot; <strong>"+fc(tl)+"</strong> locked"
+      +" &middot; <strong>"+fc(tp)+"</strong> projected";
+
+    var canvas = document.getElementById("financeChart"); if(!canvas) return;
+    var empty  = document.getElementById("home-chart-empty");
+    if(window.financeChartInstance){
+      window.financeChartInstance.destroy();
+      window.financeChartInstance = null;
+    }
+    var contrib = Number(tc), locked = Number(tl);
+    if(!contrib && !locked){
+      if(empty) empty.classList.remove("hidden");
+      return;
+    }
+    if(empty) empty.classList.add("hidden");
+    var isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme:dark)").matches;
+    window.financeChartInstance = new Chart(canvas.getContext("2d"), {
+      type: "doughnut",
+      data: {
+        labels: ["Contributions","Locked Capital"],
+        datasets: [{ data:[contrib,locked], backgroundColor:["#2563eb","#4edea3"], borderWidth:0 }]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false, cutout:"70%",
+        plugins:{ legend:{ position:"bottom",
+          labels:{ color:isDark?"#e2e8f0":"#0f172a", font:{size:11} }
+        }}
+      }
+    });
+  };
+
+  window.renderHomeProjectSnapshot = function(data){
+    var el = document.getElementById("home-project-snapshot"); if(!el) return;
+    var projects = Array.isArray(data.projects) ? data.projects : [];
+    var total    = projects.length;
+    var active   = projects.filter(function(p){ return /in.progress|active/i.test(p.Status||""); }).length;
+    var planning = projects.filter(function(p){ return /planning/i.test(p.Status||""); }).length;
+    var done     = projects.filter(function(p){ return /complet|done/i.test(p.Status||""); }).length;
+    var tasks    = projects.reduce(function(s,p){ return s+(p.tasks?p.tasks.length:0); }, 0);
+    if(!total){ el.innerHTML = "No projects yet."; return; }
+    var parts = ["<strong>"+total+"</strong> total"];
+    if(active)   parts.push("<strong>"+active+"</strong> active");
+    if(planning) parts.push("<strong>"+planning+"</strong> planning");
+    if(done)     parts.push("<strong>"+done+"</strong> done");
+    if(tasks)    parts.push("<strong>"+tasks+"</strong> task"+(tasks!==1?"s":""));
+    el.innerHTML = parts.join(" &middot; ");
+  };
+
+  window.renderHomeVoteSnapshot = function(data){
+    var el = document.getElementById("home-vote-snapshot"); if(!el) return;
+    var votes = Array.isArray(data.votes) ? data.votes : [];
+    var open   = votes.filter(function(v){ return /open/i.test(v.Status||""); });
+    var closed = votes.filter(function(v){ return /closed|done|passed|rejected/i.test(v.Status||""); });
+    if(!votes.length){ el.innerHTML = "No proposals yet."; return; }
+    var html = "<div style='display:flex;gap:1.2rem;margin-bottom:.5rem'>"
+      +"<div><div style='font-size:1.1rem;font-weight:800;color:var(--ink)'>"+open.length+"</div>"
+      +"<div style='font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em'>Open</div></div>"
+      +"<div><div style='font-size:1.1rem;font-weight:800;color:var(--ink)'>"+votes.length+"</div>"
+      +"<div style='font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em'>Total</div></div>"
+      +"<div><div style='font-size:1.1rem;font-weight:800;color:var(--ink)'>"+closed.length+"</div>"
+      +"<div style='font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em'>Closed</div></div>"
+      +"</div>";
+    var shown = open.slice(0,2);
+    if(shown.length){
+      html += shown.map(function(v){
+        return "<div style='font-size:.72rem;padding:.3rem 0;border-top:1px solid var(--line);"
+          +"white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)'>"
+          +"<span style='display:inline-block;width:6px;height:6px;border-radius:50%;"
+          +"background:#f59e0b;margin-right:.4rem;vertical-align:middle'></span>"
+          +escapeHtml(v.Title||"Untitled proposal")+"</div>";
+      }).join("");
+    }
+    el.innerHTML = html;
+  };
+
+  window.renderHomeTimelineSnapshot = function(data){
+    var snap = document.getElementById("home-timeline-snapshot");
+    if(snap){
+      var upcoming = Array.isArray(data.upcoming) ? data.upcoming : [];
+      var next30 = upcoming.filter(function(e){
+        if(!e.NextOccurrence) return false;
+        var days = Math.floor((new Date(e.NextOccurrence)-new Date())/86400000);
+        return days>=0 && days<=30;
+      }).length;
+      var nextDate = upcoming.length ? formatDate(upcoming[0].NextOccurrence) : "—";
+      snap.innerHTML = "<strong>"+next30+"</strong> event"+(next30!==1?"s":"")+" in next 30 days"
+        +" &middot; Next: <strong>"+nextDate+"</strong>";
+    }
+    var act = document.getElementById("home-activity-list"); if(!act) return;
+    var hist = Array.isArray(data.historical) ? data.historical : [];
+    if(!hist.length){
+      act.innerHTML = "<div style='color:var(--muted);font-size:.875rem'>No recent events.</div>";
+      return;
+    }
+    act.innerHTML = hist.slice(0,5).map(function(e){
+      var d = e.EventDate
+        ? new Date(e.EventDate).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})
+        : "";
+      return "<div style='padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.8rem'>"
+        +"<div style='color:var(--ink);font-weight:600'>"
+        +escapeHtml(e.Title||e.title||"Event")+"</div>"
+        +"<div style='color:var(--muted);font-size:.68rem'>"+d
+        +(e.EventType?" &middot; "+escapeHtml(e.EventType):"")+"</div>"
+        +"</div>";
+    }).join("");
+  };
+
+})();
+</script>
+
+<script>
+/* ================================================================
+   HOTFIX BLOCK 3 — INSTITUTION SETTINGS + CALENDAR
+   ================================================================ */
+
+/* Hardcode calendar ID — visible for all users while dev bypass active.
+   Remove once Admin login works without dev bypass. */
+window._gcalId = "ef666a1fd28b250bedbb85add971169e871c0a90cf8624e5a610ee5723b2704c@group.calendar.google.com";
+try{ localStorage.setItem("_tgbgcal", window._gcalId); }catch(e){}
+if(typeof window._renderCalendarEmbed==="function") window._renderCalendarEmbed(window._gcalId);
+
+window.renderInstitutionSettingsSummary = function(settings){
+  var entries = Array.isArray(settings&&settings.entries) ? settings.entries : [];
+  entries.forEach(function(e){
+    var k = String(e.key||e.Key||"").toLowerCase().replace(/[_\- ]/g,"");
+    var v = String(e.value||e.Value||"").trim();
+    if(k==="googlecalendarid"||k==="gcalendarid"||k==="calendarid"
+       ||k==="familycalendarid"||k==="gcalid"||k==="familygooglecalendarid"){
+      window._gcalId = v;
+      try{ localStorage.setItem("_tgbgcal", v); }catch(e){}
+      if(typeof window._renderCalendarEmbed==="function") window._renderCalendarEmbed(v);
+    }
+    if(k==="finnhubapikey"||k==="marketapikey"||k==="tickerapikey"){
+      if(typeof window._tickerStart==="function") window._tickerStart(v);
+    }
+  });
+  var el = document.getElementById("admin-inst-settings-summary"); if(!el) return;
+  if(!entries.length){
+    el.innerHTML = "<div style='color:var(--muted);font-size:.875rem'>No institution settings.</div>";
+    return;
+  }
+  var sensitive = ["apikey","password","secret","token"];
+  el.innerHTML = entries.map(function(e){
+    var k = String(e.SettingKey||e.key||e.Key||"").replace(/&/g,"&amp;");
+    var v = String(e.SettingValue||e.value||e.Value||"—");
+    var mask = sensitive.some(function(s){ return k.toLowerCase().indexOf(s)!==-1; });
+    return "<div class='module-stat'><span>"+k+"</span>"
+      +"<span style='color:var(--ink);font-size:.75rem'>"
+      +(mask?"••••••••":v.replace(/&/g,"&amp;").replace(/</g,"&lt;"))
+      +"</span></div>";
+  }).join("");
+};
+</script>
+
+<script>
+/* ================================================================
+   HOTFIX BLOCK 4 — LIVE ASSET TICKER
+   ================================================================ */
+(function(){
+  var SYMS = [
+    {label:"S&P 500",  sym:"SPY",             pfx:"",  dp:2},
+    {label:"NASDAQ",   sym:"QQQ",             pfx:"",  dp:2},
+    {label:"GOLD",     sym:"OANDA:XAU_USD",   pfx:"$", dp:2},
+    {label:"BTC/USD",  sym:"BINANCE:BTCUSDT", pfx:"$", dp:0},
+    {label:"EUR/USD",  sym:"OANDA:EUR_USD",   pfx:"",  dp:4},
+    {label:"WTI",      sym:"OANDA:USOIL_USD", pfx:"$", dp:2}
+  ];
+  var _key = "", _timer = null;
+
+  function _fmt(n,pfx,dp){
+    if(!n) return "—";
+    return pfx+(dp===0
+      ? Math.round(n).toLocaleString()
+      : Number(n).toLocaleString(undefined,{minimumFractionDigits:dp,maximumFractionDigits:dp}));
+  }
+  function _pct(dp){ var n=Number(dp)||0; return (n>0?"+":"")+n.toFixed(2)+"%"; }
+  function _arrow(dir){
+    return dir>0  ? "<span style='color:var(--green)'>▲ </span>"
+         : dir<0  ? "<span style='color:var(--red)'>▼ </span>"
+                  : "<span style='color:var(--muted)'>— </span>";
+  }
+  function _render(items){
+    var track = document.getElementById("ticker-track"); if(!track) return;
+    var html = items.map(function(t){
+      var col = t.dir>0?"var(--green)":t.dir<0?"var(--red)":"var(--muted)";
+      return "<div class='asset-ticker'>"
+        +"<span class='asset-ticker-label'>"+t.label+"</span>"
+        +"<span class='asset-ticker-val'>"+t.price+"</span>"
+        +"<span class='asset-ticker-chg' style='color:"+col+"'>"+_arrow(t.dir)+t.chg+"</span>"
+        +"</div>";
+    }).join("");
+    track.innerHTML = "<div class='asset-ribbon-items'>"+html+"</div>"
+                    + "<div class='asset-ribbon-items' aria-hidden='true'>"+html+"</div>";
+  }
+  function _fetchOne(sym,i,live,renderFn){
+    return fetch("https://finnhub.io/api/v1/quote?symbol="
+        +encodeURIComponent(sym.sym)+"&token="+encodeURIComponent(_key))
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(d){
+        if(d&&d.c){ var dir=d.dp>0?1:d.dp<0?-1:0;
+          live[i]={label:sym.label,price:_fmt(d.c,sym.pfx,sym.dp),chg:_pct(d.dp),dir:dir}; }
+        renderFn(live);
+      }).catch(function(){ renderFn(live); });
+  }
+  function _fetchAll(){
+    if(!_key) return;
+    var live = SYMS.map(function(s){ return {label:s.label,price:"…",chg:"",dir:0}; });
+    var chain = Promise.resolve();
+    SYMS.forEach(function(sym,i){
+      chain = chain
+        .then(function(){ return new Promise(function(res){ setTimeout(res,i*250); }); })
+        .then(function(){ return _fetchOne(sym,i,live,_render); });
+    });
+    clearTimeout(_timer);
+    _timer = setTimeout(_fetchAll, 90000);
+  }
+
+  window._tickerStart = function(key){
+    _key = String(key||"").trim();
+    if(_key){
+      try{ localStorage.setItem("_tgbfhk",_key); }catch(e){}
+      _fetchAll();
+    }
+  };
+
+  try{
+    var _sk = localStorage.getItem("_tgbfhk");
+    if(_sk){ _key=_sk; setTimeout(_fetchAll,1500); }
+  }catch(e){}
+
+  _render(SYMS.map(function(s){ return {label:s.label,price:"—",chg:"",dir:0}; }));
+})();
+</script>
+
+<script>
+/* ================================================================
+   HOTFIX BLOCK 5 — MOBILE SIDEBAR
+   Must run AFTER JS_Sidebar so it wins over its toggleSidebar.
+   App_Topbar script runs too early (before JS_Sidebar loads) so
+   the override belongs here instead.
+   ================================================================ */
+(function(){
+  function _ensureOverlay(){
+    if(document.getElementById("sidebar-overlay")) return;
+    var o=document.createElement("div");
+    o.id="sidebar-overlay";
+    o.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:49;display:none;";
+    o.onclick=function(){ _closeM(); };
+    document.body.appendChild(o);
+  }
+  function _openM(){
+    var s=document.getElementById("sidebar");
+    var o=document.getElementById("sidebar-overlay");
+    if(s){ s.style.display="flex"; s.style.zIndex="50"; }
+    if(o) o.style.display="block";
+  }
+  function _closeM(){
+    var s=document.getElementById("sidebar");
+    var o=document.getElementById("sidebar-overlay");
+    if(s) s.style.removeProperty("display");
+    if(o) o.style.display="none";
+  }
+
+  /* Override toggleSidebar — runs AFTER JS_Sidebar so this wins */
+  var _origToggle=window.toggleSidebar;
+  window.toggleSidebar=function(){
+    if(window.innerWidth<768){
+      _ensureOverlay();
+      var s=document.getElementById("sidebar");
+      var open=s&&s.style.display==="flex";
+      if(open) _closeM(); else _openM();
+    } else {
+      if(typeof _origToggle==="function") _origToggle();
+    }
+  };
+
+  /* Close sidebar when a nav item is tapped on mobile */
+  document.addEventListener("click",function(e){
+    if(window.innerWidth>=768) return;
+    if(e.target.closest(".sidebar-item")) setTimeout(_closeM,80);
+  });
+
+  /* Set role label and welcome name in topbar after login */
+  var _origInit=window.initApp;
+  window.initApp=function(){
+    if(typeof _origInit==="function") _origInit();
+    var lbl=document.getElementById("topbar-role-label");
+    if(lbl&&window.currentUser) lbl.innerText=currentUser.role||"";
+    var wn=document.getElementById("welcome-name");
+    if(wn&&window.currentUser) wn.innerText=currentUser.name||"Welcome";
+  };
+})();
+</script>
+
+
+<script>
+/* ================================================================
+   HOTFIX BLOCK 6 — TIMELINE EVENT WIRING
+   Makes timeline events clickable with detail drill-down panel.
+   Wraps JS_Blocks renderTimelineList to use the clickable version
+   defined in Page_Timeline.html.
+   ================================================================ */
+(function(){
+  /* Patch the timeline render path after JS_Blocks loads */
+  var _origLoad = window.loadTimelineData;
+  window.loadTimelineData = function(){
+    if(typeof _origLoad === "function") _origLoad();
+  };
+
+  /* Override renderTimelineList from JS_Blocks if it exists */
+  var _patchInterval = setInterval(function(){
+    if(typeof window.renderTimelineList === "function"){
+      var _orig = window.renderTimelineList;
+      window.renderTimelineList = function(events){
+        /* Call original for history/upcoming panels */
+        if(typeof _orig === "function") _orig(events);
+        /* Also render unified list with click support */
+        if(typeof window._renderTimelineEvents === "function"){
+          var all = Array.isArray(events) ? events
+            : [].concat(
+                Array.isArray(events&&events.historical) ? events.historical : [],
+                Array.isArray(events&&events.upcoming)   ? events.upcoming   : [],
+                Array.isArray(events&&events.recent)     ? events.recent     : []
+              );
+          window._timelineEventsCache = all;
+          window._renderTimelineEvents(all, "timeline-list");
+        }
+      };
+      clearInterval(_patchInterval);
+    }
+  }, 500);
+  /* Give up after 10s if JS_Blocks never defines it */
+  setTimeout(function(){ clearInterval(_patchInterval); }, 10000);
+})();
+</script>
+
 </body>
 </html>
