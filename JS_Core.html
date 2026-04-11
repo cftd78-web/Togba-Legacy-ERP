@@ -57,7 +57,6 @@ function onServerFailure(err){
 function _setText(id,v){ var e=document.getElementById(id); if(e) e.innerText=v; }
 function _setHtml(id,v){ var e=document.getElementById(id); if(e) e.innerHTML=v; }
 function _isDark(){
-  /* Falls back gracefully when no theme system is present */
   return window.matchMedia&&window.matchMedia("(prefers-color-scheme:dark)").matches;
 }
 
@@ -202,7 +201,6 @@ window.showPage = function(pageId){
   _updateBottomNav(pageId);
   if(typeof window._updateSidebarNav==="function") window._updateSidebarNav(pageId);
   window.scrollTo(0,0);
-  /* Auto-load guards — prevent redundant server calls */
   if(pageId==="finance"  && !financeLoaded)                           loadFinanceDashboard();
   if(pageId==="projects" && !projectsLoaded)                          loadProjects();
   if(pageId==="messages" && (!userChannels.length||!selectedChannelID)) loadUserChannels();
@@ -542,6 +540,17 @@ window.loadFamilyData = function(){
     .getFamilyTree(token);
 };
 
+/* ── FAMILY TREE — fixed version ──────────────────────────────────
+   Fixes vs previous:
+   1. Generation labels work for BOTH numeric ("1","2") and ordinal
+      ("0th","1st") GenerationTier values from the sheet
+   2. Patriarch detected by: lowest generation key OR
+      RelationshipToPatriarch containing "patriarch" (case-insensitive)
+   3. Fallback connecting lines: when FatherID/MotherID are empty,
+      draws lines from each member to the centroid of the generation
+      above — showing visual hierarchy without needing parent data
+   4. Line colour uses CSS variable so it adapts to dark/light mode
+   ─────────────────────────────────────────────────────────────── */
 window.renderFamilyTree = function(tree){
   var el=document.getElementById("family-tree"); if(!el) return;
   var members=Array.isArray(tree&&tree.members)?tree.members:(Array.isArray(tree)?tree:[]);
@@ -550,27 +559,51 @@ window.renderFamilyTree = function(tree){
     return;
   }
 
-  /* ── Maps ── */
+  /* ── Build ID map ── */
   var map={};
   members.forEach(function(m){ map[m.PersonID||""]=m; });
 
   /* ── Group by generation ── */
   var byGen={};
   members.forEach(function(m){
-    var g=String(m.GenerationTier||m.generation||"?");
+    var g=String(m.GenerationTier||m.generation||"1");
     if(!byGen[g]) byGen[g]=[];
     byGen[g].push(m);
   });
-  var genKeys=Object.keys(byGen).sort();
-  var genLabels={
-    "0th":"Patriarch","1st":"First Generation",
-    "2nd":"Second Generation","3rd":"Third Generation","4th":"Fourth Generation"
+
+  /* Sort generation keys — handles both "1","2","3" and "0th","1st" */
+  var genKeys=Object.keys(byGen).sort(function(a,b){
+    /* Extract leading number for sorting */
+    var na=parseInt(a,10)||0, nb=parseInt(b,10)||0;
+    if(na!==nb) return na-nb;
+    return a.localeCompare(b);
+  });
+
+  /* ── Human-readable generation label ── */
+  var ordinalLabels={
+    "0th":"Patriarch","0":"Patriarch",
+    "1st":"First Generation","1":"First Generation",
+    "2nd":"Second Generation","2":"Second Generation",
+    "3rd":"Third Generation","3":"Third Generation",
+    "4th":"Fourth Generation","4":"Fourth Generation",
+    "5th":"Fifth Generation","5":"Fifth Generation"
   };
+  function _genLabel(g){
+    return ordinalLabels[g] || ("Generation "+g);
+  }
+
+  /* ── Patriarch: lowest gen key OR marked in relationship field ── */
+  var lowestGen=genKeys[0];
+  function _isPatriarch(m){
+    var g=String(m.GenerationTier||m.generation||"");
+    var rel=String(m.RelationshipToPatriarch||m.relationship||"").toLowerCase();
+    return g===lowestGen || rel.indexOf("patriarch")!==-1 || rel.indexOf("root")!==-1;
+  }
 
   /* ── Card dimensions ── */
-  var CW=160, CH=88, HGAP=12, VGAP=72;
+  var CW=160, CH=90, HGAP=14, VGAP=72;
 
-  /* ── Assign x,y positions per generation row ── */
+  /* ── Assign (x,y) positions ── */
   var pos={};
   genKeys.forEach(function(g,gi){
     byGen[g].forEach(function(m,i){
@@ -581,18 +614,23 @@ window.renderFamilyTree = function(tree){
   /* ── SVG canvas size ── */
   var maxX=0, maxY=0;
   Object.keys(pos).forEach(function(id){
-    maxX=Math.max(maxX,pos[id].x+CW);
-    maxY=Math.max(maxY,pos[id].y+CH);
+    if(!pos[id]) return;
+    maxX=Math.max(maxX, pos[id].x+CW);
+    maxY=Math.max(maxY, pos[id].y+CH);
   });
-  var SVG_W=Math.max(maxX+20,400);
+  var SVG_W=Math.max(maxX+20, 400);
   var SVG_H=maxY+CH+20;
 
-  /* ── SVG connector lines ── */
+  /* ── Build connector lines ── */
   var lines="";
+  var hasExplicitLinks=false;
+
+  /* Pass 1: use FatherID/MotherID if populated */
   members.forEach(function(m){
     var cp=pos[m.PersonID]; if(!cp) return;
     [m.FatherID,m.MotherID].forEach(function(pid){
       if(!pid||!pos[pid]) return;
+      hasExplicitLinks=true;
       var pp=pos[pid];
       var x1=pp.x+CW/2, y1=pp.y+CH;
       var x2=cp.x+CW/2, y2=cp.y;
@@ -600,12 +638,41 @@ window.renderFamilyTree = function(tree){
       lines+="<path d='M"+x1+","+y1
         +" C"+x1+","+my+" "+x2+","+my+" "+x2+","+y2+"'"
         +" fill='none' stroke='var(--accent)'"
-        +" stroke-width='1.5' stroke-opacity='.4'"
+        +" stroke-width='1.5' stroke-opacity='.45'"
         +" stroke-dasharray='5 3'/>";
     });
   });
 
-  /* ── Member cards ── */
+  /* Pass 2: fallback — if no explicit links, draw from each member
+     up to the centroid of the generation above */
+  if(!hasExplicitLinks && genKeys.length>1){
+    genKeys.forEach(function(g,gi){
+      if(gi===0) return; /* skip first gen — no parent gen above */
+      var parentGen=genKeys[gi-1];
+      var parentList=byGen[parentGen]||[];
+      if(!parentList.length) return;
+
+      /* Centroid x of parent generation */
+      var parentCentreX=parentList.reduce(function(s,pm){
+        return s+(pos[pm.PersonID]?pos[pm.PersonID].x+CW/2:0);
+      },0)/parentList.length;
+      var parentBottomY=(pos[parentList[0].PersonID]||{y:0}).y+CH;
+
+      byGen[g].forEach(function(m){
+        var cp=pos[m.PersonID]; if(!cp) return;
+        var x1=parentCentreX, y1=parentBottomY;
+        var x2=cp.x+CW/2,    y2=cp.y;
+        var my=(y1+y2)/2;
+        lines+="<path d='M"+x1+","+y1
+          +" C"+x1+","+my+" "+x2+","+my+" "+x2+","+y2+"'"
+          +" fill='none' stroke='var(--accent)'"
+          +" stroke-width='1.5' stroke-opacity='.3'"
+          +" stroke-dasharray='5 3'/>";
+      });
+    });
+  }
+
+  /* ── Build member cards ── */
   var cards="";
   members.forEach(function(m){
     var p=pos[m.PersonID]; if(!p) return;
@@ -613,24 +680,25 @@ window.renderFamilyTree = function(tree){
     var rel=escapeHtml(m.RelationshipToPatriarch||m.relationship||"");
     var country=escapeHtml(m.CountryResidence||m.country||"");
     var photo=m.PhotoURL||m.photoURL||"";
-    var isPatriarch=String(m.GenerationTier||m.generation||"")==="0th";
+    var patriarch=_isPatriarch(m);
     var initials=(m.FullName||m.fullName||"?")
       .split(" ").map(function(w){return w[0]||"";}).slice(0,2).join("").toUpperCase();
 
     var avatar=photo
       ? "<img src='"+photo+"' style='width:1.9rem;height:1.9rem;border-radius:50%;"
         +"object-fit:cover;flex-shrink:0' alt=''>"
-      : "<div style='width:1.9rem;height:1.9rem;border-radius:50%;background:var(--accent-soft);"
-        +"display:flex;align-items:center;justify-content:center;"
-        +"font-size:.58rem;font-weight:700;color:var(--accent);flex-shrink:0'>"
+      : "<div style='width:1.9rem;height:1.9rem;border-radius:50%;"
+        +"background:"+(patriarch?"var(--accent)":"var(--accent-soft)")+";display:flex;"
+        +"align-items:center;justify-content:center;font-size:.58rem;font-weight:700;"
+        +"color:"+(patriarch?"#fff":"var(--accent)")+";flex-shrink:0'>"
         +initials+"</div>";
 
     cards+="<div style='position:absolute;"
       +"left:"+p.x+"px;top:"+p.y+"px;"
       +"width:"+CW+"px;height:"+CH+"px;"
-      +"background:var(--panel);border-radius:.75rem;padding:.5rem .6rem;"
-      +"box-sizing:border-box;overflow:hidden;"
-      +"border:"+(isPatriarch?"2px solid var(--accent)":"1px solid var(--line)")+";'>"
+      +"background:var(--panel);border-radius:.75rem;"
+      +"padding:.5rem .6rem;box-sizing:border-box;overflow:hidden;"
+      +"border:"+(patriarch?"2px solid var(--accent)":"1px solid var(--line)")+";'>"
       +"<div style='display:flex;align-items:center;gap:.4rem;margin-bottom:.2rem'>"
       +avatar
       +"<div style='min-width:0'>"
@@ -644,26 +712,28 @@ window.renderFamilyTree = function(tree){
       +"</div>";
   });
 
-  /* ── Render tree ── */
+  /* ── Render ── */
   el.innerHTML=
     "<div style='overflow-x:auto;padding-bottom:.5rem'>"
     +"<div style='position:relative;width:"+SVG_W+"px;height:"+SVG_H+"px;min-width:100%'>"
-    +"<svg style='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none'"
-      +" viewBox='0 0 "+SVG_W+" "+SVG_H+"' preserveAspectRatio='none'>"
+    +"<svg style='position:absolute;top:0;left:0;width:"+SVG_W+"px;height:"+SVG_H+"px;"
+      +"pointer-events:none'>"
       +lines
     +"</svg>"
     +cards
     +"</div></div>"
-    /* Generation legend */
     +"<div style='display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem'>"
     +genKeys.map(function(g){
       return "<div style='display:flex;align-items:center;gap:.35rem;"
         +"font-size:.65rem;color:var(--muted)'>"
         +"<div style='width:8px;height:8px;border-radius:50%;"
           +"background:var(--accent);opacity:.6'></div>"
-        +escapeHtml(genLabels[g]||("Gen "+g))
-        +" ("+byGen[g].length+")</div>";
+        +escapeHtml(_genLabel(g))+" ("+byGen[g].length+")"
+        +"</div>";
     }).join("")
+    +(hasExplicitLinks?"":"<div style='font-size:.62rem;color:var(--muted);width:100%;margin-top:.25rem'>"
+      +"ⓘ Add FatherID / MotherID to each member for precise connecting lines."
+      +"</div>")
     +"</div>";
 };
 
@@ -728,8 +798,6 @@ window.renderAdminUserList = function(users){
 window.renderSettingsSummary = function(settings){
   var el=document.getElementById("admin-settings-summary"); if(!el) return;
   var entries=Array.isArray(settings&&settings.entries)?settings.entries:[];
-  /* Scan for calendar — do NOT reset _gcalId first (preserves value
-     already set by renderInstitutionSettingsSummary) */
   entries.forEach(function(e){
     var k=String(e.Key||e.key||"").toLowerCase().replace(/[_\- ]/g,"");
     var isCalKey = k==="googlecalendarid"||k==="gcalendarid"
@@ -1177,11 +1245,11 @@ window._renderCalendarEmbed=function(calendarId){
   if(openLink) openLink.href="https://calendar.google.com/calendar/embed?src="+encId;
   if(wrap) wrap.style.display="block";
   if(setup) setup.style.display="none";
-  /* Apply current theme filter immediately after embed loads */
+  /* Apply current theme filter after iframe loads */
   setTimeout(function(){
-    var mode = "auto";
-    try{ mode = localStorage.getItem("togba-theme") || "auto"; }catch(e){}
-    if(typeof window._applyCalendarFilter === "function")
+    var mode="auto";
+    try{ mode=localStorage.getItem("togba-theme")||"auto"; }catch(e){}
+    if(typeof window._applyCalendarFilter==="function")
       window._applyCalendarFilter(mode);
   }, 800);
 };
