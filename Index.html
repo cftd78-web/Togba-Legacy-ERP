@@ -105,12 +105,6 @@
    Extends JS_Core renderInstitutionSettingsSummary to trigger the
    live ticker and mask sensitive values like API keys.
    ================================================================ */
-/* Hardcode calendar ID so all users see the calendar regardless of role.
-   Remove this block once Admin login is working without dev bypass. */
-window._gcalId = "ef666a1fd28b250bedbb85add971169e871c0a90cf8624e5a610ee5723b2704c@group.calendar.google.com";
-try{ localStorage.setItem("_tgbgcal", window._gcalId); }catch(e){}
-if(typeof window._renderCalendarEmbed==="function") window._renderCalendarEmbed(window._gcalId);
-
 window.renderInstitutionSettingsSummary = function(settings){
   var entries = Array.isArray(settings&&settings.entries) ? settings.entries : [];
 
@@ -118,10 +112,8 @@ window.renderInstitutionSettingsSummary = function(settings){
     var k = String(e.key||e.Key||"").toLowerCase().replace(/[_\- ]/g,"");
     var v = String(e.value||e.Value||"").trim();
 
-    if(k==="googlecalendarid"||k==="gcalendarid"||k==="calendarid"
-       ||k==="familycalendarid"||k==="gcalid"||k==="familygooglecalendarid"){
+    if(k==="googlecalendarid"||k==="gcalendarid"||k==="calendarid"){
       window._gcalId = v;
-      try{ localStorage.setItem("_tgbgcal", v); }catch(e){}
       if(typeof window._renderCalendarEmbed==="function") window._renderCalendarEmbed(v);
     }
 
