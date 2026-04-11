@@ -681,6 +681,7 @@ window.renderSettingsSummary = function(settings){
       var v=String(e.Value||e.value||"").trim();
       if(v){
         window._gcalId=v;
+        try{ localStorage.setItem("_tgbgcal",v); }catch(err){}
         if(typeof window._renderCalendarEmbed==="function")
           window._renderCalendarEmbed(v);
       }
