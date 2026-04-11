@@ -1,62 +1,361 @@
 <div id="page-messages" class="page">
 
-<div class="page-header">
-<h2 class="page-heading">Messaging</h2>
-<button onclick="refreshMessages()" class="btn-refresh">Refresh</button>
+<div id="message-error" class="err-box hidden" style="margin-bottom:.5rem"></div>
+
+<!-- ══════════════════════════════════════════
+     TAB CONTENT PANELS
+══════════════════════════════════════════ -->
+
+<!-- UPDATES TAB (default hidden) -->
+<div id="msgtab-content-updates" style="display:none;padding-bottom:4rem">
+  <div style="padding:.75rem 1rem 0">
+    <div class="page-heading" style="font-size:1.4rem;margin-bottom:.25rem">Updates</div>
+  </div>
+
+  <!-- Status story circles -->
+  <div style="padding:.75rem 1rem;border-bottom:1px solid var(--line)">
+    <div class="section-label" style="margin-bottom:.5rem">Status</div>
+    <div style="display:flex;gap:.75rem;overflow-x:auto;padding-bottom:.25rem">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;flex-shrink:0">
+        <div style="width:52px;height:52px;border-radius:50%;background:var(--panel-alt);
+                    border:2px dashed var(--line);display:flex;align-items:center;justify-content:center">
+          <span class="material-icons-round" style="font-size:20px;color:var(--muted)">add</span>
+        </div>
+        <div style="font-size:.62rem;color:var(--muted)">Add status</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Channels section -->
+  <div style="padding:.75rem 1rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+      <div class="section-label" style="margin:0">Channels</div>
+      <button onclick="document.getElementById('channel-create-panel').classList.toggle('hidden')"
+        style="font-size:.72rem;padding:.25rem .65rem;border-radius:9999px;
+               border:1px solid var(--line);background:var(--panel-alt);color:var(--muted);cursor:pointer">
+        + New
+      </button>
+    </div>
+    <div id="channel-list-updates" style="display:flex;flex-direction:column;gap:.3rem"></div>
+  </div>
+
+  <!-- Post update composer -->
+  <div style="padding:.75rem 1rem;border-top:1px solid var(--line);margin-top:.5rem">
+    <div class="section-label" style="margin-bottom:.5rem">Post a family update</div>
+    <textarea id="update-input" rows="3" placeholder="Share with the family…"
+      style="width:100%;padding:.5rem .75rem;font-size:.875rem;border-radius:.6rem;
+             resize:none;box-sizing:border-box;margin-bottom:.5rem"></textarea>
+    <button onclick="sendFamilyUpdate()"
+      style="padding:.45rem 1.1rem;border-radius:.6rem;background:var(--accent);
+             color:#fff;border:none;cursor:pointer;font-weight:700;font-size:.8rem">
+      Post update
+    </button>
+  </div>
 </div>
 
-<div class="messages-shell">
+<!-- CALLS TAB (hidden) -->
+<div id="msgtab-content-calls" style="display:none;padding-bottom:4rem">
+  <div style="padding:.75rem 1rem 0">
+    <div class="page-heading" style="font-size:1.4rem;margin-bottom:.75rem">Calls</div>
+  </div>
 
-<div class="mail-panel p-4" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;">
-<h3 style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;">Channels</h3>
-<div class="grid gap-2 mb-3">
-<input id="channel-create-name" class="p-2 rounded-lg border" placeholder="New channel name" />
-<select id="channel-create-type" class="p-2 rounded-lg border"><option value="private">private</option><option value="family broadcast">family broadcast</option><option value="project">project</option></select>
-<button onclick="createChannelUI()" class="btn-primary text-sm">Create Channel</button>
-<input id="channel-join-id" class="p-2 rounded-lg border" placeholder="ChannelID to join" />
-<button onclick="joinChannelUI()" class="btn-secondary text-sm">Join Channel</button>
-</div>
-<div class="mail-section-title mb-2">Inbox</div>
-<div id="channel-list" class="space-y-2 max-h-[28vh] overflow-y-auto"></div>
-<div class="mt-3 border-t pt-3">
-<div class="mail-section-title mb-2">Sent / Outbox Directory</div>
-<div id="channel-directory" class="space-y-2 max-h-[18vh] overflow-y-auto"></div>
-</div>
+  <!-- Quick action icons like WhatsApp -->
+  <div style="display:flex;gap:.5rem;padding:.5rem 1rem 1rem;
+              border-bottom:1px solid var(--line);overflow-x:auto">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:.35rem;flex-shrink:0">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--panel-alt);
+                  display:flex;align-items:center;justify-content:center">
+        <span class="material-icons-round" style="font-size:22px;color:var(--muted)">call</span>
+      </div>
+      <div style="font-size:.65rem;color:var(--muted)">Call</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:.35rem;flex-shrink:0">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--panel-alt);
+                  display:flex;align-items:center;justify-content:center">
+        <span class="material-icons-round" style="font-size:22px;color:var(--muted)">calendar_month</span>
+      </div>
+      <div style="font-size:.65rem;color:var(--muted)">Schedule</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:.35rem;flex-shrink:0">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--panel-alt);
+                  display:flex;align-items:center;justify-content:center">
+        <span class="material-icons-round" style="font-size:22px;color:var(--muted)">dialpad</span>
+      </div>
+      <div style="font-size:.65rem;color:var(--muted)">Keypad</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:.35rem;flex-shrink:0"
+      onclick="showPage('messages');msgTab('chats')">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--panel-alt);
+                  display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <span class="material-icons-round" style="font-size:22px;color:var(--muted)">chat</span>
+      </div>
+      <div style="font-size:.65rem;color:var(--muted)">General</div>
+    </div>
+  </div>
+
+  <!-- Recent calls placeholder -->
+  <div style="padding:.75rem 1rem">
+    <div class="section-label" style="margin-bottom:.5rem">Recent</div>
+    <div style="padding:2rem;text-align:center;color:var(--muted)">
+      <span class="material-icons-round"
+        style="font-size:40px;color:var(--line);display:block;margin-bottom:.5rem">call_end</span>
+      <div style="font-size:.875rem">No recent calls.</div>
+      <div style="font-size:.78rem;margin-top:.25rem">
+        Voice and video calls require additional backend setup.
+        Use the Chats tab to message family members directly.
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="mail-panel flex flex-col min-h-[64vh]" style="background:var(--panel);border:1px solid rgba(66,71,84,.12);border-radius:.9rem;">
-<div class="mail-panel-head">
-<h3 id="message-channel-title" class="mail-section-title">Select a channel</h3>
-<button onclick="refreshMessages()" class="btn-refresh">Refresh</button>
-</div>
-<div class="p-4">
-<div id="message-error" class="hidden err-box mb-2"></div>
-<div class="mb-3">
-<input id="message-recipient-input" type="text" placeholder="To: search family member by name" class="w-full p-3 rounded-xl border" oninput="handleRecipientSearchInput()" autocomplete="off" />
-<div id="message-recipient-results" class="mt-2 space-y-1"></div>
-</div>
-<div class="grid gap-3 lg:grid-cols-5">
-<div class="lg:col-span-3">
-<div class="mail-section-title mb-2">Conversation</div>
-<div id="message-history" class="chat-pane"></div>
-</div>
-<div class="lg:col-span-2">
-<div class="mail-section-title mb-2">Sent / Outbox</div>
-<div id="message-sent-list" class="mail-pane space-y-2"></div>
-</div>
-</div>
-<div class="mt-3">
-<div class="mail-section-title mb-2">Compose Message</div>
-<div class="flex flex-col gap-2">
-<textarea id="message-input" placeholder="Write your message..." class="w-full p-3 rounded-xl border mail-compose-box min-h-[80px]"></textarea>
-<div class="flex justify-end">
-<button id="btn-send-message" onclick="sendCurrentMessage()" class="btn-primary">Send</button>
-</div>
-</div>
-</div>
-</div>
+<!-- CHATS TAB (shown by default) -->
+<div id="msgtab-content-chats" style="padding-bottom:4rem">
+  <div style="padding:.75rem 1rem 0">
+    <div class="page-heading" style="font-size:1.4rem;margin-bottom:.5rem">Chats</div>
+    <!-- Filter chips -->
+    <div style="display:flex;gap:.4rem;margin-bottom:.5rem;overflow-x:auto">
+      <div style="padding:.25rem .7rem;border-radius:9999px;background:var(--accent);
+                  color:#fff;font-size:.72rem;font-weight:600;white-space:nowrap;flex-shrink:0">All</div>
+      <div style="padding:.25rem .7rem;border-radius:9999px;background:var(--panel-alt);
+                  color:var(--muted);font-size:.72rem;white-space:nowrap;flex-shrink:0">Unread</div>
+      <div style="padding:.25rem .7rem;border-radius:9999px;background:var(--panel-alt);
+                  color:var(--muted);font-size:.72rem;white-space:nowrap;flex-shrink:0">Favourites</div>
+      <div style="padding:.25rem .7rem;border-radius:9999px;background:var(--panel-alt);
+                  color:var(--muted);font-size:.72rem;white-space:nowrap;flex-shrink:0">Groups</div>
+    </div>
+  </div>
+
+  <!-- Channel list (chat-list style) -->
+  <div id="channel-list" style="display:flex;flex-direction:column"></div>
+
+  <!-- ── Full chat thread (opens when channel selected) ── -->
+  <div id="msg-thread" style="display:none;position:fixed;inset:0;background:var(--app-bg);
+       z-index:80;display:none;flex-direction:column">
+
+    <!-- Thread header -->
+    <div style="display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;
+                background:var(--panel);border-bottom:1px solid var(--line);
+                position:sticky;top:0;z-index:2">
+      <button onclick="closeMsgThread()"
+        style="border:none;background:transparent;color:var(--accent);
+               font-size:1.1rem;cursor:pointer;padding:.25rem">←</button>
+      <div style="flex:1">
+        <div id="message-channel-title" style="font-weight:700;color:var(--ink);font-size:.9rem">
+          Channel</div>
+      </div>
+      <button onclick="refreshMessages()" class="btn-refresh" title="Refresh">↺</button>
+    </div>
+
+    <!-- Chat bubbles -->
+    <div id="message-history" class="chat-pane"
+      style="flex:1;min-height:0;overflow-y:auto;padding:.75rem">
+    </div>
+
+    <!-- Compose bar -->
+    <div style="padding:.5rem .75rem;border-top:1px solid var(--line);
+                background:var(--panel);position:sticky;bottom:0">
+      <div style="position:relative;margin-bottom:.35rem">
+        <input id="message-recipient-input" placeholder="To: (leave blank for channel)"
+          oninput="handleRecipientSearchInput()"
+          style="width:100%;padding:.35rem .6rem;font-size:.75rem;box-sizing:border-box">
+        <div id="message-recipient-results"
+          style="position:absolute;z-index:10;width:100%;background:var(--panel);
+                 border:1px solid var(--line);border-radius:.5rem;
+                 max-height:150px;overflow-y:auto;bottom:100%;left:0"></div>
+      </div>
+      <div style="display:flex;gap:.4rem;align-items:flex-end">
+        <textarea id="message-input" rows="2"
+          placeholder="Type a message…" class="mail-compose-box"
+          style="flex:1;padding:.4rem .6rem;font-size:.875rem;resize:none;border-radius:.6rem"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendCurrentMessage();}">
+        </textarea>
+        <button id="btn-send-message" onclick="sendCurrentMessage()"
+          style="padding:.5rem .9rem;border-radius:.6rem;background:var(--accent);
+                 color:#fff;border:none;cursor:pointer;font-weight:700;font-size:.8rem">
+          ➤
+        </button>
+      </div>
+    </div>
+  </div><!-- /msg-thread -->
+
+  <!-- Channel create / join panels -->
+  <div style="padding:.5rem 1rem">
+    <div style="display:flex;gap:.4rem;margin-bottom:.4rem">
+      <button onclick="document.getElementById('channel-create-panel').classList.toggle('hidden')"
+        class="btn-secondary" style="flex:1;font-size:.75rem;padding:.4rem">+ New channel</button>
+      <button onclick="document.getElementById('channel-join-panel').classList.toggle('hidden')"
+        class="btn-secondary" style="flex:1;font-size:.75rem;padding:.4rem">↗ Join by ID</button>
+    </div>
+    <div id="channel-create-panel" class="hidden"
+      style="padding:.6rem;border:1px solid var(--line);border-radius:.6rem;
+             background:var(--panel-alt);margin-bottom:.35rem">
+      <input id="channel-create-name" placeholder="Channel name"
+        style="width:100%;padding:.4rem .6rem;font-size:.8rem;margin-bottom:.35rem;box-sizing:border-box">
+      <select id="channel-create-type"
+        style="width:100%;padding:.4rem .6rem;font-size:.8rem;margin-bottom:.35rem">
+        <option value="family">Family</option>
+        <option value="group">Group</option>
+        <option value="private">Private</option>
+      </select>
+      <button onclick="createChannelUI()" class="btn-primary"
+        style="width:100%;padding:.4rem;font-size:.8rem">Create</button>
+    </div>
+    <div id="channel-join-panel" class="hidden"
+      style="padding:.6rem;border:1px solid var(--line);border-radius:.6rem;background:var(--panel-alt)">
+      <input id="channel-join-id" placeholder="Channel ID"
+        style="width:100%;padding:.4rem .6rem;font-size:.8rem;margin-bottom:.35rem;box-sizing:border-box">
+      <button onclick="joinChannelUI()" class="btn-primary"
+        style="width:100%;padding:.4rem;font-size:.8rem">Join</button>
+    </div>
+  </div>
 </div>
 
+<!-- ══════════════════════════════════════════
+     BOTTOM TAB BAR (WhatsApp-style)
+══════════════════════════════════════════ -->
+<div id="msg-bottom-tabs"
+  style="position:fixed;bottom:0;left:0;right:0;z-index:70;
+         background:var(--panel);border-top:1px solid var(--line);
+         display:none;justify-content:space-around;padding:.3rem .25rem .5rem">
+  <button onclick="msgTab('updates')" id="msgtab-updates"
+    style="display:flex;flex-direction:column;align-items:center;gap:.15rem;
+           border:none;background:transparent;cursor:pointer;padding:.3rem .5rem;
+           color:var(--muted);font-size:.62rem;font-weight:500;min-width:52px">
+    <span class="material-icons-round" style="font-size:22px">campaign</span>
+    Updates
+  </button>
+  <button onclick="msgTab('calls')" id="msgtab-calls"
+    style="display:flex;flex-direction:column;align-items:center;gap:.15rem;
+           border:none;background:transparent;cursor:pointer;padding:.3rem .5rem;
+           color:var(--muted);font-size:.62rem;font-weight:500;min-width:52px">
+    <span class="material-icons-round" style="font-size:22px">call</span>
+    Calls
+  </button>
+  <button onclick="msgTab('chats')" id="msgtab-chats"
+    style="display:flex;flex-direction:column;align-items:center;gap:.15rem;
+           border:none;background:transparent;cursor:pointer;padding:.3rem .5rem;
+           color:var(--accent);font-size:.62rem;font-weight:600;min-width:52px">
+    <span class="material-icons-round" style="font-size:22px;color:var(--accent)">chat</span>
+    Chats
+  </button>
+  <button onclick="showPage('family')" id="msgtab-you"
+    style="display:flex;flex-direction:column;align-items:center;gap:.15rem;
+           border:none;background:transparent;cursor:pointer;padding:.3rem .5rem;
+           color:var(--muted);font-size:.62rem;font-weight:500;min-width:52px">
+    <span class="material-icons-round" style="font-size:22px">person</span>
+    You
+  </button>
 </div>
+
+<script>
+/* ── Show bottom tabs when Messages page is active ── */
+(function(){
+  var _orig = window.showPage;
+  window.showPage = function(pageId){
+    if(typeof _orig==="function") _orig(pageId);
+    var tabs = document.getElementById("msg-bottom-tabs");
+    if(tabs) tabs.style.display = (pageId==="messages") ? "flex" : "none";
+  };
+})();
+
+/* ── Tab switching ── */
+window.msgTab = function(tab){
+  ["updates","calls","chats"].forEach(function(t){
+    var btn = document.getElementById("msgtab-"+t);
+    var pnl = document.getElementById("msgtab-content-"+t);
+    var active = t===tab;
+    if(btn){
+      btn.style.color = active ? "var(--accent)" : "var(--muted)";
+      var icon = btn.querySelector(".material-icons-round");
+      if(icon) icon.style.color = active ? "var(--accent)" : "var(--muted)";
+    }
+    if(pnl) pnl.style.display = active ? (t==="chats"?"block":"block") : "none";
+  });
+};
+
+/* ── Open full-screen thread ── */
+window.openMsgThread = function(channelId){
+  var thread = document.getElementById("msg-thread");
+  if(thread){ thread.style.display="flex"; }
+  selectChannel(channelId);
+};
+
+/* ── Close thread (back to channel list) ── */
+window.closeMsgThread = function(){
+  var thread = document.getElementById("msg-thread");
+  if(thread){ thread.style.display="none"; }
+};
+
+/* ── Override selectChannel to open thread on mobile ── */
+var _origSelect = window.selectChannel;
+window.selectChannel = function(channelId){
+  if(typeof _origSelect==="function") _origSelect(channelId);
+  /* On narrow screens open full-screen thread */
+  if(window.innerWidth < 768){
+    var thread = document.getElementById("msg-thread");
+    if(thread) thread.style.display="flex";
+  }
+};
+
+/* ── Override renderChannelList to use full-width chat-list style ── */
+/* This runs BEFORE the hotfix block in index.html so the hotfix still wins */
+window._msgRenderChannels = function(){
+  var el = document.getElementById("channel-list"); if(!el) return;
+  if(!userChannels.length){
+    el.innerHTML="<div style='padding:.75rem 1rem;color:var(--muted);font-size:.8rem'>No channels yet.</div>";
+    return;
+  }
+  el.innerHTML = userChannels.map(function(c){
+    var active = c.ChannelID === selectedChannelID;
+    var initials = (c.Name||c.ChannelID||"?").slice(0,2).toUpperCase();
+    var preview = escapeHtml((c.LastMessage||c.lastMessage||c.Type||"").slice(0,55));
+    var unread  = Number(c.UnreadCount||c.unreadCount||0);
+    return "<div onclick=\"openMsgThread('"+escapeHtml(c.ChannelID)+"')\""
+      +" style='display:flex;align-items:center;gap:.75rem;padding:.7rem 1rem;"
+        +"cursor:pointer;border-bottom:1px solid var(--line);"
+        +"background:"+(active?"var(--accent-soft)":"var(--panel)")+"'>"
+      /* Avatar circle */
+      +"<div style='width:46px;height:46px;border-radius:50%;background:var(--accent-soft);"
+        +"display:flex;align-items:center;justify-content:center;font-weight:700;"
+        +"font-size:.82rem;color:var(--accent);flex-shrink:0'>"+initials+"</div>"
+      /* Name + preview */
+      +"<div style='flex:1;min-width:0'>"
+      +"<div style='font-weight:600;color:var(--ink);font-size:.875rem;white-space:nowrap;"
+        +"overflow:hidden;text-overflow:ellipsis'>"+escapeHtml(c.Name||c.ChannelID)+"</div>"
+      +(preview?"<div style='font-size:.75rem;color:var(--muted);white-space:nowrap;"
+        +"overflow:hidden;text-overflow:ellipsis'>"+preview+"</div>":"")
+      +"</div>"
+      /* Unread badge */
+      +(unread?"<div style='min-width:20px;height:20px;border-radius:9999px;"
+        +"background:var(--accent);color:#fff;font-size:.62rem;font-weight:700;"
+        +"display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 5px'>"
+        +unread+"</div>":"")
+      +"</div>";
+  }).join("");
+  if(!selectedChannelID && userChannels.length){
+    selectChannel(userChannels[0].ChannelID);
+  }
+};
+
+/* Replace renderChannelList with our styled version */
+window.renderChannelList = window._msgRenderChannels;
+
+/* ── Send family update ── */
+window.sendFamilyUpdate = function(){
+  var body = ((document.getElementById("update-input")||{}).value||"").trim();
+  if(!body){ setMessageError("Update cannot be empty."); return; }
+  if(!selectedChannelID){ setMessageError("Select a channel in Chats first."); return; }
+  setMessageError("");
+  google.script.run
+    .withSuccessHandler(function(res){
+      if(res&&res.success){
+        var ui=document.getElementById("update-input"); if(ui) ui.value="";
+        setMessageError("");
+      } else { setMessageError((res&&res.message)||"Failed."); }
+    })
+    .withFailureHandler(function(err){ setMessageError((err&&err.message)||"Failed."); })
+    .sendMessage(token, selectedChannelID, body, "");
+};
+</script>
 
 </div>
