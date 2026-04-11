@@ -41,7 +41,6 @@
 <script>
 /* ================================================================
    HOTFIX BLOCK 1 — MESSAGING
-   Runs last so it wins over all earlier definitions.
    ================================================================ */
 (function(){
   window.renderChannelList = function(){
@@ -96,11 +95,9 @@
 <script>
 /* ================================================================
    HOTFIX BLOCK 2 — HOME DASHBOARD SNAPSHOT RENDERERS
-   These run AFTER JS_FinanceFix so they are the final definitions.
    ================================================================ */
 (function(){
 
-  /* ── Finance: text + donut chart ── */
   window.renderHomeFinanceSummary = function(data){
     var el = document.getElementById("home-finance-snapshot"); if(!el) return;
     var tc = (data.totals&&data.totals.totalContributions) || data.totalContributions || 0;
@@ -111,7 +108,6 @@
       +" &middot; <strong>"+fc(tl)+"</strong> locked"
       +" &middot; <strong>"+fc(tp)+"</strong> projected";
 
-    /* Draw donut — always called here, never lost to overrides */
     var canvas = document.getElementById("financeChart"); if(!canvas) return;
     var empty  = document.getElementById("home-chart-empty");
     if(window.financeChartInstance){
@@ -140,7 +136,6 @@
     });
   };
 
-  /* ── Projects: total / active / planning / done / tasks ── */
   window.renderHomeProjectSnapshot = function(data){
     var el = document.getElementById("home-project-snapshot"); if(!el) return;
     var projects = Array.isArray(data.projects) ? data.projects : [];
@@ -149,9 +144,7 @@
     var planning = projects.filter(function(p){ return /planning/i.test(p.Status||""); }).length;
     var done     = projects.filter(function(p){ return /complet|done/i.test(p.Status||""); }).length;
     var tasks    = projects.reduce(function(s,p){ return s+(p.tasks?p.tasks.length:0); }, 0);
-
     if(!total){ el.innerHTML = "No projects yet."; return; }
-
     var parts = ["<strong>"+total+"</strong> total"];
     if(active)   parts.push("<strong>"+active+"</strong> active");
     if(planning) parts.push("<strong>"+planning+"</strong> planning");
@@ -160,15 +153,12 @@
     el.innerHTML = parts.join(" &middot; ");
   };
 
-  /* ── Governance: counts + up to 2 proposal titles ── */
   window.renderHomeVoteSnapshot = function(data){
     var el = document.getElementById("home-vote-snapshot"); if(!el) return;
     var votes = Array.isArray(data.votes) ? data.votes : [];
     var open   = votes.filter(function(v){ return /open/i.test(v.Status||""); });
     var closed = votes.filter(function(v){ return /closed|done|passed|rejected/i.test(v.Status||""); });
-
     if(!votes.length){ el.innerHTML = "No proposals yet."; return; }
-
     var html = "<div style='display:flex;gap:1.2rem;margin-bottom:.5rem'>"
       +"<div><div style='font-size:1.1rem;font-weight:800;color:var(--ink)'>"+open.length+"</div>"
       +"<div style='font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em'>Open</div></div>"
@@ -177,7 +167,6 @@
       +"<div><div style='font-size:1.1rem;font-weight:800;color:var(--ink)'>"+closed.length+"</div>"
       +"<div style='font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em'>Closed</div></div>"
       +"</div>";
-
     var shown = open.slice(0,2);
     if(shown.length){
       html += shown.map(function(v){
@@ -188,11 +177,9 @@
           +escapeHtml(v.Title||"Untitled proposal")+"</div>";
       }).join("");
     }
-
     el.innerHTML = html;
   };
 
-  /* ── Timeline: events in 30 days + next event date + recent history ── */
   window.renderHomeTimelineSnapshot = function(data){
     var snap = document.getElementById("home-timeline-snapshot");
     if(snap){
@@ -230,16 +217,11 @@
 
 <script>
 /* ================================================================
-   HOTFIX BLOCK 3 — INSTITUTION SETTINGS
-   Triggers ticker and calendar from finnhub_api_key /
-   google_calendar_id in InstitutionSettings sheet.
+   HOTFIX BLOCK 3 — INSTITUTION SETTINGS + CALENDAR
    ================================================================ */
 
-/* ── CALENDAR FIX ──────────────────────────────────────────────
-   Hardcode calendar ID so the Timeline page works for ALL users
-   regardless of role (needed while dev bypass gives Member role).
-   Remove this block once Admin login is working normally.
-   ──────────────────────────────────────────────────────────── */
+/* Hardcode calendar ID — visible for all users while dev bypass active.
+   Remove once Admin login works without dev bypass. */
 window._gcalId = "ef666a1fd28b250bedbb85add971169e871c0a90cf8624e5a610ee5723b2704c@group.calendar.google.com";
 try{ localStorage.setItem("_tgbgcal", window._gcalId); }catch(e){}
 if(typeof window._renderCalendarEmbed==="function") window._renderCalendarEmbed(window._gcalId);
@@ -280,8 +262,6 @@ window.renderInstitutionSettingsSummary = function(settings){
 <script>
 /* ================================================================
    HOTFIX BLOCK 4 — LIVE ASSET TICKER
-   With localStorage persistence so Member users also get prices
-   after Admin has logged in once on the same browser.
    ================================================================ */
 (function(){
   var SYMS = [
@@ -350,14 +330,72 @@ window.renderInstitutionSettingsSummary = function(settings){
     }
   };
 
-  /* Auto-start from localStorage — works for all user roles */
   try{
     var _sk = localStorage.getItem("_tgbfhk");
     if(_sk){ _key=_sk; setTimeout(_fetchAll,1500); }
   }catch(e){}
 
-  /* Placeholder dashes until a key is available */
   _render(SYMS.map(function(s){ return {label:s.label,price:"—",chg:"",dir:0}; }));
+})();
+</script>
+
+<script>
+/* ================================================================
+   HOTFIX BLOCK 5 — MOBILE SIDEBAR
+   Must run AFTER JS_Sidebar so it wins over its toggleSidebar.
+   App_Topbar script runs too early (before JS_Sidebar loads) so
+   the override belongs here instead.
+   ================================================================ */
+(function(){
+  function _ensureOverlay(){
+    if(document.getElementById("sidebar-overlay")) return;
+    var o=document.createElement("div");
+    o.id="sidebar-overlay";
+    o.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:49;display:none;";
+    o.onclick=function(){ _closeM(); };
+    document.body.appendChild(o);
+  }
+  function _openM(){
+    var s=document.getElementById("sidebar");
+    var o=document.getElementById("sidebar-overlay");
+    if(s){ s.style.display="flex"; s.style.zIndex="50"; }
+    if(o) o.style.display="block";
+  }
+  function _closeM(){
+    var s=document.getElementById("sidebar");
+    var o=document.getElementById("sidebar-overlay");
+    if(s) s.style.removeProperty("display");
+    if(o) o.style.display="none";
+  }
+
+  /* Override toggleSidebar — runs AFTER JS_Sidebar so this wins */
+  var _origToggle=window.toggleSidebar;
+  window.toggleSidebar=function(){
+    if(window.innerWidth<768){
+      _ensureOverlay();
+      var s=document.getElementById("sidebar");
+      var open=s&&s.style.display==="flex";
+      if(open) _closeM(); else _openM();
+    } else {
+      if(typeof _origToggle==="function") _origToggle();
+    }
+  };
+
+  /* Close sidebar when a nav item is tapped on mobile */
+  document.addEventListener("click",function(e){
+    if(window.innerWidth>=768) return;
+    if(e.target.closest(".sidebar-item")) setTimeout(_closeM,80);
+  });
+
+  /* Set role label and welcome name in topbar after login */
+  var _origInit=window.initApp;
+  window.initApp=function(){
+    if(typeof _origInit==="function") _origInit();
+    var lbl=document.getElementById("topbar-role-label");
+    if(lbl&&window.currentUser) lbl.innerText=currentUser.role||"";
+    var wn=document.getElementById("welcome-name");
+    if(wn&&window.currentUser) wn.innerText=currentUser.name||"Welcome";
+  };
 })();
 </script>
 
