@@ -59,23 +59,12 @@
             : "background:var(--panel-alt);color:var(--ink);");
       var over = "if(this.dataset.active!=='1'){this.style.background='var(--accent-soft)';this.style.borderColor='var(--accent)';this.style.color='var(--accent)';}";
       var out  = "if(this.dataset.active!=='1'){this.style.background='var(--panel-alt)';this.style.borderColor='var(--line)';this.style.color='var(--ink)';}";
-      var preview=escapeHtml((c.LastMessage||c.lastMessage||"").slice(0,42));
-      var unread=Number(c.UnreadCount||c.unreadCount||0);
       return "<button onclick=\"selectChannel('"+escapeHtml(c.ChannelID)+"')\" "
         + "data-active=\""+(active?"1":"0")+"\" "
         + "onmouseover=\""+over+"\" onmouseout=\""+out+"\" "
         + "style=\""+style+"\">"
-        + "<div style='display:flex;align-items:center;justify-content:space-between;gap:.25rem'>"
-        + "<div style='font-weight:600;font-size:.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"
-        +   escapeHtml(c.Name||c.ChannelID)+"</div>"
-        + (unread?"<div style='min-width:16px;height:16px;border-radius:9999px;"
-            +"background:var(--accent);color:#fff;font-size:.58rem;font-weight:700;"
-            +"display:flex;align-items:center;justify-content:center;padding:0 4px'>"
-            +unread+"</div>":"")
-        + "</div>"
-        + "<div style='font-size:.68rem;color:var(--muted);white-space:nowrap;"
-        +   "overflow:hidden;text-overflow:ellipsis'>"
-        +   (preview||escapeHtml(c.Type||""))+"</div>"
+        + "<div style='font-weight:600;font-size:.8rem'>"+escapeHtml(c.Name||c.ChannelID)+"</div>"
+        + "<div style='font-size:.68rem;color:var(--muted)'>"+escapeHtml(c.Type||"")+"</div>"
         + "</button>";
     }).join("");
     if(!selectedChannelID && userChannels.length){
@@ -407,6 +396,48 @@ window.renderInstitutionSettingsSummary = function(settings){
     var wn=document.getElementById("welcome-name");
     if(wn&&window.currentUser) wn.innerText=currentUser.name||"Welcome";
   };
+})();
+</script>
+
+
+<script>
+/* ================================================================
+   HOTFIX BLOCK 6 — TIMELINE EVENT WIRING
+   Makes timeline events clickable with detail drill-down panel.
+   Wraps JS_Blocks renderTimelineList to use the clickable version
+   defined in Page_Timeline.html.
+   ================================================================ */
+(function(){
+  /* Patch the timeline render path after JS_Blocks loads */
+  var _origLoad = window.loadTimelineData;
+  window.loadTimelineData = function(){
+    if(typeof _origLoad === "function") _origLoad();
+  };
+
+  /* Override renderTimelineList from JS_Blocks if it exists */
+  var _patchInterval = setInterval(function(){
+    if(typeof window.renderTimelineList === "function"){
+      var _orig = window.renderTimelineList;
+      window.renderTimelineList = function(events){
+        /* Call original for history/upcoming panels */
+        if(typeof _orig === "function") _orig(events);
+        /* Also render unified list with click support */
+        if(typeof window._renderTimelineEvents === "function"){
+          var all = Array.isArray(events) ? events
+            : [].concat(
+                Array.isArray(events&&events.historical) ? events.historical : [],
+                Array.isArray(events&&events.upcoming)   ? events.upcoming   : [],
+                Array.isArray(events&&events.recent)     ? events.recent     : []
+              );
+          window._timelineEventsCache = all;
+          window._renderTimelineEvents(all, "timeline-list");
+        }
+      };
+      clearInterval(_patchInterval);
+    }
+  }, 500);
+  /* Give up after 10s if JS_Blocks never defines it */
+  setTimeout(function(){ clearInterval(_patchInterval); }, 10000);
 })();
 </script>
 
